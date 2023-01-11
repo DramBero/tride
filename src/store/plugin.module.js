@@ -18,7 +18,7 @@ const state = {
     GlobalVariable: []
   },
   parsedQuests: [],
-  test: 7
+  activeHeader: {}
 };
 
 const getters = {
@@ -30,7 +30,29 @@ const getters = {
   },
   getBooks(state) {
     return state.activePlugin.Book;
-  }
+  },
+  getDialogueSpeakerNPCs(state) {
+    return [
+      ...new Set(
+        state.activePlugin.Topic.map((topic) => topic.speaker_id).filter(
+          (speaker) => speaker
+        )
+      )
+    ];
+  },
+  getDialogueSpeakerCells(state) {
+    return [
+      ...new Set(
+        state.activePlugin.Topic.map((topic) => topic.speaker_cell).filter(
+          (speaker) => speaker
+        )
+      )
+    ];
+  },
+  getDialogueBySpeakerNPC: (state) => (npc) =>
+    state.activePlugin.Topic.filter((topic) => topic.speaker_id === npc),
+  getDialogueBySpeakerCell: (state) => (cell) =>
+    state.activePlugin.Topic.filter((topic) => topic.speaker_cell === cell)
 };
 
 const actions = {
@@ -97,7 +119,7 @@ const actions = {
 
 const mutations = {
   setActiveHeader(state, header) {
-    state.test = header;
+    state.activeHeader = header;
   },
   resetActivePlugin(state) {
     let clearedPlugin = {

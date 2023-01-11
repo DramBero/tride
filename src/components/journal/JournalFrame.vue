@@ -24,6 +24,9 @@ export default {
 .journal-frame {
   background-color: #986;
   padding: 10px;
-  max-width: 50%;
+  min-width: 500px;
+  max-width: 500px;
+  height: 100%;
+  overflow-y: scroll;
 }
 </style>

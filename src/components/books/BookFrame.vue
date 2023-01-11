@@ -1,5 +1,5 @@
 <template>
-  <div class="journal-frame">
+  <div class="book-frame">
     <BookFrameItem v-for="book in getBooks" :key="book.id" :book="book" />
   </div>
 </template>
@@ -17,9 +17,10 @@ export default {
 </script>
 
 <style>
-.journal-frame {
+.book-frame {
   background-color: #986;
   padding: 10px;
-  max-width: 50%;
+  max-width: 500px;
+  height: 100%;
 }
 </style>

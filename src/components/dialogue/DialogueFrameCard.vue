@@ -1,5 +1,5 @@
 <template>
-  <div class="dialogue-card">
+  <div class="dialogue-card" @click="openDialogueModal">
     {{ speakerId }}
   </div>
 </template>
@@ -12,6 +12,11 @@ export default {
     },
     speakerId: {
       type: String
+    }
+  },
+  methods: {
+    openDialogueModal() {
+      this.$store.commit("setDialogueModal", this.speakerId);
     }
   }
 };

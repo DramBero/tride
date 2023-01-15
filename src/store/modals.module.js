@@ -1,5 +1,6 @@
 const state = {
-  openFile: false
+  openFile: false,
+  dialogueModal: ""
 };
 
 const mutations = {
@@ -8,13 +9,20 @@ const mutations = {
   },
   hideOpenFile(state) {
     state.openFile = false;
+  },
+  hideDialogue(state) {
+    state.dialogueModal = "";
+  },
+  setDialogueModal(state, value) {
+    state.dialogueModal = value;
   }
 };
 
 const actions = {};
 
 const getters = {
-  getOpenFile: (s) => s.openFile
+  getOpenFile: (s) => s.openFile,
+  getDialogueModal: (s) => s.dialogueModal
 };
 
 export default {

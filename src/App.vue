@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <ModalMain v-show="getOpenModal" modalHide="hideOpenFile">
+    <ModalMain v-show="getOpenModal" modalHide="hideOpenFile" header="Load">
       <ModalContentUpload />
     </ModalMain>
     <CWorkspace />
@@ -15,6 +15,7 @@ import ModalContentUpload from "./components/modals/ModalContentUpload.vue";
 import ModalMain from "./components/modals/ModalMain.vue";
 import BookFrame from "./components/books/BookFrame.vue";
 import CWorkspace from "./components/CWorkspace.vue";
+import ModalContentDialogue from "./components/modals/ModalContentDialogue.vue";
 
 export default {
   name: "App",
@@ -25,7 +26,8 @@ export default {
     ModalContentUpload,
     ModalMain,
     BookFrame,
-    CWorkspace
+    CWorkspace,
+    ModalContentDialogue
   },
   computed: {
     getOpenModal() {

@@ -31,7 +31,6 @@ export default {
     },
     loadTextFromFile(ev) {
       const file = ev.target.files[0];
-      console.log(ev.target.files);
       this.fileName = ev.target.files[0].name;
       this.fileSize = this.formatBytes(ev.target.files[0].size);
       const reader = new FileReader();

@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="window">
+    <div class="window" :class="{ window_dialogue: dialogue }">
       <div class="window-header">
         <div class="window-header__left"></div>
-        <div class="window-header__name">Header</div>
+        <div class="window-header__name">{{ header }}</div>
         <div class="window-header__right">
           <div class="window-header__close" @click="closeModal">Close</div>
         </div>
@@ -18,7 +18,9 @@
 <script>
 export default {
   props: {
-    modalHide: String
+    modalHide: String,
+    header: String,
+    dialogue: Boolean
   },
   methods: {
     closeModal() {
@@ -30,11 +32,12 @@ export default {
 
 <style lang="scss">
 .window {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   width: 33%;
   height: 33%;
+  z-index: 99;
   display: flex;
   flex-direction: column;
   transform: translate(-50%, -50%);
@@ -44,6 +47,10 @@ export default {
   font-family: "Pelagiad";
   font-size: 20px;
   color: rgb(202, 165, 96);
+  &_dialogue {
+    width: 70%;
+    height: 70%;
+  }
   &-header {
     background-color: rgba(0, 0, 0, 0);
     display: flex;
@@ -76,8 +83,9 @@ export default {
   }
   &__content {
     border: 2px solid rgb(202, 165, 96);
-    padding: 5px;
+    // padding: 5px;
     height: 100%;
+    max-height: calc(100% - 35px);
   }
 }
 </style>

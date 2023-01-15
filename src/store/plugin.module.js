@@ -31,46 +31,48 @@ const getters = {
   getBooks(state) {
     return state.activePlugin.Book;
   },
-  getDialogueSpeakerNPCs(state) {
+  getDialogueSpeaker: (state) => (speakerType) => {
     return [
-      ...new Set(
-        state.activePlugin.Topic.map((topic) => topic.speaker_id).filter(
+      ...new Set([
+        ...state.activePlugin.Topic.map((topic) => topic[speakerType]).filter(
           (speaker) => speaker
-        )
-      )
+        ),
+        ...state.activePlugin.Greeting.map(
+          (topic) => topic[speakerType]
+        ).filter((speaker) => speaker),
+        ...state.activePlugin.Persuasion.map(
+          (topic) => topic[speakerType]
+        ).filter((speaker) => speaker)
+      ])
     ];
   },
-  getDialogueSpeakerCells(state) {
-    return [
-      ...new Set(
-        state.activePlugin.Topic.map((topic) => topic.speaker_cell).filter(
-          (speaker) => speaker
-        )
+  getDialogueBySpeakerNPC:
+    (state) =>
+    ([npc, speakerType, dialogueType]) =>
+      state.activePlugin[dialogueType].filter(
+        (topic) => topic[speakerType] === npc
       )
-    ];
-  },
-  getDialogueBySpeakerNPC: (state) => (npc) =>
-    state.activePlugin.Topic.filter((topic) => topic.speaker_id === npc),
-  getDialogueBySpeakerCell: (state) => (cell) =>
-    state.activePlugin.Topic.filter((topic) => topic.speaker_cell === cell)
 };
 
 const actions = {
   parseLocalPlugin({ commit, dispatch }, [plugin]) {
     commit("resetActivePlugin");
     let dialogueType;
+    let dialogueId;
     for (let entry of plugin) {
-      console.log(entry.type);
       // let dialogueId
       if (entry.type === "Header") {
         commit("setActiveHeader", [entry]);
       } else if (["Info", "Dialogue"].includes(entry.type)) {
         if (entry.type === "Dialogue") {
-          // dialogueId = entry.id
+          if (entry.id) dialogueId = entry.id;
           dialogueType = entry.dialogue_type;
-          commit("addToActiveArray", [dialogueType, entry]);
+          let dialogueEntry = { ...entry, TMP_topic: dialogueId };
+          commit("addToActiveArray", [dialogueType, dialogueEntry]);
         } else {
-          commit("addToActiveArray", [dialogueType, entry]);
+          if (entry.id) dialogueId = entry.id;
+          let dialogueEntry = { ...entry, TMP_topic: dialogueId };
+          commit("addToActiveArray", [dialogueType, dialogueEntry]);
         }
       } else {
         commit("addToActiveArray", [entry.type, entry]);

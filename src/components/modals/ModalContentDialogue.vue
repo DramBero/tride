@@ -185,7 +185,6 @@ export default {
     getSpeakerData(topicType) {
       return this.$store.getters["getDialogueBySpeaker"]([
         this.speaker,
-        "speaker_id",
         topicType
       ]);
     },

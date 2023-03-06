@@ -55,7 +55,7 @@ const getters = {
   },
   getDialogueBySpeaker:
     (state) =>
-    ([id, speakerType, dialogueType]) =>
+    ([id, dialogueType]) =>
       state.activePlugin[dialogueType].filter(
         (topic) =>
           topic["speaker_id"] === id ||

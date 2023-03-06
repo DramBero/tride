@@ -1,7 +1,10 @@
 <template>
-  <div class="quest">
+  <div class="quest" v-if="quest.entries.length">
     <div class="quest-title" @click="toggleCollapse">
       {{ quest.name }}
+    </div>
+    <div class="quest-id" @click="toggleCollapse">
+      {{ quest.id }}
     </div>
     <collapse-transition>
       <div v-show="isCollapsed">
@@ -71,6 +74,10 @@ input[type="reset"] {
     &:hover {
       color: rgb(180, 80, 60);
     }
+  }
+  &-id {
+    color: black;
+    font-size: 16px;
   }
   &-entry {
     background-color: rgba(255, 255, 255, 0.5);

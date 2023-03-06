@@ -2,7 +2,7 @@
   <div>
     <label class="text-reader">
       <input ref="file" type="file" @change="loadTextFromFile" />
-      Load file...
+      {{ active ? "Load active plugin" : "Load dependency" }}
     </label>
     {{ fileName }}
     {{ fileSize }}
@@ -11,6 +11,13 @@
 
 <script>
 export default {
+  props: {
+    active: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
   data() {
     return {
       fileName: "",
@@ -34,8 +41,13 @@ export default {
       this.fileName = ev.target.files[0].name;
       this.fileSize = this.formatBytes(ev.target.files[0].size);
       const reader = new FileReader();
-      reader.onload = (e) =>
-        this.$store.dispatch("parseLocalPlugin", [JSON.parse(e.target.result)]);
+      reader.onload = (e) => {
+        if (this.active) {
+          this.$store.dispatch("parseLocalPlugin", [
+            JSON.parse(e.target.result)
+          ]);
+        }
+      };
       reader.readAsText(file);
     }
   }
@@ -47,7 +59,8 @@ input[type="file"] {
   display: none;
 }
 .text-reader {
-  border: 1px solid #ccc;
+  border: 2px solid rgb(202, 165, 96);
+  border-radius: 2px;
   display: inline-block;
   padding: 6px 12px;
   cursor: pointer;

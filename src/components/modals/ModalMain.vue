@@ -5,7 +5,9 @@
         <div class="window-header__left"></div>
         <div class="window-header__name">{{ header }}</div>
         <div class="window-header__right">
-          <div class="window-header__close" @click="closeModal">Close</div>
+          <div class="window-header__close" @click="closeModal">
+            <icon name="times" scale="1.3"></icon>
+          </div>
         </div>
       </div>
       <div class="window__content">
@@ -16,7 +18,13 @@
 </template>
 
 <script>
+import Icon from "vue-awesome/components/Icon";
+import "vue-awesome/icons";
+
 export default {
+  components: {
+    Icon
+  },
   props: {
     modalHide: String,
     header: String,
@@ -67,10 +75,13 @@ export default {
     &__name {
       background-color: rgba(0, 0, 0, 0);
       border-radius: 2px;
-      padding: 2px 20px;
+      padding: 8px 20px;
     }
     &__close {
       color: black;
+      display: flex;
+      align-items: center;
+      height: 35px;
       position: absolute;
       border: 1px solid rgb(202, 165, 96);
       user-select: none;

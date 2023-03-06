@@ -15,7 +15,10 @@ const state = {
     Enchantment: [],
     Book: [],
     Other: [],
-    GlobalVariable: []
+    Light: [],
+    Activator: [],
+    GlobalVariable: [],
+    GameSetting: []
   },
   parsedQuests: [],
   activeHeader: {}
@@ -31,26 +34,34 @@ const getters = {
   getBooks(state) {
     return state.activePlugin.Book;
   },
-  getDialogueSpeaker: (state) => (speakerType) => {
-    return [
-      ...new Set([
-        ...state.activePlugin.Topic.map((topic) => topic[speakerType]).filter(
-          (speaker) => speaker
-        ),
-        ...state.activePlugin.Greeting.map(
-          (topic) => topic[speakerType]
-        ).filter((speaker) => speaker),
-        ...state.activePlugin.Persuasion.map(
-          (topic) => topic[speakerType]
-        ).filter((speaker) => speaker)
-      ])
-    ];
+  getActiveHeader(state) {
+    return state.activeHeader;
   },
-  getDialogueBySpeakerNPC:
+  getDialogueSpeaker: (state) => (speakerTypes) => {
+    let dialogues = [];
+    for (let speakerType of speakerTypes) {
+      const dialogueTypes = ["Topic", "Greeting", "Persuasion"];
+      for (let dialogueType of dialogueTypes) {
+        dialogues = [
+          ...dialogues,
+          ...state.activePlugin[dialogueType]
+            .map((topic) => topic[speakerType])
+            .filter((speaker) => speaker)
+        ];
+        dialogues = [...new Set(dialogues)];
+      }
+    }
+    return dialogues;
+  },
+  getDialogueBySpeaker:
     (state) =>
-    ([npc, speakerType, dialogueType]) =>
+    ([id, speakerType, dialogueType]) =>
       state.activePlugin[dialogueType].filter(
-        (topic) => topic[speakerType] === npc
+        (topic) =>
+          topic["speaker_id"] === id ||
+          topic["speaker_cell"] === id ||
+          topic["speaker_faction"] === id ||
+          topic["speaker_class"] === id
       )
 };
 
@@ -60,7 +71,7 @@ const actions = {
     let dialogueType;
     let dialogueId;
     for (let entry of plugin) {
-      // let dialogueId
+      console.log("ENTRY TYPE: ", entry.type);
       if (entry.type === "Header") {
         commit("setActiveHeader", [entry]);
       } else if (["Info", "Dialogue"].includes(entry.type)) {
@@ -143,15 +154,19 @@ const mutations = {
       Door: [],
       Container: [],
       Other: [],
+      Activator: [],
+      Light: [],
       GlobalVariable: []
     };
     state.activePlugin = clearedPlugin;
   },
   addToActiveArray(state, [destination, entry]) {
-    state.activePlugin[destination] = [
-      ...state.activePlugin[destination],
-      entry
-    ];
+    if (state.activePlugin[destination]) {
+      state.activePlugin[destination] = [
+        ...state.activePlugin[destination],
+        entry
+      ];
+    }
   },
   setParsedQuests(state, quests) {
     state.parsedQuests = quests;

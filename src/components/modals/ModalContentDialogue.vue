@@ -1,41 +1,98 @@
 <template>
   <div class="dialogue">
     <div class="dialogue-answers">
-      <div class="dialogue-answers__header">{{ currentTopic }}</div>
-      <div
-        class="dialogue-answers-answer"
-        v-for="(answer, index) in currentAnswers"
-        :key="index"
-      >
-        <div class="dialogue-answers-answer-filters">
-          <div
-            class="dialogue-answers-answer-filters__filter"
-            v-for="(filter, index) in answer.filters"
-            :key="index"
-          >
-            <span class="filter__if">if </span>
-            <span class="filter__function">{{ filter.filter_function }} </span>
-            <span class="filter__id">{{ filter.id }} </span>
-            <span class="filter__comparison"
-              >{{ parseComparison(filter.filter_comparison) }}
-            </span>
-            <span class="filter__value">{{
-              Object.values(filter.value)[0]
-            }}</span>
+      <div class="dialogue-answers__header" v-if="currentTopic">
+        {{ currentTopic }}
+        <div class="dialogue-answers__edit">
+          <icon
+            v-if="!editMode"
+            name="pen"
+            color="#E1FF00"
+            class="icon_gold"
+            scale="1"
+            @click="editMode = true"
+          ></icon>
+          <div v-else>
+            <icon
+              name="save"
+              color="#E1FF00"
+              class="icon_gold"
+              scale="1"
+              @click="editMode = false"
+            ></icon>
+            <icon
+              name="ban"
+              color="#E1FF00"
+              class="icon_gold"
+              scale="1"
+              @click="editMode = false"
+            ></icon>
+            <icon
+              name="trash"
+              color="#E1FF00"
+              class="icon_gold"
+              scale="1"
+              @click="editMode = false"
+            ></icon>
           </div>
         </div>
+      </div>
+      <div class="dialogue-answers__frame">
         <div
-          class="dialogue-answers-answer__text"
-          v-html="getHyperlinkedAnswer(answer.text)"
-          @click="handleAnswerClick($event)"
-        ></div>
-        <div class="dialogue-answers-answer-results" v-if="answer.result">
+          class="dialogue-answers-answer"
+          :class="{ 'dialogue-answers-answer_edit': editMode }"
+          v-for="(answer, index) in currentAnswers"
+          :key="index"
+        >
+          <div class="dialogue-answers-answer__ids" v-if="editMode">
+            <div class="prev-id">{{ answer.prev_id || "-" }} (before)</div>
+            <div class="curr-id">id: {{ answer.info_id }}</div>
+          </div>
           <div
-            class="dialogue-answers-answer-results__result"
-            v-for="(text, index) in answer.result.split(';')"
-            :key="index"
+            class="dialogue-answers-answer-filters"
+            v-if="answer.filters.length"
           >
-            {{ text }}
+            <div
+              class="dialogue-answers-answer-filters__filter"
+              v-for="(filter, index) in answer.filters"
+              :key="index"
+            >
+              <span class="filter__if">if </span>
+              <span class="filter__function"
+                >{{ filter.filter_function }}
+              </span>
+              <span class="filter__id">{{ filter.id }} </span>
+              <span class="filter__comparison"
+                >{{ parseComparison(filter.filter_comparison) }}
+              </span>
+              <span class="filter__value">{{
+                Object.values(filter.value)[0]
+              }}</span>
+            </div>
+            <icon
+              v-if="editMode"
+              name="plus-circle"
+              class="icon_gray"
+              scale="1.5"
+            ></icon>
+          </div>
+          <div
+            class="dialogue-answers-answer__text"
+            v-html="getHyperlinkedAnswer(answer.text)"
+            @click="handleAnswerClick($event)"
+          ></div>
+          <div class="dialogue-answers-answer-results" v-if="answer.result">
+            <div
+              class="dialogue-answers-answer-results__result"
+              v-for="(text, index) in answer.result.split(';')"
+              :key="index"
+            >
+              {{ text }}
+            </div>
+          </div>
+          <div class="dialogue-answers-answer__ids" v-if="editMode">
+            <div class="prev-id">{{ answer.info_id }} (id)</div>
+            <div class="curr-id">next id: {{ answer.next_id || "-" }}</div>
           </div>
         </div>
       </div>
@@ -74,16 +131,29 @@
 </template>
 
 <script>
+import Icon from "vue-awesome/components/Icon";
+import "vue-awesome/icons";
+
 export default {
+  components: {
+    Icon
+  },
   props: {
     speaker: String
   },
+
   data() {
     return {
       currentAnswers: [],
-      currentTopic: ""
+      currentTopic: "",
+      editMode: false
     };
   },
+
+  mounted() {
+    this.editMode = false;
+  },
+
   computed: {
     getTopics() {
       return [
@@ -103,15 +173,17 @@ export default {
       ];
     }
   },
+
   methods: {
     setCurrentAnswers(topic, topicType) {
+      if (this.editMode) return;
       this.currentAnswers = this.getSpeakerData(topicType).filter(
         (val) => val.TMP_topic == topic
       );
       this.currentTopic = topic;
     },
     getSpeakerData(topicType) {
-      return this.$store.getters["getDialogueBySpeakerNPC"]([
+      return this.$store.getters["getDialogueBySpeaker"]([
         this.speaker,
         "speaker_id",
         topicType
@@ -136,7 +208,10 @@ export default {
       }
     },
     handleAnswerClick(e) {
-      if (e.target.className == "dialogue-answers-answer__text_hyperlink") {
+      if (this.editMode) return;
+      else if (
+        e.target.className == "dialogue-answers-answer__text_hyperlink"
+      ) {
         this.setCurrentAnswers(e.target.innerText, "Topic");
         this.currentTopic = e.target.innerText;
       }
@@ -154,6 +229,7 @@ export default {
       return hyperlinkedAnswer;
     }
   },
+
   watch: {
     speaker() {
       this.currentAnswers = [];
@@ -168,20 +244,55 @@ export default {
   display: flex;
   width: 100%;
   height: 100%;
+  padding: 2px;
   &-answers {
-    padding: 10px;
+    padding: 0 5px;
     flex-grow: 1;
-    overflow: scroll;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    //overflow-y: scroll;
+    &__edit {
+      position: absolute;
+      right: 5px;
+    }
     &__header {
       width: 100%;
+      position: relative;
       display: flex;
       justify-content: center;
       align-items: center;
       border-bottom: 2px solid rgb(202, 165, 96);
-      height: 30px;
+      min-height: 40px;
+      margin-bottom: 2px;
+    }
+    &__frame {
+      flex-grow: 1;
+      overflow-y: scroll;
+      padding: 5px;
+      ::-webkit-scrollbar {
+        width: 5px;
+        scrollbar-width: thin;
+        background: rgba(25, 56, 31, 0.02);
+        border-radius: 24px;
+        &-thumb {
+          background-color: rgba(25, 56, 31, 0.4);
+        }
+      }
     }
     &-answer {
       margin-top: 20px;
+      &_edit {
+        border: 1px dotted rgb(202, 165, 96);
+        border-radius: 4px;
+        padding: 5px;
+        background: rgba(202, 165, 96, 0.02);
+        transition: all 0.15s ease-in-out;
+        &:hover {
+          background: rgba(202, 165, 96, 0.04);
+        }
+      }
       &__text {
         border-left: 2px dotted rgb(202, 165, 96);
         padding-left: 10px;
@@ -194,9 +305,19 @@ export default {
           }
         }
       }
+      &__ids {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        font-size: 15px;
+      }
       &-filters {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
         &__filter {
           display: inline-block;
+          align-items: center;
           background: rgba(255, 255, 255, 0.7);
           border-radius: 20px;
           padding: 5px 10px;
@@ -224,8 +345,9 @@ export default {
   }
   &-questions {
     min-width: 30%;
+    max-width: 300px;
     border-left: 2px solid rgb(202, 165, 96);
-    overflow: scroll;
+    overflow-y: scroll;
     &__topic {
       padding: 5px 10px 0px 10px;
       cursor: pointer;
@@ -244,6 +366,24 @@ export default {
 .filter {
   &__if {
     color: rgb(33, 133, 38);
+  }
+}
+
+.icon_gold {
+  fill: rgb(202, 165, 96);
+  margin-left: 10px;
+  cursor: pointer;
+  &:hover {
+    fill: rgba(202, 165, 96, 0.7);
+  }
+}
+
+.icon_gray {
+  fill: rgba(255, 255, 255, 0.7);
+  margin-left: 10px;
+  cursor: pointer;
+  &:hover {
+    fill: rgba(255, 255, 255, 0.5);
   }
 }
 </style>

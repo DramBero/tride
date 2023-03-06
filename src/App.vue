@@ -43,19 +43,22 @@ export default {
   src: local("Pelagiad"), url(./fonts/pelagiad/Pelagiad.ttf) format("truetype");
 }
 
-html {
+* {
   padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
-  /* chrome based */
-  width: 0px; /* ширина scrollbar'a */
+  width: 8px;
   scrollbar-width: thin;
-  background: rgba(25, 56, 31, 0.02);
-  border-radius: 24px;
+  background: none;
   &-thumb {
-    background-color: rgba(25, 56, 31, 0.4);
+    background-color: rgb(202, 165, 96);
   }
-  // background: transparent; /* опционально */
 }
 </style>

@@ -23,6 +23,8 @@ export default {
 <style>
 .journal-frame {
   background-color: #986;
+  box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.25);
+  z-index: 2;
   padding: 10px;
   min-width: 500px;
   max-width: 500px;

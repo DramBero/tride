@@ -1,4 +1,5 @@
 <template>
+  <div>
   <div class="toolbar">
     <div class="file-controls">
       <ToolBarOpen />
@@ -13,6 +14,8 @@
     </div>
 
   </div>
+  <div class="pseudoheader"></div>
+</div>
 </template>
 
 <script>
@@ -30,11 +33,20 @@ export default {
 
 <style lang="scss">
 .toolbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
   height: 50px;
   background-color: #cb9;
-  box-shadow: 2px 2px 8px rgba(25, 56, 31, 0.15);
+  box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.25);
+  z-index: 3;
   display: flex;
   font-family: 'Pelagiad';
+}
+
+.pseudoheader {
+  height: 50px;
+  width: 100vw;
 }
 
 .file-controls {

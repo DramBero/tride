@@ -2,7 +2,7 @@
   <div class="frame-upload">
     <ToolbarReadFile active />
     <div class="frame-upload-deps">
-      <div class="frame-upload-deps__title">Dependencies:</div>
+      <div class="frame-upload-deps__title" v-if="getDependencies && getDependencies.length > 0">Requires:</div>
       <div
         class="frame-upload-deps__element"
         v-for="dep in getDependencies"
@@ -40,10 +40,12 @@ export default {
   overflow-y: scroll;
   &-deps {
     font-size: 16px;
+    margin-top: 10px;
     &__element {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin: 10px;
     }
   }
 }

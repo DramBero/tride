@@ -1,27 +1,10 @@
 const state = {
   activePlugin: {
-    Header: {},
-    Script: [],
-    Creature: [],
-    Npc: [],
-    Clothing: [],
-    Cell: [],
-    Journal: [],
-    Topic: [],
-    Greeting: [],
-    Persuasion: [],
-    Weapon: [],
-    Armor: [],
-    Enchantment: [],
-    Book: [],
-    Other: [],
-    Light: [],
-    Activator: [],
-    GlobalVariable: [],
-    GameSetting: []
   },
   parsedQuests: [],
-  activeHeader: {}
+  activeHeader: {},
+  activePluginTitle: '',
+  journalHighlight: {},
 };
 
 const getters = {
@@ -37,11 +20,18 @@ const getters = {
   getActiveHeader(state) {
     return state.activeHeader;
   },
+  getJournalHighlight(state) {
+    return state.journalHighlight;
+  },
+  getActivePluginTitle(state) {
+    return state.activePluginTitle;
+  },
   getDialogueSpeaker: (state) => (speakerTypes) => {
     let dialogues = [];
     for (let speakerType of speakerTypes) {
       const dialogueTypes = ["Topic", "Greeting", "Persuasion"];
       for (let dialogueType of dialogueTypes) {
+        if (state.activePlugin[dialogueType]) {
         dialogues = [
           ...dialogues,
           ...state.activePlugin[dialogueType]
@@ -50,19 +40,23 @@ const getters = {
         ];
         dialogues = [...new Set(dialogues)];
       }
+      }
     }
     return dialogues;
   },
   getDialogueBySpeaker:
     (state) =>
-    ([id, dialogueType]) =>
-      state.activePlugin[dialogueType].filter(
+    ([id, dialogueType]) => {
+      if (state.activePlugin[dialogueType]) {
+      return state.activePlugin[dialogueType].filter(
         (topic) =>
           topic["speaker_id"] === id ||
           topic["speaker_cell"] === id ||
           topic["speaker_faction"] === id ||
           topic["speaker_class"] === id
       )
+      } else return []
+    }
 };
 
 const actions = {
@@ -134,6 +128,12 @@ const mutations = {
   setActiveHeader(state, header) {
     state.activeHeader = header;
   },
+  setActivePluginTitle(state, title) {
+    state.activePluginTitle = title
+  },
+  setJournalHighlight(state, filter) {
+    state.journalHighlight = filter
+  },
   resetActivePlugin(state) {
     let clearedPlugin = {
       Header: {},
@@ -161,11 +161,14 @@ const mutations = {
     state.activePlugin = clearedPlugin;
   },
   addToActiveArray(state, [destination, entry]) {
+    console.log(destination)
     if (state.activePlugin[destination]) {
       state.activePlugin[destination] = [
         ...state.activePlugin[destination],
         entry
       ];
+    } else {
+      state.activePlugin[destination] = [entry]
     }
   },
   setParsedQuests(state, quests) {

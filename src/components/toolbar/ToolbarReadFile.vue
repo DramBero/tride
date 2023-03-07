@@ -39,6 +39,7 @@ export default {
     loadTextFromFile(ev) {
       const file = ev.target.files[0];
       this.fileName = ev.target.files[0].name;
+      this.$store.commit('setActivePluginTitle', this.fileName.split('.')[0])
       this.fileSize = this.formatBytes(ev.target.files[0].size);
       const reader = new FileReader();
       reader.onload = (e) => {

@@ -10,7 +10,7 @@
       <div v-show="isCollapsed">
         <div
           class="quest-entry"
-          :class="{ 'quest-entry_finished': entry.quest_finish }"
+          :class="{ 'quest-entry_finished': entry.quest_finish, 'quest-entry_highlighted': getIsHighlighted(entry.data.disposition) }"
           v-for="entry in quest.entries"
           :key="entry.info_id"
         >
@@ -33,12 +33,45 @@ export default {
   },
   data() {
     return {
-      isCollapsed: false
+      isCollapsed: false,
+      highlightedComparison: '',
+      highlightedId: '',
     };
+  },
+  watch: {
+    getHighlight(newValue) {
+      if (newValue.id === this.quest.id) {
+        this.isCollapsed = true
+        this.highlightedComparison = newValue.filter_comparison
+        this.highlightedId = newValue.value.Integer
+      } else {
+        this.isCollapsed = false
+        this.highlightedComparison = ''
+        this.highlightedId = ''
+      }
+    }
+  },
+  computed: {
+    getHighlight() {
+      return this.$store.getters['getJournalHighlight']
+    }
   },
   methods: {
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
+    },
+    getIsHighlighted(entryId) {
+      let intEntryId = parseInt(entryId)
+      let intHighlightedId = parseInt(this.highlightedId)
+      switch(this.highlightedComparison) {
+        case 'Equal': return intEntryId == intHighlightedId
+        case 'GreaterEqual': return intEntryId >= intHighlightedId
+        case 'LesserEqual': return intEntryId <= intHighlightedId
+        case 'Less': return intEntryId < intHighlightedId
+        case 'Greater': return intEntryId > intHighlightedId
+        case 'NotEqual': return intEntryId != intHighlightedId
+        default: return false
+      }
     }
   }
 };
@@ -84,8 +117,15 @@ input[type="reset"] {
     border-radius: 8px;
     margin: 5px 0;
     display: flex;
+    transition: all .2s ease-in;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
     &_finished {
       background-color: rgba(145, 215, 145, 0.5);
+    }
+    &_highlighted {
+      background-color: rgba(255, 242, 122, 0.7) !important;
+      border-color: rgb(255, 242, 122)
     }
     &__text {
       flex-grow: 1;

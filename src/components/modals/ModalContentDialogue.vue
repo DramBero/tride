@@ -56,6 +56,9 @@
               class="dialogue-answers-answer-filters__filter"
               v-for="(filter, index) in answer.filters"
               :key="index"
+              tabindex="0"
+              @focus="handleFilter(filter)"
+              @focusout="handleFilter({})"
             >
               <span class="filter__if">if </span>
               <span class="filter__function"
@@ -84,7 +87,7 @@
           <div class="dialogue-answers-answer-results" v-if="answer.result">
             <div
               class="dialogue-answers-answer-results__result"
-              v-for="(text, index) in answer.result.split(';')"
+              v-for="(text, index) in answer.result.split('\n')"
               :key="index"
             >
               {{ text }}
@@ -206,6 +209,13 @@ export default {
           return comparison;
       }
     },
+    handleFilter(filter) {
+      if (filter.filter_function === 'JournalType') {
+        this.$store.commit('setJournalHighlight', filter)
+      } else {
+        this.$store.commit('setJournalHighlight', {})
+      }
+    },
     handleAnswerClick(e) {
       if (this.editMode) return;
       else if (
@@ -316,6 +326,7 @@ export default {
         flex-wrap: wrap;
         &__filter {
           display: inline-block;
+          cursor: pointer;
           align-items: center;
           background: rgba(255, 255, 255, 0.7);
           border-radius: 20px;

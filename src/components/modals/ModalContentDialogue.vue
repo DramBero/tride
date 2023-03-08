@@ -87,6 +87,7 @@
           <div class="dialogue-answers-answer-results" v-if="answer.result">
             <div
               class="dialogue-answers-answer-results__result"
+              :class="{'dialogue-answers-answer-results__result_lua': text.includes(';lua')}"
               v-for="(text, index) in answer.result.split('\n')"
               :key="index"
             >
@@ -349,6 +350,9 @@ export default {
         margin: 10px 20px;
         &__result {
           display: block;
+          &_lua {
+            color: rgb(159, 169, 223);
+          }
         }
       }
     }

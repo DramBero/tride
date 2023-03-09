@@ -55,6 +55,7 @@ const getters = {
       }
       plugin[entry] = noDevEntry
     }
+    plugin.filter(val => val.type === 'Header')[0].num_objects = (plugin.length - 1)
     return plugin
   },
   getActiveHeader(state) {
@@ -203,7 +204,7 @@ const mutations = {
       text: entryText,
       filters: []
     }
-    if (lastIdIndex) state.activePlugin.splice(lastIdIndex, 0, newEntry)
+    if (lastIdIndex) state.activePlugin.splice(lastIdIndex + 1, 0, newEntry)
     else state.activePlugin = [...state.activePlugin, newEntry]
   },
 

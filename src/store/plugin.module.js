@@ -175,10 +175,13 @@ const mutations = {
     let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
     let questEntries = state.activePlugin.filter(val => val.TMP_type === 'Journal').filter(val => val.TMP_topic === questId).filter(val => val.next_id === "")
     let lastId = ""
+    let lastIdIndex = null
     if (questEntries.length && questEntries[0].info_id) {
       lastId = questEntries[0].info_id
+      lastIdIndex = state.activePlugin.findIndex(item => item.info_id === lastId)
       state.activePlugin.filter(val => val.info_id === lastId)[0].next_id = generatedId
     }
+    console.log(lastIdIndex)
     let newEntry = {
       TMP_topic: questId,
       TMP_type: "Journal",
@@ -200,7 +203,8 @@ const mutations = {
       text: entryText,
       filters: []
     }
-    state.activePlugin = [...state.activePlugin, newEntry]
+    if (lastIdIndex) state.activePlugin.splice(lastIdIndex, 0, newEntry)
+    else state.activePlugin = [...state.activePlugin, newEntry]
   },
 
   deleteJournalEntry(state, info_id) {

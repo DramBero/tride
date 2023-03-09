@@ -139,7 +139,7 @@ export default {
       return this.$store.getters["getJournalHighlight"];
     },
     getLatestDisposition() {
-      if (!this.quest.entries[0].data.disposition) return "10";
+      if (!this.quest.entries[0] || this.quest.entries[0].data.disposition) return "10";
       return (
         Math.floor(
           Math.max(

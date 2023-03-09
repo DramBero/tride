@@ -45,7 +45,6 @@
                 <icon
                   name="trash"
                   scale="1"
-                  @click="entryEdit = entry.data.disposition"
                 ></icon>
               </button>
               <div class="edit-entry">
@@ -78,14 +77,12 @@
                   <icon
                     name="save"
                     scale="1"
-                    @click="entryEdit = entry.data.disposition"
                   ></icon>
                 </button>
                 <button @click.prevent="entryEdit = ''">
                   <icon
                     name="ban"
                     scale="1"
-                    @click="entryEdit = entry.data.disposition"
                   ></icon>
                 </button>
               </div>

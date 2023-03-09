@@ -3,6 +3,13 @@
     <ModalMain v-show="getOpenModal" modalHide="hideOpenFile" header="Load">
       <ModalContentUpload />
     </ModalMain>
+    <ModalMain
+      v-show="getQuestCreateModal"
+      header="New quest"
+      modalHide="hideQuestCreateModal"
+    >
+      <ModalContentNewQuest />
+    </ModalMain>
     <CWorkspace />
   </div>
 </template>
@@ -16,6 +23,7 @@ import ModalMain from "./components/modals/ModalMain.vue";
 import BookFrame from "./components/books/BookFrame.vue";
 import CWorkspace from "./components/CWorkspace.vue";
 import ModalContentDialogue from "./components/modals/ModalContentDialogue.vue";
+import ModalContentNewQuest from "./components/modals/ModalContentNewQuest.vue";
 
 export default {
   name: "App",
@@ -27,12 +35,16 @@ export default {
     ModalMain,
     BookFrame,
     CWorkspace,
-    ModalContentDialogue
-  },
+    ModalContentDialogue,
+    ModalContentNewQuest
+},
   computed: {
     getOpenModal() {
       return this.$store.getters["getOpenFile"];
-    }
+    },
+    getQuestCreateModal() {
+      return this.$store.getters["getQuestCreateModal"];
+    },
   }
 };
 </script>
@@ -60,5 +72,24 @@ body {
   &-thumb {
     background-color: rgb(202, 165, 96);
   }
+}
+
+.modal-field {
+  width: 100%;
+  &__input {
+    width: 100%;
+    background: white;
+    font-family: 'Pelagiad';
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 8px;
+  }
+}
+
+.modal-button {
+  border: 2px solid rgb(202, 165, 96);
+  padding: 5px 10px;
+  max-width: 100px;
+  border-radius: 4px;
 }
 </style>

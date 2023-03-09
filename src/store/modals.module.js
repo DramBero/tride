@@ -1,6 +1,7 @@
 const state = {
   openFile: false,
-  dialogueModal: ""
+  dialogueModal: "",
+  questCreateModal: false,
 };
 
 const mutations = {
@@ -15,6 +16,12 @@ const mutations = {
   },
   setDialogueModal(state, value) {
     state.dialogueModal = value;
+  },
+  setQuestCreateModal(state, value) {
+    state.questCreateModal = value
+  },
+  hideQuestCreateModal(state) {
+    state.questCreateModal = false
   }
 };
 
@@ -22,7 +29,8 @@ const actions = {};
 
 const getters = {
   getOpenFile: (s) => s.openFile,
-  getDialogueModal: (s) => s.dialogueModal
+  getDialogueModal: (s) => s.dialogueModal,
+  getQuestCreateModal: (s) => s.questCreateModal,
 };
 
 export default {

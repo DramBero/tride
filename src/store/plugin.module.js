@@ -8,6 +8,7 @@ const state = {
 
 const getters = {
   getParsedQuests(state) {
+    if (!state.activePlugin.length) return []
     let quests = []
     let initialQuestData = {
       id: "",
@@ -45,7 +46,7 @@ const getters = {
   },
   getActivePlugin(state) {
     if (!state.activePlugin.length) return
-    let plugin = state.activePlugin
+    let plugin = JSON.parse(JSON.stringify(state.activePlugin))
     for (let entry in plugin) {
       let noDevEntry = plugin[entry]
       let devStrings = ['TMP_type', 'TMP_topic']
@@ -131,6 +132,106 @@ const actions = {
 const mutations = {
   setActiveHeader(state, header) {
     state.activeHeader = header;
+  },
+  addJournalQuest(state, [id, name]) {
+    let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
+    let idEntry = {
+      type: "Dialogue",
+      flags: [
+        0,
+        0
+      ],
+      id: id,
+      dialogue_type: "Journal",
+      TMP_topic: id,
+      TMP_type: "Journal"
+    }
+    let nameEntry = {
+      type: "Info",
+      flags: [
+        0,
+        0
+      ],
+      info_id: generatedId,
+      prev_id: "",
+      next_id: "",
+      data: {
+        dialogue_type: "Journal",
+        disposition: 0,
+        speaker_rank: -1,
+        speaker_sex: "Any",
+        player_rank: -1
+      },
+      text: name,
+      quest_name: 1,
+      filters: [],
+      TMP_topic: id,
+      TMP_type: "Journal"
+    }
+    state.activePlugin = [...state.activePlugin, idEntry]
+    state.activePlugin = [...state.activePlugin, nameEntry]
+  },
+  addJournalEntry(state, [questId, entryText, entryDisposition]) {
+    let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
+    let questEntries = state.activePlugin.filter(val => val.TMP_type === 'Journal').filter(val => val.TMP_topic === questId).filter(val => val.next_id === "")
+    let lastId = ""
+    if (questEntries.length && questEntries[0].info_id) {
+      lastId = questEntries[0].info_id
+      state.activePlugin.filter(val => val.info_id === lastId)[0].next_id = generatedId
+    }
+    let newEntry = {
+      TMP_topic: questId,
+      TMP_type: "Journal",
+      type: "Info",
+      flags: [
+        0,
+        0
+      ],
+      info_id: generatedId,
+      prev_id: lastId,
+      next_id: "",
+      data: {
+        dialogue_type: "Journal",
+        disposition: entryDisposition,
+        speaker_rank: -1,
+        speaker_sex: "Any",
+        player_rank: -1
+      },
+      text: entryText,
+      filters: []
+    }
+    state.activePlugin = [...state.activePlugin, newEntry]
+  },
+
+  deleteJournalEntry(state, info_id) {
+    let questEntries = state.activePlugin.filter(val => val.info_id === info_id)
+    if (!questEntries.length) return
+    else {
+      let next_id = questEntries[0].next_id
+      let prev_id = questEntries[0].prev_id
+      state.activePlugin = state.activePlugin.filter(val => val.info_id !== info_id)
+      let nextEntry = state.activePlugin.filter(val => val.info_id === next_id)
+      if (nextEntry.length) {
+        state.activePlugin.filter(val => val.info_id === next_id)[0].prev_id = prev_id
+      }
+      let prevEntry = state.activePlugin.filter(val => val.info_id === prev_id)
+      if (prevEntry.length) {
+        state.activePlugin.filter(val => val.info_id === prev_id)[0].next_id = next_id
+      }
+    }
+  },
+
+  editJournalEntry(state, [entryId, entryText, entryDisp, entryFinished]) {
+    let questEntries = state.activePlugin.filter(val => val.info_id === entryId)
+    if (!questEntries.length) return
+    else {
+      state.activePlugin.filter(val => val.info_id === entryId)[0].text = entryText
+      state.activePlugin.filter(val => val.info_id === entryId)[0].data.disposition = entryDisp
+      state.activePlugin.filter(val => val.info_id === entryId)[0].quest_finish = entryFinished ? 1 : 0
+      if (!entryFinished && state.activePlugin.filter(val => val.info_id === entryId)[0].quest_finish) {
+        delete state.activePlugin.filter(val => val.info_id === entryId)[0][quest_finish]
+      }
+    }
   },
   setActivePluginTitle(state, title) {
     state.activePluginTitle = title

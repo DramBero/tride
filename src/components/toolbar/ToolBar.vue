@@ -3,6 +3,7 @@
   <div class="toolbar">
     <div class="file-controls">
       <ToolBarOpen />
+      <ToolBarSave v-if="getTitle"/>
     </div>
     <div class="header-controls" v-if="getTitle">
       <div class="header-controls__title">
@@ -20,9 +21,10 @@
 
 <script>
 import ToolBarOpen from "./ToolBarOpen.vue";
+import ToolBarSave from './ToolBarSave.vue';
 
 export default {
-  components: { ToolBarOpen },
+  components: { ToolBarOpen, ToolBarSave },
   computed: {
     getTitle() {
       return this.$store.getters['getActivePluginTitle']
@@ -51,6 +53,7 @@ export default {
 
 .file-controls {
   height: 100%;
+  display: flex;
 }
 .header-controls {
   margin-left: 50px;

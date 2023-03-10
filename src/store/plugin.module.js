@@ -1,9 +1,12 @@
+import Vue from "vue";
+
 const state = {
   activePlugin: [],
   parsedQuests: [],
   activeHeader: {},
   activePluginTitle: '',
   journalHighlight: {},
+  dependencies: [],
 };
 
 const getters = {
@@ -101,33 +104,13 @@ const getters = {
 };
 
 const actions = {
-  parseLocalPlugin({ state, commit, dispatch }, [plugin]) {
+  parseLocalPlugin({ commit }, [plugin]) {
     commit("resetActivePlugin");
-    let dialogueType;
-    let dialogueId;
-    for (let entry of plugin) {
-      if (entry.type === "Header") {
-        commit("addEntryToActive", entry)
-        //commit("setActiveHeader", [entry]);
-      } else if (["Info", "Dialogue"].includes(entry.type)) {
-        if (entry.type === "Dialogue") {
-          if (entry.id) dialogueId = entry.id;
-          dialogueType = entry.dialogue_type;
-          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          commit("addEntryToActive", dialogueEntry)
-          //commit("addToActiveArray", [dialogueType, dialogueEntry]);
-        } else {
-          if (entry.id) dialogueId = entry.id;
-          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          commit("addEntryToActive", dialogueEntry)
-          //commit("addToActiveArray", [dialogueType, dialogueEntry]);
-        }
-      } else {
-        commit("addEntryToActive", entry)
-        //commit("addToActiveArray", [entry.type, entry]);
-      }
-    }
+    commit("parsePluginData", plugin)
   },
+  parseDependency({ commit }, [plugin]) {
+    commit("setDependencies", plugin)
+  }
 };
 
 const mutations = {
@@ -182,7 +165,7 @@ const mutations = {
       lastIdIndex = state.activePlugin.findIndex(item => item.info_id === lastId)
       state.activePlugin.filter(val => val.info_id === lastId)[0].next_id = generatedId
     }
-    console.log(lastIdIndex)
+    //console.log(lastIdIndex)
     let newEntry = {
       TMP_topic: questId,
       TMP_type: "Journal",
@@ -196,7 +179,7 @@ const mutations = {
       next_id: "",
       data: {
         dialogue_type: "Journal",
-        disposition: entryDisposition,
+        disposition: parseInt(entryDisposition),
         speaker_rank: -1,
         speaker_sex: "Any",
         player_rank: -1
@@ -231,10 +214,12 @@ const mutations = {
     if (!questEntries.length) return
     else {
       state.activePlugin.filter(val => val.info_id === entryId)[0].text = entryText
-      state.activePlugin.filter(val => val.info_id === entryId)[0].data.disposition = entryDisp
-      state.activePlugin.filter(val => val.info_id === entryId)[0].quest_finish = entryFinished ? 1 : 0
+      state.activePlugin.filter(val => val.info_id === entryId)[0].data.disposition = parseInt(entryDisp)
+      if (entryFinished) {
+        state.activePlugin.filter(val => val.info_id === entryId)[0].quest_finish = 1
+      }
       if (!entryFinished && state.activePlugin.filter(val => val.info_id === entryId)[0].quest_finish) {
-        delete state.activePlugin.filter(val => val.info_id === entryId)[0][quest_finish]
+        delete state.activePlugin.filter(val => val.info_id === entryId)[0]['quest_finish']
       }
     }
   },
@@ -249,6 +234,46 @@ const mutations = {
   },
   addEntryToActive(state, entry) {
     state.activePlugin = [...state.activePlugin, entry]
+  },
+  parsePluginData(state, plugin) {
+    let dialogueType;
+    let dialogueId;
+    for (let entry of plugin) {
+      if (["Info", "Dialogue"].includes(entry.type)) {
+        if (entry.type === "Dialogue") {
+          if (entry.id) dialogueId = entry.id;
+          dialogueType = entry.dialogue_type;
+          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
+          state.activePlugin.push(dialogueEntry)
+        } else {
+          if (entry.id) dialogueId = entry.id;
+          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
+          state.activePlugin.push(dialogueEntry)
+        }
+      } else {
+        state.activePlugin.push(entry)
+      }
+    }
+  },
+  setDependencies(state, plugin) {
+    let dialogueType;
+    let dialogueId;
+    for (let entry of plugin) {
+      if (["Info", "Dialogue"].includes(entry.type)) {
+        if (entry.type === "Dialogue") {
+          if (entry.id) dialogueId = entry.id;
+          dialogueType = entry.dialogue_type;
+          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
+          state.dependencies.push(dialogueEntry)
+        } else {
+          if (entry.id) dialogueId = entry.id;
+          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
+          state.dependencies.push(dialogueEntry)
+        }
+      } else if (["Faction", "Book", "NPC"].includes(entry.type)) {
+        state.activePlugin.push(entry)
+      }
+    }
   },
   addToActiveArray(state, [destination, entry]) {
     if (state.activePlugin[destination]) {

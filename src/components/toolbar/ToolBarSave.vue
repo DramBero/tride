@@ -24,7 +24,7 @@ export default {
   },
   methods: {
     testPlugin() {
-      console.log(this.getPluginData)
+      //console.log(this.getPluginData)
     }
   }
 };

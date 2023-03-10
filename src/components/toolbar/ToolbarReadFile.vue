@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="text-reader__wrapper" :class="{'text-reader__wrapper_dep': !active}">
     <label class="text-reader">
       <input ref="file" type="file" @change="loadTextFromFile" />
       {{ active ? "Load active plugin" : "Load dependency" }}
@@ -39,23 +39,30 @@ export default {
     loadTextFromFile(ev) {
       const file = ev.target.files[0];
       this.fileName = ev.target.files[0].name;
-      this.$store.commit('setActivePluginTitle', this.fileName.split('.')[0])
+      if (this.active) this.$store.commit('setActivePluginTitle', this.fileName.split('.')[0])
       this.fileSize = this.formatBytes(ev.target.files[0].size);
       const reader = new FileReader();
+      reader.onprogress = (e) => {
+        //console.log(e.loaded, e.total)
+      }
       reader.onload = (e) => {
         if (this.active) {
           this.$store.dispatch("parseLocalPlugin", [
             JSON.parse(e.target.result)
           ]);
+        } else {
+          this.$store.dispatch("parseDependency", [
+            JSON.parse(e.target.result)
+          ]);
         }
-      };
+      }; 
       reader.readAsText(file);
     }
   }
 };
 </script>
 
-<style>
+<style lang="scss">
 input[type="file"] {
   display: none;
 }
@@ -65,5 +72,13 @@ input[type="file"] {
   display: inline-block;
   padding: 6px 12px;
   cursor: pointer;
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    &_dep {
+      flex-direction: row-reverse;
+    }
+  }
 }
 </style>

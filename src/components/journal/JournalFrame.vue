@@ -13,7 +13,7 @@
       <transition-group name="fadeHeight" mode="out-in" :style="{'width': '100%'}">
     <JournalFrameQuest
       v-for="quest in getJournal"
-      :key="quest.name_id || 0"
+      :key="quest.id || 0"
       :quest="quest"
     />
   </transition-group>

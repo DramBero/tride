@@ -287,18 +287,15 @@ input[type="reset"] {
     min-height: 50px;
     display: flex;
     transition: all 0.2s ease-in;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.3);
     &_finished {
       background-color: rgba(145, 215, 145, 0.5);
     }
     &_highlighted {
       background-color: rgba(255, 242, 122, 0.7) !important;
-      border-color: rgb(255, 242, 122);
     }
     &__text {
       flex-grow: 1;
-      padding: 10px;
+      padding: 15px;
     }
     &__index {
       min-width: 50px;

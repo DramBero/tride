@@ -8,6 +8,11 @@
     </div>
     <collapse-transition v-if="quest.entries.length">
       <div v-show="isCollapsed">
+        <transition-group
+        name="fadeHeight"
+        mode="out-in"
+        :style="{ width: '100%' }"
+      >
         <div
           v-for="entry in quest.entries.sort(
             (a, b) =>
@@ -89,8 +94,10 @@
             </form>
           </div>
         </div>
+        </transition-group>
         <div class="add-entry" @click="createEntry">+</div>
       </div>
+      
     </collapse-transition>
     <div v-else class="no-entries">
       No entries yet. <a class="link" @click="createEntry">Create?</a>
@@ -328,6 +335,17 @@ input[type="reset"] {
 .no-entries {
   text-align: center;
   width: 100%;
-  padding: 10px;
+  padding: 20px;
+}
+
+.fadeHeight-enter-active,
+.fadeHeight-leave-active {
+  transition: all 0.15s cubic-bezier(1, 1, 1, 1);
+  opacity: 100;
+}
+
+.fadeHeight-enter,
+.fadeHeight-leave-to {
+  opacity: 0%;
 }
 </style>

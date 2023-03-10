@@ -2,7 +2,7 @@
   <div class="frame">
     <div class="frame-controls">
       <div class="frame-controls-left"></div>
-      <div class="frame-controls-types">
+      <div class="frame-controls-types" v-if="getNPCs">
         <div
           class="frame-controls-types__type"
           :class="{
@@ -11,7 +11,7 @@
           }"
           @click="toggleType('speaker_id')"
         >
-          Name
+          Name {{ getSpeakerIdLength }}
         </div>
         <div
           class="frame-controls-types__type"
@@ -21,7 +21,7 @@
           }"
           @click="toggleType('speaker_cell')"
         >
-          Cell
+          Cell {{ getSpeakerCellLength }}
         </div>
         <div
           class="frame-controls-types__type"
@@ -31,7 +31,7 @@
           }"
           @click="toggleType('speaker_faction')"
         >
-          Faction
+          Faction {{ getSpeakerFactionLength }}
         </div>
         <div
           class="frame-controls-types__type"
@@ -41,9 +41,10 @@
           }"
           @click="toggleType('speaker_class')"
         >
-          Class
+          Class {{ getSpeakerClassLength }}
         </div>
         <div
+          v-if="false"
           class="frame-controls-types__type"
           :class="{
             'frame-controls-types__type_active':
@@ -94,7 +95,19 @@ export default {
     },
     getOpenModalDialogue() {
       return this.$store.getters["getDialogueModal"];
-    }
+    },
+    getSpeakerIdLength() {
+      return this.$store.getters["getDialogueSpeaker"](["speaker_id"]).length || '';
+    },
+    getSpeakerCellLength() {
+      return this.$store.getters["getDialogueSpeaker"](["speaker_cell"]).length || '';
+    },
+    getSpeakerFactionLength() {
+      return this.$store.getters["getDialogueSpeaker"](["speaker_faction"]).length || '';
+    },
+    getSpeakerClassLength() {
+      return this.$store.getters["getDialogueSpeaker"](["speaker_class"]).length || '';
+    },
   },
   methods: {
     toggleType(type) {
@@ -103,7 +116,7 @@ export default {
       } else {
         this.speakerTypes.push(type);
       }
-    }
+    },
   }
 };
 </script>
@@ -141,11 +154,15 @@ export default {
         align-items: center;
         transition: all 0.2s ease-in;
         &:hover {
+          color: white;
         }
         &_active {
           border: 3px solid rgb(202, 165, 96);
           background: rgb(202, 165, 96);
           color: black;
+          &:hover {
+            color: black;
+          }
         }
       }
     }

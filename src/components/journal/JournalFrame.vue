@@ -1,23 +1,23 @@
 <template>
-  <div class="journal-frame" >
+  <div class="journal-frame">
     <div class="journal-frame__controls" v-if="getJournal.length">
       <div class="add-quest" @click="addQuest()">
-      New <icon
-        name="plus-circle"
-        class="add-quest__button"
-        scale="1"
-      ></icon>
-    </div>
+        New <icon name="plus-circle" class="add-quest__button" scale="1"></icon>
+      </div>
     </div>
     <div v-if="getJournal.length" class="quests">
-      <transition-group name="fadeHeight" mode="out-in" :style="{'width': '100%'}">
-    <JournalFrameQuest
-      v-for="quest in getJournal"
-      :key="quest.id || 0"
-      :quest="quest"
-    />
-  </transition-group>
-  </div>
+      <transition-group
+        name="fadeHeight"
+        mode="out-in"
+        :style="{ width: '100%' }"
+      >
+        <JournalFrameQuest
+          v-for="quest in getJournal"
+          :key="quest.id || 0"
+          :quest="quest"
+        />
+      </transition-group>
+    </div>
   </div>
 </template>
 
@@ -50,7 +50,7 @@ export default {
   max-width: 500px;
   height: 100%;
   max-height: 100%;
-  font-family: 'Pelagiad';
+  font-family: "Pelagiad";
   position: relative;
   &__controls {
     font-size: 22px;
@@ -81,7 +81,7 @@ export default {
   width: fit-content;
   padding: 3px 10px;
   border-radius: 4px;
-  transition: all .1s ease-in;
+  transition: all 0.1s ease-in;
   &:hover {
     color: white;
     .add-quest__button {
@@ -89,7 +89,7 @@ export default {
     }
   }
   &__button {
-    transition: all .1s ease-in;
+    transition: all 0.1s ease-in;
     fill: rgb(202, 165, 96);
   }
 }
@@ -103,6 +103,5 @@ export default {
 .fadeHeight-enter,
 .fadeHeight-leave-to {
   opacity: 0%;
-
 }
 </style>

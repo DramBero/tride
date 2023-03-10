@@ -52,7 +52,7 @@ export default {
           ]);
         } else {
           this.$store.dispatch("parseDependency", [
-            JSON.parse(e.target.result)
+            JSON.parse(e.target.result), this.fileName
           ]);
         }
       }; 

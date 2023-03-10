@@ -70,6 +70,17 @@ const getters = {
   getActivePluginTitle(state) {
     return state.activePluginTitle;
   },
+  getAllNpcs(state) {
+    let depNpcs = []
+    for (let dep of state.dependencies) {
+      depNpcs.push(...dep.data.filter(val => val.type === "Npc"))
+    }
+    return [...state.activePlugin.filter(val => val.type === "Npc"), ...depNpcs]
+  },
+  getNpcById: (state, getters) => (npcId) => {
+    let npcNames = getters.getAllNpcs.filter(val => val.id === npcId)
+    return npcNames.length ? npcNames[0] : {}
+  },
   getDialogueSpeaker: (state) => (speakerTypes) => {
     let dialogues = [];
     for (let speakerType of speakerTypes) {
@@ -108,8 +119,8 @@ const actions = {
     commit("resetActivePlugin");
     commit("parsePluginData", plugin)
   },
-  parseDependency({ commit }, [plugin]) {
-    commit("setDependencies", plugin)
+  parseDependency({ commit }, [plugin, fileName]) {
+    commit("setDependencies", [plugin, fileName])
   }
 };
 
@@ -255,25 +266,27 @@ const mutations = {
       }
     }
   },
-  setDependencies(state, plugin) {
+  setDependencies(state, [plugin, fileName]) {
     let dialogueType;
     let dialogueId;
+    let pluginData = []
     for (let entry of plugin) {
       if (["Info", "Dialogue"].includes(entry.type)) {
         if (entry.type === "Dialogue") {
           if (entry.id) dialogueId = entry.id;
           dialogueType = entry.dialogue_type;
           let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          state.dependencies.push(dialogueEntry)
+          pluginData.push(Object.freeze(dialogueEntry))
         } else {
           if (entry.id) dialogueId = entry.id;
           let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          state.dependencies.push(dialogueEntry)
+          pluginData.push(Object.freeze(dialogueEntry))
         }
-      } else if (["Faction", "Book", "NPC"].includes(entry.type)) {
-        state.activePlugin.push(entry)
+      } else if (["Faction", "Book", "Npc"].includes(entry.type)) {
+        pluginData.push(Object.freeze(entry))
       }
     }
+    state.dependencies.push({name: fileName, data: pluginData})
   },
   addToActiveArray(state, [destination, entry]) {
     if (state.activePlugin[destination]) {

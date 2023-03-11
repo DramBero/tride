@@ -247,6 +247,7 @@ input[type="reset"] {
         min-height: 200px;
         padding: 10px;
         font-size: 20px;
+        border: none;
         border-radius: 8px 0 0 8px;
       }
       &__disp {

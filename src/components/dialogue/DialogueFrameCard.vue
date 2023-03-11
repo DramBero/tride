@@ -31,7 +31,7 @@ export default {
         case "Imperial": return 'imperial-' + sex + '.png'
         case "Khajiit": return 'khajiit-' + sex + '.png'
         case "Nord": return 'nord-' + sex + '.png'
-        case "Orc": return 'ord-' + sex + '.png'
+        case "Orc": return 'orc-' + sex + '.png'
         case "Redguard": return 'redguard-' + sex + '.png'
         default: return ''
       }

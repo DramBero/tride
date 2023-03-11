@@ -174,9 +174,10 @@ export default {
   //flex-grow: 1;
   align-items: flex-start;
   flex-wrap: wrap;
-  padding: 20px 20px 0px 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  padding: 20px 20px 30px 20px;
+  display: flex;
+  justify-content: center;
+  //grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;
 }
 </style>

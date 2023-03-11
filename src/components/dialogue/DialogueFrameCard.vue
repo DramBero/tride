@@ -49,13 +49,14 @@ export default {
 .dialogue-card {
   font-family: "Pelagiad", "Sans serif";
   line-height: 23px;
-  font-size: 18px;
-  background: rgba(0, 0, 0, 0.7);
-  border: 3px solid rgb(202, 165, 96);
-  border-radius: 4px;
-  word-break: break-word;
+  max-width: 230px;
   min-width: 200px;
-  max-width: 300px;
+  width: 230px;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.5);
+  //border: 3px solid rgb(202, 165, 96);
+  border-radius: 8px;
+  word-break: break-word;
   flex-grow: 1;
   height: 220px;
   padding: 20px;
@@ -73,17 +74,17 @@ export default {
     color: black;
     .dialogue-card__decoration {
       background: rgb(53, 44, 27);
-      transform: translateY(-65%) rotate(-8deg) scale(1.2);
+      transform: translateY(-65%) rotate(-8deg);
     }
   }
   &__decoration {
     position: absolute;
     top: 50%;
     transform: translateY(-65%) rotate(-8deg);
-    width: 70%;
-    height: 30%;
-    clip-path: ellipse(45% 40% at 50% 50%);
-    background: rgb(202, 165, 96);
+    width: 105px;
+    height: 105px;
+    clip-path: ellipse(50% 50% at 50% 50%);
+    background: rgb(201, 200, 199);
     transition: all .25s ease-in;
   }
   &__image {

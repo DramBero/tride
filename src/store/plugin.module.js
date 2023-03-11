@@ -249,20 +249,19 @@ const mutations = {
   parsePluginData(state, plugin) {
     let dialogueType;
     let dialogueId;
-    for (let entry of plugin) {
-      if (["Info", "Dialogue"].includes(entry.type)) {
-        if (entry.type === "Dialogue") {
-          if (entry.id) dialogueId = entry.id;
-          dialogueType = entry.dialogue_type;
-          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          state.activePlugin.push(dialogueEntry)
+    state.activePlugin = plugin;
+    for (let entry in state.activePlugin) {
+      if (["Info", "Dialogue"].includes(state.activePlugin[entry].type)) {
+        if (state.activePlugin[entry].type === "Dialogue") {
+          if (state.activePlugin[entry].id) dialogueId = state.activePlugin[entry].id;
+          dialogueType = state.activePlugin[entry].dialogue_type;
+          let dialogueEntry = { ...state.activePlugin[entry], TMP_topic: dialogueId, TMP_type: dialogueType };
+          state.activePlugin[entry] = dialogueEntry
         } else {
-          if (entry.id) dialogueId = entry.id;
-          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          state.activePlugin.push(dialogueEntry)
+          if (state.activePlugin[entry].id) dialogueId = state.activePlugin[entry].id;
+          let dialogueEntry = { ...state.activePlugin[entry], TMP_topic: dialogueId, TMP_type: dialogueType };
+          state.activePlugin[entry] = dialogueEntry
         }
-      } else {
-        state.activePlugin.push(entry)
       }
     }
   },

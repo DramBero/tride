@@ -4,6 +4,13 @@
       <ModalContentUpload />
     </ModalMain>
     <ModalMain
+      v-show="getDialogueCreateModal"
+      header="New dialogue"
+      modalHide="hideDialogueCreateModal"
+    >
+      <ModalContentNewDialogue />
+    </ModalMain>
+    <ModalMain
       v-show="getQuestCreateModal"
       header="New quest"
       modalHide="hideQuestCreateModal"
@@ -24,6 +31,7 @@ import BookFrame from "./components/books/BookFrame.vue";
 import CWorkspace from "./components/CWorkspace.vue";
 import ModalContentDialogue from "./components/modals/ModalContentDialogue.vue";
 import ModalContentNewQuest from "./components/modals/ModalContentNewQuest.vue";
+import ModalContentNewDialogue from "./components/modals/ModalContentNewDialogue.vue";
 
 export default {
   name: "App",
@@ -36,7 +44,8 @@ export default {
     BookFrame,
     CWorkspace,
     ModalContentDialogue,
-    ModalContentNewQuest
+    ModalContentNewQuest,
+    ModalContentNewDialogue
 },
   computed: {
     getOpenModal() {
@@ -44,6 +53,9 @@ export default {
     },
     getQuestCreateModal() {
       return this.$store.getters["getQuestCreateModal"];
+    },
+    getDialogueCreateModal() {
+      return this.$store.getters["getDialogueCreateModal"];
     },
   }
 };
@@ -78,7 +90,9 @@ body {
   width: 100%;
   &__input {
     width: 100%;
-    background: white;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgb(202, 165, 96);
+    color: rgb(202, 165, 96);
     font-family: 'Pelagiad';
     font-size: 20px;
     padding: 10px;
@@ -91,5 +105,15 @@ body {
   padding: 5px 10px;
   max-width: 100px;
   border-radius: 4px;
+  cursor: pointer;
+  transition: color .15s ease-in;
+  &:hover {
+    color: white;
+  }
+  &:disabled {
+    color: gray;
+    border: 2px solid gray;
+    cursor: default;
+  }
 }
 </style>

@@ -150,7 +150,8 @@ export default {
     return {
       currentAnswers: [],
       currentTopic: "",
-      editMode: false
+      editMode: false,
+      showDependencies: false,
     };
   },
 
@@ -160,30 +161,49 @@ export default {
 
   computed: {
     getTopics() {
-      return [
-        ...new Set(this.getSpeakerData("Topic").map((val) => val.TMP_topic))
-      ];
+      let topics = [
+        ...new Set(this.getSpeakerData("Topic"))
+      ]
+      if (!this.showDependencies) {
+        topics = topics.filter(val => !val.TMP_dep)
+      }
+      return [...new Set(topics.map((val) => val.TMP_topic))]
     },
     getGreetings() {
-      return [
-        ...new Set(this.getSpeakerData("Greeting").map((val) => val.TMP_topic))
-      ];
+      let topics = [
+        ...new Set(this.getSpeakerData("Greeting"))
+      ]
+      if (!this.showDependencies) {
+        topics = topics.filter(val => !val.TMP_dep)
+      }
+      return [...new Set(topics.map((val) => val.TMP_topic))]
     },
     getPersuasion() {
-      return [
-        ...new Set(
-          this.getSpeakerData("Persuasion").map((val) => val.TMP_topic)
-        )
-      ];
-    }
+      let topics = [
+        ...new Set(this.getSpeakerData("Persuasion"))
+      ]
+      if (!this.showDependencies) {
+        topics = topics.filter(val => !val.TMP_dep)
+      }
+      return [...new Set(topics.map((val) => val.TMP_topic))]
+    },
+    getOrderedEntries() {
+      return this.$store.getters['getOrderedEntriesByTopic']([this.currentTopic, "Topic"])
+    },
   },
 
   methods: {
     setCurrentAnswers(topic, topicType) {
       if (this.editMode) return;
+      if (this.showDependencies) {
       this.currentAnswers = this.getSpeakerData(topicType).filter(
         (val) => val.TMP_topic == topic
-      );
+      )
+      } else {
+        this.currentAnswers = this.getSpeakerData(topicType).filter(
+        (val) => val.TMP_topic == topic && !val.TMP_dep
+      )
+      }
       this.currentTopic = topic;
     },
     getSpeakerData(topicType) {

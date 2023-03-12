@@ -44,13 +44,13 @@ export default {
   top: 50%;
   left: 50%;
   width: 33%;
-  height: 33%;
+  max-height: 80vh;
   z-index: 99;
   display: flex;
   flex-direction: column;
   transform: translate(-50%, -50%);
   border: 2px solid rgb(202, 165, 96);
-  border-radius: 2px;
+  border-radius: 4px;
   background-color: rgba(0, 0, 0, 0.85);
   font-family: "Pelagiad";
   font-size: 20px;
@@ -63,7 +63,7 @@ export default {
     background-color: rgba(0, 0, 0, 0);
     display: flex;
     justify-content: center;
-    border: 2px solid rgb(182, 145, 76);
+    //border: 2px solid rgb(182, 145, 76);
     &__left {
       background-color: rgb(182, 145, 76);
       flex-grow: 1;
@@ -71,6 +71,7 @@ export default {
     &__right {
       background-color: rgb(182, 145, 76);
       flex-grow: 1;
+      position: relative;
     }
     &__name {
       background-color: rgba(0, 0, 0, 0);
@@ -81,14 +82,18 @@ export default {
       color: black;
       display: flex;
       align-items: center;
-      height: 35px;
+      top: 1px;
+      height: 99%;
+      cursor: pointer;
       position: absolute;
-      border: 1px solid rgb(202, 165, 96);
+      border: 2px solid rgb(202, 165, 96);
       user-select: none;
+      background-color: rgb(202, 165, 96);
+      border-radius: 4px;
       padding: 0 10px;
       right: 15px;
       &:hover {
-        background-color: rgb(202, 165, 96);
+        background-color: rgba(0, 0, 0, 0);
       }
     }
   }

@@ -2,7 +2,7 @@
   <div class="dialogue-card" @click="openDialogueModal">
     <span class="dialogue-card__name">{{ getNpc.name || speakerId }}</span>
     <div v-if="getNpcFace" class="dialogue-card__decoration"></div>
-    <img class="dialogue-card__image" v-if="getNpcFace" :src="getNpcFace ? require('@/assets/images/faces/' + getNpcFace) : ''" :alt="getNpc.name || speakerId" :title="getNpc.name || speakerId">
+    <img class="dialogue-card__image" v-if="getNpcFace" :src="getNpcFace ? require('@/assets/images/faces/' + getNpcFace) : ''" :alt="getNpc.name || speakerId">
   </div>
 </template>
 

@@ -1,7 +1,15 @@
 <template>
   <div class="frame">
     <div class="frame-controls">
-      <div class="frame-controls-left"></div>
+      <div class="frame-controls-left">
+        <div
+          class="frame-controls-types__type frame-controls-types__type_active"
+          :style="{'gap': '10px'}"
+          @click="addDialogue()"
+        >
+          Add <icon name="plus-circle" scale="1"></icon>
+        </div>
+      </div>
       <div class="frame-controls-types" v-if="getNPCs">
         <div
           class="frame-controls-types__type"
@@ -117,6 +125,9 @@ export default {
         this.speakerTypes.push(type);
       }
     },
+    addDialogue() {
+      this.$store.commit("setDialogueCreateModal", true);
+    }
   }
 };
 </script>
@@ -134,14 +145,14 @@ export default {
   &-controls {
     display: flex;
     justify-content: space-between;
-    margin: 5px;
+    padding: 10px;
     &-types {
       display: flex;
       gap: 5px;
       &__type {
         width: 90px;
         user-select: none;
-        border-radius: 2px;
+        border-radius: 4px;
         cursor: pointer;
         height: 40px;
         border: 2px solid rgb(120, 120, 120);
@@ -162,6 +173,7 @@ export default {
           color: black;
           &:hover {
             color: black;
+            background-color: rgba(202, 165, 96, 0.7);;
           }
         }
       }

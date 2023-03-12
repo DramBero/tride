@@ -1,6 +1,6 @@
 <template>
   <div class="frame-upload">
-    <form class="add-dialogue-form" @submit.prevent="createQuest()">
+    <form class="add-dialogue-form" @submit.prevent="">
       <div v-if="!speakerName">
         <div class="add-dialogue-label">Choose an NPC:</div>
         <label class="modal-field">
@@ -82,7 +82,8 @@ export default {
       inputName: "",
       inputTopic: "",
       speakerName: "",
-      speakerId: ""
+      speakerId: "",
+      dialogueType: "Topic",
     };
   },
   watch: {
@@ -112,7 +113,12 @@ export default {
     createTopic() {
       if (!this.inputTopic) return
       else {
-        this.$store.commit('createTopic', ['speaker_id', this.speakerId, this.inputTopic])
+        //this.$store.commit('createTopic', ['speaker_id', this.speakerId, this.inputTopic])
+        let location = this.$store.getters['getBestOrderLocationForNpc']([this.speakerId, this.inputTopic, this.dialogueType])
+        console.log('Location: ', location)
+        this.$store.commit('addDialogue', [this.speakerId, this.inputTopic, this.dialogueType, location[0], location[1], "New entry"])
+        this.$store.commit("setDialogueCreateModal", false);
+        this.$store.commit("setDialogueModal", this.speakerId);
       }
     }
   },

@@ -114,7 +114,7 @@ const getters = {
           if (firstEntry.length === 0) {
             return {error_code: "NO_PREV_ID", error_text: "Ordering error! No elements with defined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
           } else if (firstEntry.length > 1) {
-            return {error_code: "MULTIPLE_PREV_ID", error_text: "Ordering error! More than one elements have a defined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
+            return {error_code: "MULTIPLE_PREV_ID", error_text: "Ordering error! More than one elements have an undefined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
           }
           orderedTopics.push(firstEntry[0])
           allTopics = allTopics.filter(val => val !== firstEntry[0])
@@ -130,7 +130,7 @@ const getters = {
             nextEntry = nextEntry.filter(val => val.info_id === currentOrderedTopicNextId)
           }
           if (nextEntry.length === 0 && allTopics.length > 1) {
-            return {error_code: "NO_NEXT_ENTRY", error_text: "Ordering error! The entry ordering chain is broken. Make sure you uploaded all dependencies.", error_details: orderedTopics.slice(-1)[0]}
+            return {error_code: "NO_NEXT_ENTRY", error_text: "Ordering error! The entry ordering chain is broken. Make sure you uploaded all dependencies.", error_details: {'orderedTopics': orderedTopics, 'allTopics': allTopics}}
           } else if (nextEntry.length > 1) {
             return {error_code: "MULTIPLE_NEXT_ENTRIES", error_text: "Ordering error! The entry ordering chain is broken. Make sure you uploaded all dependencies.", error_details: nextEntry}
           }
@@ -143,7 +143,7 @@ const getters = {
   }, 
 
   getBestOrderLocationForNpc: (state, getters) => ([npcId, topicId, dialogueType]) => {
-    let orderedTopics = getters.getOrderedEntriesByTopic(topicId, dialogueType)
+    let orderedTopics = getters.getOrderedEntriesByTopic([topicId, dialogueType])
     if (!orderedTopics.length) return ['', '']
     else if (orderedTopics.filter(val => val.speaker_id === npcId).length) {
       return [orderedTopics.filter(val => val.speaker_id === npcId).slice(-1)[0], '']
@@ -222,7 +222,7 @@ const mutations = {
   },
 
   addDialogue(state, [npcId, topicId, dialogueType, prev_id, next_id, text]) {
-    let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
+    let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9) + 'KUKS'
     let topicObject = {
       dialogue_type: "Topic",
       flags: [
@@ -235,12 +235,11 @@ const mutations = {
       TMP_type: dialogueType,
     }
 
-    if (prev_id === "" && next_id === "") {
+    let questEntries = state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId)
+
+    if (!questEntries.length) {
       state.activePlugin = [...state.activePlugin, topicObject]
     }
-
-
-    let questEntries = state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId)
 
     let lastIdIndex = null
     if (questEntries.length && questEntries[0].info_id) {
@@ -268,6 +267,13 @@ const mutations = {
       type: "Info",
       TMP_topic: topicId,
       TMP_type: dialogueType
+    }
+    if (state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === prev_id)) {
+      state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === prev_id)[0].next_id = generatedId
+    }
+
+    if (state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === next_id)) {
+      state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === next_id)[0].prev_id = generatedId
     }
     if (lastIdIndex) state.activePlugin.splice(lastIdIndex + 1, 0, newEntry)
     else state.activePlugin = [...state.activePlugin, newEntry]

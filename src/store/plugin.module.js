@@ -50,17 +50,9 @@ const getters = {
 
   getActivePlugin(state) {
     if (!state.activePlugin.length) return
-    let plugin = JSON.parse(JSON.stringify(state.activePlugin))
-    for (let entry in plugin) {
-      let noDevEntry = plugin[entry]
-      let devStrings = ['TMP_type', 'TMP_topic']
-      for (let devKey of devStrings) {
-        if (noDevEntry[devKey]) delete noDevEntry[devKey]
-      }
-      plugin[entry] = noDevEntry
-    }
-    plugin.filter(val => val.type === 'Header')[0].num_objects = (plugin.length - 1)
-    return plugin
+    state.activePlugin.filter(val => val.type === 'Header')[0].num_objects = (state.activePlugin.length - 1)
+    
+    return state.activePlugin
   },
 
   getActiveHeader(state) {
@@ -80,7 +72,14 @@ const getters = {
     for (let dep of state.dependencies) {
       depNpcs.push(...dep.data.filter(val => val.type === "Npc"))
     }
-    return [...state.activePlugin.filter(val => val.type === "Npc"), ...depNpcs]
+    let allNpcs = [...state.activePlugin.filter(val => val.type === "Npc"), ...depNpcs]
+    const uniqueObjMap = {};
+    for (const object of allNpcs) {
+      uniqueObjMap[object.id] = object;
+    }
+
+    const uniqueObjects = Object.values(uniqueObjMap);
+    return uniqueObjects
   },
 
   getAllTopics(state) {
@@ -88,7 +87,15 @@ const getters = {
     for (let dep of state.dependencies) {
       depTopics.push(...dep.data.filter(val => val.TMP_type === "Topic" && val.type === 'Dialogue'))
     }
-    return [...state.activePlugin.filter(val => val.TMP_type === "Topic" && val.type === 'Dialogue'), ...depTopics]
+    let allTopics = [...state.activePlugin.filter(val => val.TMP_type === "Topic" && val.type === 'Dialogue'), ...depTopics]
+    const uniqueObjMap = {};
+    for (const object of allTopics) {
+      uniqueObjMap[object.id] = object;
+    }
+
+    const uniqueObjects = Object.values(uniqueObjMap);
+
+    return uniqueObjects
   },
 
   getOrderedEntriesByTopic: (state) => ([topicId, dialogueType]) => {
@@ -279,6 +286,18 @@ const mutations = {
     else state.activePlugin = [...state.activePlugin, newEntry]
 
     //getBestOrderLocationForNpc: (state, getters) => ([npcId, topicId, dialogueType]) => {
+  },
+
+  deleteDialogueEntry(state, info_id) {
+    let prev_id = state.activePlugin.find(val => val.type === 'Info' && val.info_id === info_id).prev_id
+    let next_id = state.activePlugin.find(val => val.type === 'Info' && val.info_id === info_id).next_id
+    if (state.activePlugin.find(val => val.info_id === prev_id)) state.activePlugin.find(val => val.info_id === prev_id).next_id = next_id
+    if (state.activePlugin.find(val => val.info_id === next_id)) state.activePlugin.find(val => val.info_id === next_id).prev_id = prev_id
+    state.activePlugin = state.activePlugin.filter(val => val.info_id !== info_id)
+  },
+
+  editDialogueEntry(state, [info_id, text]) {
+    state.activePlugin.find(val => val.type === 'Info' && val.info_id === info_id).text = text
   },
 
   addJournalQuest(state, [id, name]) {

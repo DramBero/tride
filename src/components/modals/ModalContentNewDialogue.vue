@@ -191,6 +191,7 @@ export default {
   height: 30vh;
   margin-top: 8px;
   margin-bottom: 8px;
+  padding-right: 5px;
   max-height: 30vh;
   overflow-y: scroll;
   flex-direction: column;

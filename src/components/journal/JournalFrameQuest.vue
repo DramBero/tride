@@ -29,6 +29,7 @@
                   entry.data.disposition
                 )
               }"
+              draggable
             >
               <div class="quest-entry__text">{{ entry.text }}</div>
               <div class="quest-entry__index">{{ entry.data.disposition }}</div>
@@ -274,12 +275,12 @@ input[type="reset"] {
         border-radius: 0 8px 8px 0;
         background: rgb(233, 233, 231);
         border: none;
+        text-align: center;
 
         min-width: 50px;
         max-width: 50px;
         display: flex;
         align-items: center;
-        justify-content: center;
         &:focus {
           outline: none !important;
         }

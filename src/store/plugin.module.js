@@ -111,17 +111,16 @@ const getters = {
         (topic) =>
           topic.TMP_topic == topicId
       )
-      console.log('ACTIVE: ', ...activeDialogue)
       let allTopics = [...depDialogue, ...activeDialogue]
       let orderedTopics = []
       while (allTopics.length > 0) {
         if (!orderedTopics.length) {
           let firstEntry = allTopics.filter(val => val.prev_id == "")
-          console.log('FIRST ENTRY: ', firstEntry)
           if (firstEntry.length === 0) {
             return {error_code: "NO_PREV_ID", error_text: "Ordering error! No elements with defined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
           } else if (firstEntry.length > 1) {
-            return {error_code: "MULTIPLE_PREV_ID", error_text: "Ordering error! More than one elements have an undefined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
+            orderedTopics.push(firstEntry[0])
+            //return {error_code: "MULTIPLE_PREV_ID", error_text: "Ordering error! More than one elements have an undefined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
           }
           orderedTopics.push(firstEntry[0])
           allTopics = allTopics.filter(val => val !== firstEntry[0])
@@ -129,17 +128,26 @@ const getters = {
         else {
           let currentOrderedTopicId = orderedTopics.slice(-1)[0].info_id
           let nextEntry = allTopics.filter(val => val.prev_id === currentOrderedTopicId)
-          if (nextEntry.length === 0) {
+          if (nextEntry.length == 0) {
             let currentOrderedTopicNextId = orderedTopics.slice(-1)[0].next_id
             nextEntry = allTopics.filter(val => val.info_id === currentOrderedTopicNextId)
-          } else if (nextEntry.length > 1) {
+          } 
+          if (nextEntry.length > 1) {
             let currentOrderedTopicNextId = orderedTopics.slice(-1)[0].next_id
             nextEntry = nextEntry.filter(val => val.info_id === currentOrderedTopicNextId)
           }
           if (nextEntry.length === 0 && allTopics.length > 1) {
-            return {error_code: "NO_NEXT_ENTRY", error_text: "Ordering error! The entry ordering chain is broken. Make sure you uploaded all dependencies.", error_details: {'orderedTopics': orderedTopics, 'allTopics': allTopics}}
-          } else if (nextEntry.length > 1) {
-            return {error_code: "MULTIPLE_NEXT_ENTRIES", error_text: "Ordering error! The entry ordering chain is broken. Make sure you uploaded all dependencies.", error_details: nextEntry}
+            let noPrevEntry = allTopics.filter(val => val.prev_id == "")
+            if (noPrevEntry.length) orderedTopics.push(noPrevEntry[0])
+            else {
+              let noNextTopic = allTopics.filter(val => val.prev_id == "")
+              if (noNextTopic.length) orderedTopics.push(noNextTopic[0])
+              else orderedTopics.push(allTopics[0])
+              //return {error_code: "NO_NEXT_ENTRY", error_text: "Ordering error! The entry ordering chain is broken (NO_NEXT_ENTRY). Make sure you uploaded all dependencies.", error_details: {'orderedTopics': orderedTopics, 'allTopics': allTopics}}
+            }
+            } else if (nextEntry.length > 1) {
+            orderedTopics.push[nextEntry[0]]
+            //return {error_code: "MULTIPLE_NEXT_ENTRIES", error_text: "Ordering error! The entry ordering chain is broken (MULTIPLE_NEXT_ENTRIES). Make sure you uploaded all dependencies.", error_details: nextEntry}
           }
           allTopics = allTopics.filter(val => val !== nextEntry[0])
           if (nextEntry[0] && allTopics.length) orderedTopics.push(nextEntry[0])

@@ -2,6 +2,9 @@
   <div class="dialogue">
     <div class="dialogue-answers">
       <div class="dialogue-answers__header" v-if="currentTopic">
+        <div class="dialogue-answers__add" v-if="editMode" @click="addEntry">
+          Add entry
+        </div>
         {{ currentTopic }}
         <div class="dialogue-answers__edit">
           <icon
@@ -25,7 +28,7 @@
               color="#E1FF00"
               class="icon_gold"
               scale="1"
-              @click="editMode = false"
+              @click="editMode = false; editedEntry = ''"
             ></icon>
             <!--             <icon
               name="trash"
@@ -261,6 +264,11 @@ export default {
   },
 
   methods: {
+    addEntry() {
+      if (!this.currentTopic) return
+      let location = this.$store.getters['getBestOrderLocationForNpc']([this.speaker, this.currentTopic, this.topicType])
+      this.$store.commit('addDialogue', [this.speaker, this.currentTopic, this.topicType, location[0], location[1], "New entry"])
+    },
     editDialogue() {
       this.$store.commit('editDialogueEntry', [this.editedEntry, event.target.elements.entryText.value])
       this.editedEntry = ''
@@ -351,6 +359,15 @@ export default {
     //overflow-y: scroll;
     &__error {
       background: rgba(110, 32, 32, 0.8);
+    }
+    &__add {
+      position: absolute;
+      cursor: pointer;
+      left: 5px;
+      transition: color .15s ease-in;
+      &:hover {
+        color: rgba(233, 214, 180, 1);
+      }
     }
     &__edit {
       position: absolute;
@@ -511,7 +528,7 @@ export default {
   transition: fill .2s ease-in;
   cursor: pointer;
   &:hover {
-    fill: rgba(202, 165, 96, 0.7);
+    fill: rgba(233, 214, 180, 1);
   }
 }
 

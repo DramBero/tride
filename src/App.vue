@@ -67,6 +67,11 @@ export default {
   src: local("Pelagiad"), url(./fonts/pelagiad/Pelagiad.ttf) format("truetype");
 }
 
+@font-face {
+  font-family: "Consolas";
+  src: local("Consolas"), url(./fonts/consolas/CONSOLA.TTF) format("truetype");
+}
+
 * {
   padding: 0;
   margin: 0;
@@ -75,6 +80,7 @@ export default {
 
 body {
   overflow: hidden;
+  font-family: "Pelagiad";
 }
 
 ::-webkit-scrollbar {

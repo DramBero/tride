@@ -40,7 +40,13 @@
           </div>
         </div>
       </div>
-      <div class="dialogue-answers__frame">
+      <div>
+        <transition-group
+          name="fadeHeight"
+          class="dialogue-answers__frame"
+          mode="out-in"
+          :style="{ width: '100%' }"
+        >
         <form
           v-for="(answer, index) in currentAnswers"
           @submit.prevent="editDialogue"
@@ -157,6 +163,7 @@
             ></icon>
           </div>
         </form>
+      </transition-group>
       </div>
       <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
         {{ getOrderedEntries.error_text }}
@@ -456,12 +463,14 @@ export default {
       }
       &-results {
         border: 1px solid rgba(235, 235, 205, 0.3);
+        font-family: "Consolas";
+        line-height: 20px;
         color: rgb(145, 192, 145);
         width: fit-content;
         //white-space: pre-line;
         min-width: 50%;
         border-radius: 4px;
-        font-size: 17px;
+        font-size: 14px;
         padding: 10px;
         margin: 10px 20px;
         &__result {
@@ -518,7 +527,7 @@ export default {
   display: flex;
   height: 100%;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
 }
 
 .icon_gold {
@@ -540,5 +549,16 @@ export default {
   &:hover {
     fill: rgba(255, 255, 255, 0.5);
   }
+}
+
+.fadeHeight-enter-active,
+.fadeHeight-leave-active {
+  transition: all 0.15s cubic-bezier(1, 1, 1, 1);
+  opacity: 100;
+}
+
+.fadeHeight-enter,
+.fadeHeight-leave-to {
+  opacity: 0%;
 }
 </style>

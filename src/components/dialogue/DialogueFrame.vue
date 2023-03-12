@@ -65,13 +65,20 @@
       </div>
     </div>
 
-    <div class="frame-dialogue">
+    <div >
+      <transition-group
+          name="fadeHeight"
+          class="frame-dialogue"
+          mode="out-in"
+          :style="{ width: '100%' }"
+        >
       <DialogueFrameCard
         v-for="npc in getNPCs"
         :key="npc"
         :speaker-id="npc"
         type="npc"
       />
+    </transition-group>
     </div>
     <ModalMain
       dialogue
@@ -191,5 +198,16 @@ export default {
   justify-content: center;
   //grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;
+}
+
+.fadeHeight-enter-active,
+.fadeHeight-leave-active {
+  transition: all 0.15s cubic-bezier(1, 1, 1, 1);
+  opacity: 100;
+}
+
+.fadeHeight-enter,
+.fadeHeight-leave-to {
+  opacity: 0%;
 }
 </style>

@@ -9,101 +9,105 @@
     <collapse-transition v-if="quest.entries.length">
       <div v-show="isCollapsed">
         <transition-group
-        name="fadeHeight"
-        mode="out-in"
-        :style="{ width: '100%' }"
-      >
-        <div
-          v-for="entry in quest.entries.sort(
-            (a, b) =>
-              parseInt(a.data.disposition) - parseInt(b.data.disposition)
-          )"
-          :key="entry.info_id"
+          name="fadeHeight"
+          mode="out-in"
+          :style="{ width: '100%' }"
         >
-          <div v-if="entryEdit != entry.data.disposition" class="entry-wrapper">
+          <div
+            v-for="entry in quest.entries.sort(
+              (a, b) =>
+                parseInt(a.data.disposition) - parseInt(b.data.disposition)
+            )"
+            :key="entry.info_id"
+          >
             <div
-              class="quest-entry"
-              :class="{
-                'quest-entry_finished': entry.quest_finish,
-                'quest-entry_highlighted': getIsHighlighted(
-                  entry.data.disposition
-                )
-              }"
-              draggable
+              v-if="entryEdit != entry.data.disposition"
+              class="entry-wrapper"
             >
-              <div class="quest-entry__text">{{ entry.text }}</div>
-              <div class="quest-entry__index">{{ entry.data.disposition }}</div>
-            </div>
-            <button class="edit-button">
-              <icon
-                name="pen"
-                scale="1"
-                class="edit-entry-controls__icon"
-                @click="entryEdit = entry.data.disposition"
-              ></icon>
-            </button>
-          </div>
-          <div v-else>
-            <form
-              class="edit"
-              @submit.prevent="editEntry($event, entry.info_id)"
-            >
-              <div class="edit-entry">
-                <div class="edit-entry-above">
-                  <textarea
-                    v-text="entry.text"
-                    name="entryText"
-                    class="edit-entry-above__text"
-                    :spellCheck="true"
-                    lang="en"
-                  ></textarea>
-                  <input
-                    :placeholder="parseInt(entry.data.disposition)"
-                    name="entryDisp"
-                    type="number"
-                    :value="parseInt(entry.data.disposition)"
-                    class="edit-entry-above__disp"
-                  />
+              <div
+                class="quest-entry"
+                :class="{
+                  'quest-entry_finished': entry.quest_finish,
+                  'quest-entry_highlighted': getIsHighlighted(
+                    entry.data.disposition
+                  )
+                }"
+                draggable
+              >
+                <div class="quest-entry__text">{{ entry.text }}</div>
+                <div class="quest-entry__index">
+                  {{ entry.data.disposition }}
                 </div>
-                <label class="edit-entry__checkbox"
-                  ><span>Finished: </span
-                  ><input
-                    type="checkbox"
-                    title="Finished"
-                    name="entryFinished"
-                    :checked="entry.quest_finish"
-                /></label>
               </div>
-              <div class="edit-entry-controls">
-                <button type="submit">
-                  <icon
-                    name="save"
-                    class="edit-entry-controls__icon"
-                    scale="1"
-                  ></icon>
-                </button>
-                <button @click.prevent="entryEdit = ''">
-                  <icon
-                    name="ban"
-                    class="edit-entry-controls__icon"
-                    scale="1"
-                  ></icon>
-                </button>
-                <button @click.prevent="deleteEntry(entry.info_id)">
+              <button class="edit-button">
                 <icon
-                  name="trash"
-                  class="edit-entry-controls__icon"
+                  name="pen"
                   scale="1"
+                  class="edit-entry-controls__icon"
+                  @click="entryEdit = entry.data.disposition"
                 ></icon>
               </button>
-              </div>
-            </form>
+            </div>
+            <div v-else>
+              <form
+                class="edit"
+                @submit.prevent="editEntry($event, entry.info_id)"
+              >
+                <div class="edit-entry">
+                  <div class="edit-entry-above">
+                    <textarea
+                      v-text="entry.text"
+                      name="entryText"
+                      class="edit-entry-above__text"
+                      :spellCheck="true"
+                      lang="en"
+                    ></textarea>
+                    <input
+                      :placeholder="parseInt(entry.data.disposition)"
+                      name="entryDisp"
+                      type="number"
+                      :value="parseInt(entry.data.disposition)"
+                      class="edit-entry-above__disp"
+                    />
+                  </div>
+                  <label class="edit-entry__checkbox"
+                    ><span>Finished: </span
+                    ><input
+                      type="checkbox"
+                      title="Finished"
+                      name="entryFinished"
+                      :checked="entry.quest_finish"
+                  /></label>
+                </div>
+                <div class="edit-entry-controls">
+                  <button type="submit">
+                    <icon
+                      name="save"
+                      class="edit-entry-controls__icon"
+                      scale="1"
+                    ></icon>
+                  </button>
+                  <button @click.prevent="entryEdit = ''">
+                    <icon
+                      name="ban"
+                      class="edit-entry-controls__icon"
+                      scale="1"
+                    ></icon>
+                  </button>
+                  <button @click.prevent="deleteEntry(entry.info_id)">
+                    <icon
+                      name="trash"
+                      class="edit-entry-controls__icon"
+                      scale="1"
+                    ></icon>
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
         </transition-group>
         <div class="add-entry" @click="createEntry">+</div>
       </div>
-      
     </collapse-transition>
     <div v-else class="no-entries">
       No entries yet. <a class="link" @click="createEntry">Create?</a>
@@ -149,7 +153,8 @@ export default {
       return this.$store.getters["getJournalHighlight"];
     },
     getLatestDisposition() {
-      if (!this.quest.entries.length || !this.quest.entries[0].data.disposition) return "10";
+      if (!this.quest.entries.length || !this.quest.entries[0].data.disposition)
+        return "10";
       return (
         Math.floor(
           Math.max(
@@ -244,7 +249,7 @@ input[type="reset"] {
       justify-content: space-between;
       &__icon {
         fill: rgba(77, 58, 23, 0.4);
-        transition: fill .2s ease-in;
+        transition: fill 0.2s ease-in;
         &:hover {
           fill: rgba(77, 58, 23, 1);
         }

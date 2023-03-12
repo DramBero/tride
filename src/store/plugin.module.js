@@ -44,9 +44,10 @@ const getters = {
         }
       }
     }
-    quests.push(questData)
+    if (questData.id) quests.push(questData)
     return quests;
   },
+
   getActivePlugin(state) {
     if (!state.activePlugin.length) return
     let plugin = JSON.parse(JSON.stringify(state.activePlugin))
@@ -61,15 +62,19 @@ const getters = {
     plugin.filter(val => val.type === 'Header')[0].num_objects = (plugin.length - 1)
     return plugin
   },
+
   getActiveHeader(state) {
     return state.activePlugin.filter(val => val.type === 'Header')[0];
   },
+
   getJournalHighlight(state) {
     return state.journalHighlight;
   },
+
   getActivePluginTitle(state) {
     return state.activePluginTitle;
   },
+
   getAllNpcs(state) {
     let depNpcs = []
     for (let dep of state.dependencies) {
@@ -77,10 +82,93 @@ const getters = {
     }
     return [...state.activePlugin.filter(val => val.type === "Npc"), ...depNpcs]
   },
+
+  getAllTopics(state) {
+    let depTopics = []
+    for (let dep of state.dependencies) {
+      depTopics.push(...dep.data.filter(val => val.TMP_type === "Topic" && val.type === 'Dialogue'))
+    }
+    return [...state.activePlugin.filter(val => val.TMP_type === "Topic" && val.type === 'Dialogue'), ...depTopics]
+  },
+
+  getOrderedEntriesByTopic: (state) => ([topicId, dialogueType]) => {
+      let depDialogue = []
+      for (let dep of state.dependencies) {
+        depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType).filter(
+          (topic) =>
+            topic.TMP_topic == topicId
+        )]
+      }
+      let activePlugin = JSON.parse(JSON.stringify(state.activePlugin))
+      let activeDialogue = activePlugin.filter(val => val.TMP_type === dialogueType).filter(
+        (topic) =>
+          topic.TMP_topic == topicId
+      )
+      console.log('ACTIVE: ', ...activeDialogue)
+      let allTopics = [...depDialogue, ...activeDialogue]
+      let orderedTopics = []
+      while (allTopics.length > 0) {
+        if (!orderedTopics.length) {
+          let firstEntry = allTopics.filter(val => val.prev_id == "")
+          console.log('FIRST ENTRY: ', firstEntry)
+          if (firstEntry.length === 0) {
+            return {error_code: "NO_PREV_ID", error_text: "Ordering error! No elements with defined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
+          } else if (firstEntry.length > 1) {
+            return {error_code: "MULTIPLE_PREV_ID", error_text: "Ordering error! More than one elements have a defined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
+          }
+          orderedTopics.push(firstEntry[0])
+          allTopics = allTopics.filter(val => val !== firstEntry[0])
+        }
+        else {
+          let currentOrderedTopicId = orderedTopics.slice(-1)[0].info_id
+          let nextEntry = allTopics.filter(val => val.prev_id === currentOrderedTopicId)
+          if (nextEntry.length === 0) {
+            let currentOrderedTopicNextId = orderedTopics.slice(-1)[0].next_id
+            nextEntry = allTopics.filter(val => val.info_id === currentOrderedTopicNextId)
+          } else if (nextEntry.length > 1) {
+            let currentOrderedTopicNextId = orderedTopics.slice(-1)[0].next_id
+            nextEntry = nextEntry.filter(val => val.info_id === currentOrderedTopicNextId)
+          }
+          if (nextEntry.length === 0 && allTopics.length > 1) {
+            return {error_code: "NO_NEXT_ENTRY", error_text: "Ordering error! The entry ordering chain is broken. Make sure you uploaded all dependencies.", error_details: orderedTopics.slice(-1)[0]}
+          } else if (nextEntry.length > 1) {
+            return {error_code: "MULTIPLE_NEXT_ENTRIES", error_text: "Ordering error! The entry ordering chain is broken. Make sure you uploaded all dependencies.", error_details: nextEntry}
+          }
+          allTopics = allTopics.filter(val => val !== nextEntry[0])
+          if (nextEntry[0] && allTopics.length) orderedTopics.push(nextEntry[0])
+          else break
+        }
+      }
+      return orderedTopics
+  }, 
+
+  getBestOrderLocationForNpc: (state, getters) => ([npcId, topicId, dialogueType]) => {
+    let orderedTopics = getters.getOrderedEntriesByTopic(topicId, dialogueType)
+    if (!orderedTopics.length) return ['', '']
+    else if (orderedTopics.filter(val => val.speaker_id === npcId).length) {
+      return [orderedTopics.filter(val => val.speaker_id === npcId).slice(-1)[0], '']
+    }
+    else {
+      let selectedTopic = orderedTopics.filter(val => val.speaker_id != "")
+      if (selectedTopic.length > 1) selectedTopic = selectedTopic.slice(0, Math.ceil(selectedTopic.length / 2))
+      selectedTopic = selectedTopic[Math.floor(Math.random() * Array.length)]
+      return [selectedTopic.info_id, selectedTopic.next_id]
+    }
+  },
+
   getNpcById: (state, getters) => (npcId) => {
     let npcNames = getters.getAllNpcs.filter(val => val.id === npcId)
     return npcNames.length ? npcNames[0] : {}
   },
+
+  searchNpcs: (state, getters) => (searchString) => {
+    return getters.getAllNpcs.filter(val => val.id.toUpperCase().trim().includes(searchString.toUpperCase().trim()) || val.name.toUpperCase().trim().includes(searchString.toUpperCase().trim()))
+  },
+
+  searchTopics: (state, getters) => (searchString) => {
+    return getters.getAllTopics.filter(val => val.id.toUpperCase().includes(searchString.toUpperCase()))
+  },
+
   getDialogueSpeaker: (state) => (speakerTypes) => {
     let dialogues = [];
     for (let speakerType of speakerTypes) {
@@ -99,18 +187,22 @@ const getters = {
     }
     return dialogues;
   },
+
   getDialogueBySpeaker:
     (state) =>
     ([id, dialogueType]) => {
-      if (state.activePlugin.filter(val => val.TMP_type === dialogueType)) {
-      return state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(
+      let depDialogue = []
+      for (let dep of state.dependencies) {
+        depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType).filter(
+          (topic) =>
+            [topic["speaker_id"], topic["speaker_cell"], topic["speaker_faction"], topic["speaker_class"]].includes(id)
+        )]
+      }
+      let activeDialogue = state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(
         (topic) =>
-          topic["speaker_id"] === id ||
-          topic["speaker_cell"] === id ||
-          topic["speaker_faction"] === id ||
-          topic["speaker_class"] === id
+          [topic["speaker_id"], topic["speaker_cell"], topic["speaker_faction"], topic["speaker_class"]].includes(id)
       )
-      } else return []
+      return [...depDialogue, ...activeDialogue]
     }
 };
 
@@ -128,6 +220,61 @@ const mutations = {
   setActiveHeader(state, header) {
     state.activeHeader = header;
   },
+
+  addDialogue(state, [npcId, topicId, dialogueType, prev_id, next_id, text]) {
+    let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
+    let topicObject = {
+      dialogue_type: "Topic",
+      flags: [
+          0,
+          0
+      ],
+      id: topicId,
+      type: "Dialogue",
+      TMP_topic: topicId,
+      TMP_type: dialogueType,
+    }
+
+    if (prev_id === "" && next_id === "") {
+      state.activePlugin = [...state.activePlugin, topicObject]
+    }
+
+
+    let questEntries = state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId)
+
+    let lastIdIndex = null
+    if (questEntries.length && questEntries[0].info_id) {
+      lastId = questEntries[0].info_id
+      lastIdIndex = state.activePlugin.findIndex(item => item.info_id === lastId)
+    }
+    let newEntry = {
+      data: {
+        dialogue_type: "Topic",
+        disposition: 0,
+        player_rank: -1,
+        speaker_rank: -1,
+        speaker_sex: "Any"
+      },
+      filters: [],
+      flags: [
+          0,
+          0
+      ],
+      info_id: generatedId,
+      next_id: next_id,
+      prev_id: prev_id,
+      speaker_id: npcId,
+      text: text,
+      type: "Info",
+      TMP_topic: topicId,
+      TMP_type: dialogueType
+    }
+    if (lastIdIndex) state.activePlugin.splice(lastIdIndex + 1, 0, newEntry)
+    else state.activePlugin = [...state.activePlugin, newEntry]
+
+    //getBestOrderLocationForNpc: (state, getters) => ([npcId, topicId, dialogueType]) => {
+  },
+
   addJournalQuest(state, [id, name]) {
     let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
     let idEntry = {
@@ -166,6 +313,7 @@ const mutations = {
     state.activePlugin = [...state.activePlugin, idEntry]
     state.activePlugin = [...state.activePlugin, nameEntry]
   },
+
   addJournalEntry(state, [questId, entryText, entryDisposition]) {
     let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
     let questEntries = state.activePlugin.filter(val => val.TMP_type === 'Journal').filter(val => val.TMP_topic === questId).filter(val => val.next_id === "")
@@ -253,15 +401,11 @@ const mutations = {
     for (let entry in state.activePlugin) {
       if (["Info", "Dialogue"].includes(state.activePlugin[entry].type)) {
         if (state.activePlugin[entry].type === "Dialogue") {
-          if (state.activePlugin[entry].id) dialogueId = state.activePlugin[entry].id;
           dialogueType = state.activePlugin[entry].dialogue_type;
-          let dialogueEntry = { ...state.activePlugin[entry], TMP_topic: dialogueId, TMP_type: dialogueType };
-          state.activePlugin[entry] = dialogueEntry
-        } else {
-          if (state.activePlugin[entry].id) dialogueId = state.activePlugin[entry].id;
-          let dialogueEntry = { ...state.activePlugin[entry], TMP_topic: dialogueId, TMP_type: dialogueType };
-          state.activePlugin[entry] = dialogueEntry
         }
+        if (state.activePlugin[entry].id) dialogueId = state.activePlugin[entry].id;
+        let dialogueEntry = { ...state.activePlugin[entry], TMP_topic: dialogueId, TMP_type: dialogueType };
+        state.activePlugin[entry] = dialogueEntry
       }
     }
   },
@@ -270,17 +414,14 @@ const mutations = {
     let dialogueId;
     let pluginData = []
     for (let entry of plugin) {
+      entry = {...entry, TMP_dep: fileName}
       if (["Info", "Dialogue"].includes(entry.type)) {
         if (entry.type === "Dialogue") {
-          if (entry.id) dialogueId = entry.id;
           dialogueType = entry.dialogue_type;
-          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          pluginData.push(Object.freeze(dialogueEntry))
-        } else {
-          if (entry.id) dialogueId = entry.id;
-          let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
-          pluginData.push(Object.freeze(dialogueEntry))
         }
+        if (entry.id) dialogueId = entry.id;
+        let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
+        pluginData.push(Object.freeze(dialogueEntry))
       } else if (["Faction", "Book", "Npc"].includes(entry.type)) {
         pluginData.push(Object.freeze(entry))
       }

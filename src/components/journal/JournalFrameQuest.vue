@@ -37,6 +37,7 @@
               <icon
                 name="pen"
                 scale="1"
+                class="edit-entry-controls__icon"
                 @click="entryEdit = entry.data.disposition"
               ></icon>
             </button>
@@ -46,19 +47,14 @@
               class="edit"
               @submit.prevent="editEntry($event, entry.info_id)"
             >
-              <button @click.prevent="deleteEntry(entry.info_id)">
-                <icon
-                  name="trash"
-                  scale="1"
-                ></icon>
-              </button>
               <div class="edit-entry">
                 <div class="edit-entry-above">
                   <textarea
                     v-text="entry.text"
                     name="entryText"
-                    type="text"
                     class="edit-entry-above__text"
+                    :spellCheck="true"
+                    lang="en"
                   ></textarea>
                   <input
                     :placeholder="parseInt(entry.data.disposition)"
@@ -81,15 +77,24 @@
                 <button type="submit">
                   <icon
                     name="save"
+                    class="edit-entry-controls__icon"
                     scale="1"
                   ></icon>
                 </button>
                 <button @click.prevent="entryEdit = ''">
                   <icon
                     name="ban"
+                    class="edit-entry-controls__icon"
                     scale="1"
                   ></icon>
                 </button>
+                <button @click.prevent="deleteEntry(entry.info_id)">
+                <icon
+                  name="trash"
+                  class="edit-entry-controls__icon"
+                  scale="1"
+                ></icon>
+              </button>
               </div>
             </form>
           </div>
@@ -235,7 +240,14 @@ input[type="reset"] {
     &-controls {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      &__icon {
+        fill: rgba(77, 58, 23, 0.4);
+        transition: fill .2s ease-in;
+        &:hover {
+          fill: rgba(77, 58, 23, 1);
+        }
+      }
     }
     &-above {
       display: flex;
@@ -249,6 +261,10 @@ input[type="reset"] {
         font-size: 20px;
         border: none;
         border-radius: 8px 0 0 8px;
+        resize: none;
+        &:focus {
+          outline: none !important;
+        }
       }
       &__disp {
         width: 70px;
@@ -256,6 +272,17 @@ input[type="reset"] {
         font-family: "Pelagiad";
         font-size: 20px;
         border-radius: 0 8px 8px 0;
+        background: rgb(233, 233, 231);
+        border: none;
+
+        min-width: 50px;
+        max-width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &:focus {
+          outline: none !important;
+        }
       }
     }
   }

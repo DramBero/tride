@@ -18,6 +18,7 @@
         <div class="found-names">
           <div
             class="found-names-name"
+            :class="{'found-names-name_active': !npc.TMP_dep}"
             v-for="npc in getNpcs"
             :key="npc.id"
             @click="
@@ -60,6 +61,7 @@
         <div class="found-names">
           <div
             class="found-names-name"
+            :class="{'found-names-name_active': !topic.TMP_dep}"
             v-for="topic in getTopics"
             :key="topic.id"
             @click="inputTopic = topic.id"
@@ -212,6 +214,12 @@ export default {
     }
     &__id {
       font-size: 17px;
+    }
+    &_active {
+      background: rgba(145, 215, 145, 0.2);
+      &:hover {
+        background: rgba(145, 215, 145, 0.3);
+      }
     }
   }
 }

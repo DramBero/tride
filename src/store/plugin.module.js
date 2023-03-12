@@ -222,7 +222,7 @@ const mutations = {
   },
 
   addDialogue(state, [npcId, topicId, dialogueType, prev_id, next_id, text]) {
-    let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9) + 'KUKS'
+    let generatedId = Math.random().toString().slice(2, 15) + Math.random().toString().slice(2, 9)
     let topicObject = {
       dialogue_type: "Topic",
       flags: [

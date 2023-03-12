@@ -97,6 +97,10 @@ body {
     font-size: 20px;
     padding: 10px;
     border-radius: 8px;
+    &:focus {
+      outline: none !important;
+      border: 1px solid white;
+    }
   }
 }
 
@@ -115,5 +119,14 @@ body {
     border: 2px solid gray;
     cursor: default;
   }
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
 }
 </style>

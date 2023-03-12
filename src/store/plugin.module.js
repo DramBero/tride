@@ -94,13 +94,13 @@ const getters = {
   getOrderedEntriesByTopic: (state) => ([topicId, dialogueType]) => {
       let depDialogue = []
       for (let dep of state.dependencies) {
-        depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType).filter(
+        depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType && val.type === 'Info').filter(
           (topic) =>
             topic.TMP_topic == topicId
         )]
       }
       let activePlugin = JSON.parse(JSON.stringify(state.activePlugin))
-      let activeDialogue = activePlugin.filter(val => val.TMP_type === dialogueType).filter(
+      let activeDialogue = activePlugin.filter(val => val.TMP_type === dialogueType && val.type === 'Info').filter(
         (topic) =>
           topic.TMP_topic == topicId
       )
@@ -146,7 +146,7 @@ const getters = {
     let orderedTopics = getters.getOrderedEntriesByTopic([topicId, dialogueType])
     if (!orderedTopics.length) return ['', '']
     else if (orderedTopics.filter(val => val.speaker_id === npcId).length) {
-      return [orderedTopics.filter(val => val.speaker_id === npcId).slice(-1)[0], '']
+      return [orderedTopics.filter(val => val.speaker_id === npcId).slice(-1)[0].info_id, orderedTopics.filter(val => val.speaker_id === npcId).slice(-1)[0].next_id]
     }
     else {
       let selectedTopic = orderedTopics.filter(val => val.speaker_id != "")
@@ -268,11 +268,11 @@ const mutations = {
       TMP_topic: topicId,
       TMP_type: dialogueType
     }
-    if (state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === prev_id)) {
+    if (state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === prev_id).length) {
       state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === prev_id)[0].next_id = generatedId
     }
 
-    if (state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === next_id)) {
+    if (state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === next_id).length) {
       state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(val => val.TMP_topic === topicId).filter(val => val.info_id === next_id)[0].prev_id = generatedId
     }
     if (lastIdIndex) state.activePlugin.splice(lastIdIndex + 1, 0, newEntry)

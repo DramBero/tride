@@ -195,6 +195,7 @@ export default {
   flex-wrap: wrap;
   padding: 20px 20px 30px 20px;
   display: flex;
+  flex-grow: 1;
   justify-content: center;
   //grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;

@@ -142,7 +142,7 @@ export default {
         this.highlightedComparison = newValue.filter_comparison;
         this.highlightedId = newValue.value.Integer;
       } else {
-        this.isCollapsed = false;
+        if (newValue.id) this.isCollapsed = false;
         this.highlightedComparison = "";
         this.highlightedId = "";
       }
@@ -332,7 +332,7 @@ input[type="reset"] {
       background-color: rgba(145, 215, 145, 0.5);
     }
     &_highlighted {
-      background-color: rgba(255, 242, 122, 0.7) !important;
+      background-image: repeating-linear-gradient(-45deg, transparent, transparent 12px, rgb(216, 199, 122) 12px, rgb(216, 199, 122) 24px);
     }
     &__text {
       flex-grow: 1;

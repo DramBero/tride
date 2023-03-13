@@ -90,6 +90,9 @@ body {
   &-thumb {
     background-color: rgb(202, 165, 96);
   }
+  &-corner {
+    background: none;
+  }
 }
 
 .modal-field {

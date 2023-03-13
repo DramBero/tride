@@ -64,7 +64,6 @@
             </div>
             <div
               class="dialogue-answers-answer-filters"
-              v-if="answer.filters.length"
             >
               <div
                 class="dialogue-answers-answer-filters__filter"
@@ -109,19 +108,8 @@
               class="dialogue-entry-textarea"
             ></textarea>
 
-            <div class="dialogue-answers-answer-results" v-if="answer.result">
-              <div
-                class="dialogue-answers-answer-results__result"
-                :class="{
-                  'dialogue-answers-answer-results__result_lua':
-                    text.includes(';lua')
-                }"
-                v-for="(text, index) in answer.result.split('\n')"
-                :key="index"
-              >
-                {{ text }}
-              </div>
-            </div>
+            <dialogue-entry-results :code="getLanguage(answer.result, 'Lua')" language="Lua" />
+            <dialogue-entry-results :code="getLanguage(answer.result, 'MWScript')" language="MWScript" />
             <div class="dialogue-answers-answer__ids" v-if="false">
               <div class="prev-id">{{ answer.info_id }} (id)</div>
               <div class="curr-id">next id: {{ answer.next_id || "-" }}</div>
@@ -205,10 +193,12 @@
 <script>
 import Icon from "vue-awesome/components/Icon";
 import "vue-awesome/icons";
+import DialogueEntryResults from '../dialogue/DialogueEntryResults.vue';
 
 export default {
   components: {
-    Icon
+    Icon,
+    DialogueEntryResults
   },
   props: {
     speaker: String
@@ -267,7 +257,7 @@ export default {
           (val) => val.TMP_topic == this.currentTopic && !val.TMP_dep
         );
       }
-    }
+    },
   },
 
   methods: {
@@ -292,6 +282,21 @@ export default {
         this.speaker,
         topicType
       ]);
+    },
+    getLanguage(code, language) {
+      if (!code) return ''
+      if (language === "Lua") {
+        return code
+        .split("\r\n")
+          .filter((val) => val.includes(";lua "))
+          .map((val) => val.replace(";lua ", ""))
+          .join("\r\n");
+      } else if (language === "MWScript") {
+        return code
+          .split("\r\n")
+          .filter((val) => !val.includes(";lua "))
+          .join("\r\n");
+      }
     },
     parseComparison(comparison) {
       switch (comparison) {
@@ -395,7 +400,9 @@ export default {
       display: flex;
       flex-direction: column;
       gap: 20px;
+      max-width: 100%;
       overflow-y: scroll;
+      overflow-x: hidden;
       padding: 5px;
       scroll-behavior: smooth;
       ::-webkit-scrollbar {
@@ -410,6 +417,7 @@ export default {
     }
     &-answer {
       flex-grow: 1;
+      max-width: 100%;
       &-wrapper {
         display: flex;
         align-items: center;
@@ -461,25 +469,6 @@ export default {
           width: fit-content;
         }
       }
-      &-results {
-        border: 1px solid rgba(235, 235, 205, 0.3);
-        font-family: "Consolas";
-        line-height: 20px;
-        color: rgb(145, 192, 145);
-        width: fit-content;
-        //white-space: pre-line;
-        min-width: 50%;
-        border-radius: 4px;
-        font-size: 14px;
-        padding: 10px;
-        margin: 10px 20px;
-        &__result {
-          display: block;
-          &_lua {
-            color: rgb(159, 169, 223);
-          }
-        }
-      }
     }
   }
   &-entry-textarea {
@@ -527,7 +516,7 @@ export default {
   display: flex;
   height: 100%;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-between;
 }
 
 .icon_gold {
@@ -548,6 +537,20 @@ export default {
   cursor: pointer;
   &:hover {
     fill: rgba(255, 255, 255, 0.5);
+  }
+}
+
+.script-language {
+  background: rgba(170, 169, 98, 0.5);
+  width: 100%;
+  display: block;
+  color: rgb(237, 238, 167);
+  padding: 0 10px;
+  margin-bottom: 5px;
+  font-weight: 700;
+  &_lua {
+    color: rgb(167, 236, 238);
+    background: rgba(98, 150, 170, 0.5);
   }
 }
 

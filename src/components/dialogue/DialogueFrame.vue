@@ -52,15 +52,10 @@
           Class {{ getSpeakerClassLength }}
         </div>
         <div
-          v-if="false"
-          class="frame-controls-types__type"
-          :class="{
-            'frame-controls-types__type_active':
-              speakerTypes.includes('speaker_universal')
-          }"
-          @click="toggleType('speaker_universal')"
+          class="frame-controls-types__type frame-controls-types__type_generic"
+          @click="openGeneric"
         >
-          Global
+          Open Generic
         </div>
       </div>
     </div>
@@ -132,6 +127,9 @@ export default {
     },
     addDialogue() {
       this.$store.commit("setDialogueCreateModal", true);
+    },
+    openGeneric() {
+      this.$store.commit("setDialogueModal", "Generic Dialogue");
     }
   }
 };
@@ -155,7 +153,7 @@ export default {
       display: flex;
       gap: 5px;
       &__type {
-        width: 90px;
+        min-width: 90px;
         user-select: none;
         border-radius: 4px;
         cursor: pointer;
@@ -171,6 +169,16 @@ export default {
         transition: all 0.2s ease-in;
         &:hover {
           color: white;
+        }
+        &_generic {
+          min-width: 140px;
+          border: 2px solid rgba(255, 255, 255, 0.4);
+          color: black;
+          background-color: rgba(160, 160, 160, 1);
+          &:hover {
+            background-color: rgb(200, 200, 200);
+            color: black;
+          }
         }
         &_active {
           border: 3px solid rgb(202, 165, 96);

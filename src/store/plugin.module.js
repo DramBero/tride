@@ -210,11 +210,11 @@ const getters = {
       if (id === 'Generic Dialogue') {
         for (let dep of state.dependencies) {
           depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType).filter(
-            (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && topic["speaker_class"]
+            (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && !topic["speaker_class"]
           )]
         }
         let activeDialogue = state.activePlugin.filter(val => val.TMP_type === dialogueType).filter(
-          (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && topic["speaker_class"]
+          (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && !topic["speaker_class"]
         )
         return [...depDialogue, ...activeDialogue]
       }

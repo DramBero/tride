@@ -40,7 +40,6 @@
           </div>
         </div>
       </div>
-      <div>
         <transition-group
           name="fadeHeight"
           class="dialogue-answers__frame"
@@ -152,7 +151,6 @@
           </div>
         </form>
       </transition-group>
-      </div>
       <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
         {{ getOrderedEntries.error_text }}
       </div>

@@ -65,7 +65,6 @@
       </div>
     </div>
 
-    <div >
       <transition-group
           name="fadeHeight"
           class="frame-dialogue"
@@ -79,7 +78,6 @@
         type="npc"
       />
     </transition-group>
-    </div>
     <ModalMain
       dialogue
       v-show="getOpenModalDialogue"

@@ -54,9 +54,14 @@ export default {
 <style lang="scss">
 .editor-code {
     overflow-x: scroll;
-    .prism-editor__textarea:focus {
-    outline: none;
-  }
+    .prism-editor {
+        &__textarea {
+            white-space: nowrap;
+            &:focus {
+                outline: none;
+            }
+        }
+    }
 }
       .results {
         border: 1px solid rgba(170, 169, 98, 0.7);

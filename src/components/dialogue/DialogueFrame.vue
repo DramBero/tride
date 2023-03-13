@@ -55,7 +55,7 @@
           class="frame-controls-types__type frame-controls-types__type_generic"
           @click="openGeneric"
         >
-          Open Generic
+          Global
         </div>
       </div>
     </div>
@@ -129,7 +129,7 @@ export default {
       this.$store.commit("setDialogueCreateModal", true);
     },
     openGeneric() {
-      this.$store.commit("setDialogueModal", "Generic Dialogue");
+      this.$store.commit("setDialogueModal", "Global Dialogue");
     }
   }
 };

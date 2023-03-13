@@ -207,7 +207,7 @@ const getters = {
     (state) =>
     ([id, dialogueType]) => {
       let depDialogue = []
-      if (id === 'Generic Dialogue') {
+      if (id === 'Global Dialogue') {
         for (let dep of state.dependencies) {
           depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType && val.type === 'Info').filter(
             (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && !topic["speaker_class"]

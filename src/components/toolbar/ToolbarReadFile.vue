@@ -1,7 +1,7 @@
 <template>
   <div class="text-reader__wrapper" :class="{'text-reader__wrapper_dep': !active}">
     <label class="text-reader">
-      <input ref="file" type="file" @change="loadTextFromFile" />
+      <input ref="file" type="file" accept=".json" @change="loadTextFromFile" />
       {{ active ? "Load active plugin" : "Load dependency" }}
     </label>
     {{ fileName }}

@@ -16,13 +16,6 @@
             @click="editMode = true"
           ></icon>
           <div v-else>
-            <!--             <icon
-              name="save"
-              color="#E1FF00"
-              class="icon_gold"
-              scale="1"
-              @click="editMode = false"
-            ></icon> -->
             <icon
               name="ban"
               color="#E1FF00"
@@ -30,13 +23,6 @@
               scale="1"
               @click="editMode = false; editedEntry = ''"
             ></icon>
-            <!--             <icon
-              name="trash"
-              color="#E1FF00"
-              class="icon_gold"
-              scale="1"
-              @click="editMode = false"
-            ></icon> -->
           </div>
         </div>
       </div>
@@ -53,7 +39,7 @@
           class="dialogue-answers-answer-wrapper"
         >
           <div
-            :draggable="editMode"
+
             class="dialogue-answers-answer"
             :class="{ 'dialogue-answers-answer_edit': editMode }"
           >
@@ -61,37 +47,8 @@
               <div class="prev-id">{{ answer.prev_id || "-" }} (before)</div>
               <div class="curr-id">id: {{ answer.info_id }}</div>
             </div>
-            <div
-              class="dialogue-answers-answer-filters"
-            >
-              <div
-                class="dialogue-answers-answer-filters__filter"
-                v-for="(filter, index) in answer.filters"
-                :key="index"
-                tabindex="0"
-                @focus="handleFilter(filter)"
-                @focusout="handleFilter({})"
-              >
-                <span class="filter__if">if </span>
-                <span class="filter__function"
-                  >{{ filter.filter_function }}
-                </span>
-                <span class="filter__id">{{ filter.id }} </span>
-                <span class="filter__comparison"
-                  >{{ parseComparison(filter.filter_comparison) }}
-                </span>
-                <span class="filter__value">{{
-                  Object.values(filter.value)[0]
-                }}</span>
-              </div>
-              <icon
-                v-if="editMode"
-                name="plus-circle"
-                class="icon_gray"
-                scale="1.5"
-              ></icon>
-            </div>
 
+            <DialogueEntryFilters :answer="answer" :speaker="speaker"/>
 
             <div
               v-if="editedEntry !== answer.info_id"
@@ -107,8 +64,9 @@
               class="dialogue-entry-textarea"
             ></textarea>
 
-            <dialogue-entry-results :code="getLanguage(answer.result, 'Lua')" language="Lua" />
-            <dialogue-entry-results :code="getLanguage(answer.result, 'MWScript')" language="MWScript" />
+            <DialogueEntryResults :editMode="editMode" :code="getLanguage(answer.result, 'Lua')" language="Lua" />
+            <DialogueEntryResults :editMode="editMode" :code="getLanguage(answer.result, 'MWScript')" language="MWScript" />
+
             <div class="dialogue-answers-answer__ids" v-if="false">
               <div class="prev-id">{{ answer.info_id }} (id)</div>
               <div class="curr-id">next id: {{ answer.next_id || "-" }}</div>
@@ -192,11 +150,13 @@
 import Icon from "vue-awesome/components/Icon";
 import "vue-awesome/icons";
 import DialogueEntryResults from '../dialogue/DialogueEntryResults.vue';
+import DialogueEntryFilters from '../dialogue/DialogueEntryFilters.vue';
 
 export default {
   components: {
     Icon,
-    DialogueEntryResults
+    DialogueEntryResults,
+    DialogueEntryFilters
   },
   props: {
     speaker: String
@@ -296,31 +256,6 @@ export default {
           .join("\r\n");
       }
     },
-    parseComparison(comparison) {
-      switch (comparison) {
-        case "Equal":
-          return "==";
-        case "GreaterEqual":
-          return ">=";
-        case "LesserEqual":
-          return "<=";
-        case "Less":
-          return "<";
-        case "Greater":
-          return ">";
-        case "NotEqual":
-          return "!=";
-        default:
-          return comparison;
-      }
-    },
-    handleFilter(filter) {
-      if (filter.filter_function === "JournalType") {
-        this.$store.commit("setJournalHighlight", filter);
-      } else {
-        this.$store.commit("setJournalHighlight", {});
-      }
-    },
     handleAnswerClick(e) {
       //if (this.editMode) return;
       if (
@@ -403,7 +338,7 @@ export default {
       overflow-x: hidden;
       padding: 5px;
       scroll-behavior: smooth;
-      ::-webkit-scrollbar {
+/*       ::-webkit-scrollbar {
         width: 5px;
         scrollbar-width: thin;
         background: rgba(25, 56, 31, 0.02);
@@ -411,7 +346,7 @@ export default {
         &-thumb {
           background-color: rgba(25, 56, 31, 0.4);
         }
-      }
+      } */
     }
     &-answer {
       flex-grow: 1;
@@ -450,23 +385,6 @@ export default {
         justify-content: space-between;
         font-size: 15px;
       }
-      &-filters {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        &__filter {
-          display: inline-block;
-          cursor: pointer;
-          align-items: center;
-          background: rgba(255, 255, 255, 0.7);
-          border-radius: 20px;
-          padding: 5px 10px;
-          margin: 5px;
-          color: black;
-          height: fit-content;
-          width: fit-content;
-        }
-      }
     }
   }
   &-entry-textarea {
@@ -504,12 +422,6 @@ export default {
   }
 }
 
-.filter {
-  &__if {
-    color: rgb(33, 133, 38);
-  }
-}
-
 .entry-edit-controls {
   display: flex;
   height: 100%;
@@ -535,20 +447,6 @@ export default {
   cursor: pointer;
   &:hover {
     fill: rgba(255, 255, 255, 0.5);
-  }
-}
-
-.script-language {
-  background: rgba(170, 169, 98, 0.5);
-  width: 100%;
-  display: block;
-  color: rgb(237, 238, 167);
-  padding: 0 10px;
-  margin-bottom: 5px;
-  font-weight: 700;
-  &_lua {
-    color: rgb(167, 236, 238);
-    background: rgba(98, 150, 170, 0.5);
   }
 }
 

@@ -71,7 +71,7 @@ export default {
   }
 }
 .results {
-  border: 1px solid rgba(170, 169, 98, 0.7);
+  border: 1px solid rgba(170, 169, 98, 0.5);
   font-family: "Consolas";
   background: rgb(32, 32, 22);
   line-height: 20px;
@@ -82,12 +82,12 @@ export default {
   border-radius: 4px;
   font-size: 14px;
   padding: 0px;
-  margin: 10px 20px;
+  margin: 10px 30px;
   &:focus {
     background: rgb(59, 59, 59);
   }
   &_lua {
-    border: 1px solid rgba(98, 150, 170, 0.7);
+    border: 1px solid rgba(98, 150, 170, 0.5);
     background: rgb(17, 30, 36);
     .dialogue-answers-answer-results__result {
       color: rgb(159, 169, 223);
@@ -101,17 +101,17 @@ export default {
 }
 
 .script-language {
-  background: rgba(170, 169, 98, 0.5);
+  background: rgba(170, 169, 98, 0.2);
   width: 100%;
   display: block;
   color: rgb(237, 238, 167);
-  padding: 0 10px;
+  padding: 5px 10px;
   //margin-bottom: 5px;
   font-size: 16px;
   font-weight: 500;
   &_lua {
     color: rgb(167, 236, 238);
-    background: rgba(98, 150, 170, 0.5);
+    background: rgba(98, 150, 170, 0.2);
   }
 }
 </style>

@@ -32,10 +32,14 @@
           mode="out-in"
           :style="{ width: '100%' }"
         >
+        <div v-for="(answer, index) in currentAnswers" :key="index" class="highlight-even">
+          <div class="dialogue-answers-answer__above">
+
+          </div>
         <form
-          v-for="(answer, index) in currentAnswers"
+          
           @submit.prevent="editDialogue"
-          :key="index"
+          
           class="dialogue-answers-answer-wrapper"
         >
           <div
@@ -108,6 +112,10 @@
             ></icon>
           </div>
         </form>
+        <div class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin">
+
+</div>
+      </div>
       </transition-group>
       <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
         {{ getOrderedEntries.error_text }}
@@ -332,7 +340,7 @@ export default {
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      //gap: 20px;
       max-width: 100%;
       overflow-y: scroll;
       overflow-x: hidden;
@@ -351,10 +359,24 @@ export default {
     &-answer {
       flex-grow: 1;
       max-width: 100%;
+      &__above {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        height: 1px;
+        
+        background: rgba(202, 165, 96, 0.4);
+        background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(134, 134, 134, 0.4) 20%, rgba(134, 134, 134, 0.4) 80%, rgba(0,0,0,0) 100%);
+        &_no-margin {
+          margin: 0;
+        }
+      }
       &-wrapper {
         display: flex;
         align-items: center;
         gap: 5px;
+        margin-bottom: 20px;
       }
       &_edit {
         border: 1px dotted rgb(202, 165, 96);
@@ -408,7 +430,7 @@ export default {
     border-left: 2px solid rgb(202, 165, 96);
     overflow-y: scroll;
     &__topic {
-      padding: 5px 10px 0px 10px;
+      padding: 10px 10px 0px 10px;
       cursor: pointer;
       color: rgb(112, 126, 207);
       &:hover {
@@ -419,6 +441,15 @@ export default {
       padding: 10px 0;
       border-bottom: 2px solid rgb(202, 165, 96);
     }
+  }
+}
+
+.highlight-even {
+  background: rgb(0,0,0);
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(92, 85, 44, 0.20) 20%, rgba(92, 85, 44,0.20) 80%, rgba(0,0,0,0) 100%);
+  &:nth-child(even) {
+    background: rgb(0,0,0);
+  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(92, 85, 44,0.12) 20%, rgba(92, 85, 44,0.12) 80%, rgba(0,0,0,0) 100%);
   }
 }
 

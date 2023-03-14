@@ -1,6 +1,6 @@
 <template>
   <div class="frame-upload">
-    <ToolbarReadFile active />
+    <ToolbarReadFile />
     <div class="frame-upload-deps">
       <div class="frame-upload-deps__title" v-if="getDependencies && getDependencies.length > 0">Requires:</div>
       <div
@@ -8,7 +8,7 @@
         v-for="dep in getDependencies"
         :key="dep"
       >
-        {{ dep }} <ToolbarReadFile />
+        {{ dep }} <ToolbarReadFile :dep="dep"/>
       </div>
     </div>
   </div>

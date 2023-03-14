@@ -98,6 +98,37 @@ const getters = {
     return uniqueObjects
   },
 
+  getOrderedDeps: (state) => {
+    let orderedPluginsESM = []
+    let orderedPluginsESP = []
+    let headers = state.dependencies.map(val => val.data.find(entry => entry.type === 'Header'))
+    let activeHeader = state.activePlugin.filter(val => val.type === 'Header')
+    let test = []
+    if (activeHeader.length) headers.push(activeHeader[0])
+    let dependencies = headers.map(val => val.masters).filter(val => val.length).map(val => val.map(val => val[0]))
+    while (dependencies.length) {
+      dependencies = dependencies.filter(val => val.length)
+      test.push({dependencies: dependencies})
+      let masters = dependencies.shift().filter(v => dependencies.every(a => a.indexOf(v) !== -1))
+      if (masters.length) {
+        test.push({masters: masters})
+        for (let master of masters) {
+          if (master.toUpperCase().includes('.ESM')) orderedPluginsESM.push(master)
+          else orderedPluginsESP.push(master)
+          dependencies = dependencies.filter(val => val !== master)
+          
+        }
+      } else {
+        for (master in dependencies) {
+          if (master.toUpperCase().includes('.ESM')) orderedPluginsESM.push(master)
+          else orderedPluginsESP.push(master)
+          dependencies = dependencies.filter(val => val !== master)
+        }
+      }
+    }
+    return test
+  },
+
   getOrderedEntriesByTopic: (state) => ([topicId, dialogueType]) => {
       let depDialogue = []
       for (let dep of state.dependencies) {
@@ -466,7 +497,7 @@ const mutations = {
         if (entry.id) dialogueId = entry.id;
         let dialogueEntry = { ...entry, TMP_topic: dialogueId, TMP_type: dialogueType };
         pluginData.push(Object.freeze(dialogueEntry))
-      } else if (["Faction", "Book", "Npc"].includes(entry.type)) {
+      } else if (["Faction", "Book", "Npc", "Header"].includes(entry.type)) {
         pluginData.push(Object.freeze(entry))
       }
     }

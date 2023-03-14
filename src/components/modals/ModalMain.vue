@@ -78,6 +78,8 @@ export default {
       background-color: rgba(0, 0, 0, 0);
       border-radius: 2px;
       padding: 8px 20px;
+      height: 35px;
+      transition: all .2s ease-in;
     }
     &__close {
       color: black;

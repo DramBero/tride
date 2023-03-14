@@ -250,6 +250,7 @@ export default {
     width: auto;
     display: flex;
     justify-content: center;
+    overflow-y: scroll;
   }
 }
 

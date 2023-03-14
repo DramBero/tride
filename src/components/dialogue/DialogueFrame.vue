@@ -4,7 +4,7 @@
       <div class="frame-controls-left">
         <div
           class="frame-controls-types__type frame-controls-types__type_active"
-          :style="{'gap': '10px'}"
+          :style="{ gap: '10px' }"
           @click="addDialogue()"
         >
           Add <icon name="plus-circle" scale="1"></icon>
@@ -12,6 +12,7 @@
       </div>
       <div class="frame-controls-types" v-if="getNPCs">
         <div
+        v-if="getSpeakerIdLength"
           class="frame-controls-types__type"
           :class="{
             'frame-controls-types__type_active':
@@ -22,6 +23,7 @@
           Name {{ getSpeakerIdLength }}
         </div>
         <div
+        v-if="getSpeakerCellLength"
           class="frame-controls-types__type"
           :class="{
             'frame-controls-types__type_active':
@@ -32,6 +34,7 @@
           Cell {{ getSpeakerCellLength }}
         </div>
         <div
+        v-if="getSpeakerFactionLength"
           class="frame-controls-types__type"
           :class="{
             'frame-controls-types__type_active':
@@ -42,6 +45,7 @@
           Faction {{ getSpeakerFactionLength }}
         </div>
         <div
+          v-if="getSpeakerClassLength"
           class="frame-controls-types__type"
           :class="{
             'frame-controls-types__type_active':
@@ -52,6 +56,17 @@
           Class {{ getSpeakerClassLength }}
         </div>
         <div
+          v-if="getSpeakerRaceLength"
+          class="frame-controls-types__type"
+          :class="{
+            'frame-controls-types__type_active':
+              speakerTypes.includes('speaker_rank')
+          }"
+          @click="toggleType('speaker_rank')"
+        >
+          Race {{ getSpeakerRaceLength }}
+        </div>
+        <div
           class="frame-controls-types__type frame-controls-types__type_generic"
           @click="openGeneric"
         >
@@ -59,13 +74,13 @@
         </div>
       </div>
     </div>
-
-      <transition-group
-          name="fadeHeight"
-          class="frame-dialogue"
-          mode="out-in"
-          :style="{ width: '100%' }"
-        >
+<div class="frame-dialogue__wrapper">
+    <transition-group
+      name="fadeHeight"
+      class="frame-dialogue"
+      mode="out-in"
+      :style="{ width: '100%' }"
+    >
       <DialogueFrameCard
         v-for="npc in getNPCs"
         :key="npc"
@@ -73,6 +88,13 @@
         type="npc"
       />
     </transition-group>
+  </div>
+  <transition
+      name="fadeHeight"
+      class="frame-dialogue"
+      mode="out-in"
+      :style="{ width: '100%' }"
+    >
     <ModalMain
       dialogue
       v-show="getOpenModalDialogue"
@@ -81,6 +103,7 @@
     >
       <ModalContentDialogue :speaker="getOpenModalDialogue" />
     </ModalMain>
+  </transition>
   </div>
 </template>
 
@@ -105,16 +128,32 @@ export default {
       return this.$store.getters["getDialogueModal"];
     },
     getSpeakerIdLength() {
-      return this.$store.getters["getDialogueSpeaker"](["speaker_id"]).length || '';
+      return (
+        this.$store.getters["getDialogueSpeaker"](["speaker_id"]).length || ""
+      );
     },
     getSpeakerCellLength() {
-      return this.$store.getters["getDialogueSpeaker"](["speaker_cell"]).length || '';
+      return (
+        this.$store.getters["getDialogueSpeaker"](["speaker_cell"]).length || ""
+      );
     },
     getSpeakerFactionLength() {
-      return this.$store.getters["getDialogueSpeaker"](["speaker_faction"]).length || '';
+      return (
+        this.$store.getters["getDialogueSpeaker"](["speaker_faction"]).length ||
+        ""
+      );
     },
     getSpeakerClassLength() {
-      return this.$store.getters["getDialogueSpeaker"](["speaker_class"]).length || '';
+      return (
+        this.$store.getters["getDialogueSpeaker"](["speaker_class"]).length ||
+        ""
+      );
+    },
+    getSpeakerRaceLength() {
+      return (
+        this.$store.getters["getDialogueSpeaker"](["speaker_rank"]).length ||
+        ""
+      );
     },
   },
   methods: {
@@ -138,7 +177,8 @@ export default {
 <style lang="scss">
 .frame {
   display: flex;
-  background-image: linear-gradient(#465057 1px, transparent 1px), linear-gradient(to right, #465057 1px, transparent 1px);
+  background-image: linear-gradient(#465057 1px, transparent 1px),
+    linear-gradient(to right, #465057 1px, transparent 1px);
   background-size: 33px 33px;
   background-color: #2c3a42;
   position: relative;
@@ -186,7 +226,7 @@ export default {
           color: black;
           &:hover {
             color: black;
-            background-color: rgba(202, 165, 96, 0.7);;
+            background-color: rgba(202, 165, 96, 0.7);
           }
         }
       }
@@ -201,10 +241,16 @@ export default {
   flex-wrap: wrap;
   padding: 20px 20px 30px 20px;
   display: flex;
-  flex-grow: 1;
+  //flex-grow: 1;
   justify-content: center;
+  margin: 0 auto;
   //grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 10px;
+  &__wrapper {
+    width: auto;
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .fadeHeight-enter-active,

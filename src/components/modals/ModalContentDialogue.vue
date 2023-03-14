@@ -48,7 +48,7 @@
               <div class="curr-id">id: {{ answer.info_id }}</div>
             </div>
 
-            <DialogueEntryFilters :answer="answer" :speaker="speaker"/>
+            <DialogueEntryFilters :answer="answer" :speaker="speaker" :editMode="editMode"/>
 
             <div
               v-if="editedEntry !== answer.info_id"
@@ -281,7 +281,7 @@ export default {
 
   watch: {
     speaker() {
-      this.currentAnswers = [];
+      this.setCurrentAnswers(["", ""]);
       this.currentTopic = "";
     }
   }

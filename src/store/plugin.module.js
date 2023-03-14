@@ -210,23 +210,23 @@ const getters = {
       if (id === 'Global Dialogue') {
         for (let dep of state.dependencies) {
           depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType && val.type === 'Info').filter(
-            (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && !topic["speaker_class"]
+            (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && !topic["speaker_class"] && !topic["speaker_rank"]
           )]
         }
         let activeDialogue = state.activePlugin.filter(val => val.TMP_type === dialogueType && val.type === 'Info').filter(
-          (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && !topic["speaker_class"]
+          (topic) => !topic["speaker_id"] && !topic["speaker_cell"] && !topic["speaker_faction"] && !topic["speaker_class"] && !topic["speaker_rank"]
         )
         return [...depDialogue, ...activeDialogue]
       }
       for (let dep of state.dependencies) {
         depDialogue = [...depDialogue, ...dep.data.filter(val => val.TMP_type === dialogueType && val.type === 'Info').filter(
           (topic) =>
-            [topic["speaker_id"], topic["speaker_cell"], topic["speaker_faction"], topic["speaker_class"]].includes(id)
+            [topic["speaker_id"], topic["speaker_cell"], topic["speaker_faction"], topic["speaker_class"], topic["speaker_rank"]].includes(id)
         )]
       }
       let activeDialogue = state.activePlugin.filter(val => val.TMP_type === dialogueType && val.type === 'Info').filter(
         (topic) =>
-          [topic["speaker_id"], topic["speaker_cell"], topic["speaker_faction"], topic["speaker_class"]].includes(id)
+          [topic["speaker_id"], topic["speaker_cell"], topic["speaker_faction"], topic["speaker_class"], topic["speaker_rank"]].includes(id)
       )
       return [...depDialogue, ...activeDialogue]
     }

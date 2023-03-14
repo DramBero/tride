@@ -16,7 +16,7 @@ export default {
       return this.$store.getters['getActivePluginTitle']
     },
     getPluginData() {
-      return this.$store.getters['getActivePlugin'].map(val => Object.fromEntries(Object.entries(val).filter(([key]) => !key.includes('TMP_topic') && !key.includes('TMP_type'))))
+      return this.$store.getters['getActivePlugin'] && this.$store.getters['getActivePlugin'].map(val => Object.fromEntries(Object.entries(val).filter(([key]) => !key.includes('TMP_topic') && !key.includes('TMP_type'))))
     },
     getDownloadLink() {
       return "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.getPluginData));

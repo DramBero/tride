@@ -3,7 +3,7 @@
     <div
       class="dialogue-filters__filter dialogue-filters__filter_speaker"
       v-for="speakerType in getOtherSpeakers"
-      :key="speakerType.value"
+      :key="speakerType.value + speakerType.type"
       tabindex="0"
       @focus="handleFilter(filter)"
       @focusout="handleFilter({})"
@@ -61,6 +61,9 @@ export default {
     },
     speaker: {
       type: String
+    },
+    editMode: {
+        type: Boolean
     }
   },
   computed: {
@@ -84,11 +87,23 @@ export default {
         },
         {
             type: 'Speaker Sex',
-            value: this.answer.speaker_sex
+            value: this.answer.data.speaker_sex !== 'Any' ? this.answer.data.speaker_sex : ''
         },
         {
             type: 'Speaker Rank',
+            value: this.answer.data.speaker_rank !== -1 ? this.answer.data.speaker_rank : ''
+        },
+        {
+            type: 'Speaker Race',
             value: this.answer.speaker_rank
+        },
+        {
+            type: 'Player Rank',
+            value: this.answer.data.player_rank !== -1 ? this.answer.data.player_rank : ''
+        },
+        {
+            type: 'Player Faction',
+            value: this.answer.player_faction
         },
       ].filter(val => val.value && val.value !== this.speaker)
       ;

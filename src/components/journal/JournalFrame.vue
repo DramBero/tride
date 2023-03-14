@@ -1,6 +1,6 @@
 <template>
   <div class="journal-frame">
-    <div class="journal-frame__controls" v-if="getJournal.length">
+    <div class="journal-frame__controls" v-if="true">
       <div class="add-quest" @click="addQuest()">
         New <icon name="plus-circle" class="add-quest__button" scale="1"></icon>
       </div>

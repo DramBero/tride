@@ -41,6 +41,7 @@ export default {
 <style lang="scss">
 .window {
   position: absolute;
+  box-shadow: 0px 0px 9px 5px rgba(0, 0, 0, 0.15);
   top: 50%;
   left: 50%;
   width: 33%;

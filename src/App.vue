@@ -17,6 +17,20 @@
     >
       <ModalContentNewQuest />
     </ModalMain>
+    <transition
+      name="fadeHeight"
+      class="frame-dialogue"
+      mode="out-in"
+      :style="{ width: '100%' }"
+    >
+      <ModalMain
+        v-show="getOpenModalDialogue"
+        modalHide="hideDialogue"
+        :header="getOpenModalDialogue"
+      >
+        <ModalContentDialogue :speaker="getOpenModalDialogue" />
+      </ModalMain>
+    </transition>
     <CWorkspace />
   </div>
 </template>
@@ -46,7 +60,7 @@ export default {
     ModalContentDialogue,
     ModalContentNewQuest,
     ModalContentNewDialogue
-},
+  },
   computed: {
     getOpenModal() {
       return this.$store.getters["getOpenFile"];
@@ -57,6 +71,9 @@ export default {
     getDialogueCreateModal() {
       return this.$store.getters["getDialogueCreateModal"];
     },
+    getOpenModalDialogue() {
+      return this.$store.getters["getDialogueModal"];
+    }
   }
 };
 </script>
@@ -97,18 +114,34 @@ body {
 
 .modal-field {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  &__name {
+    font-size: 20px;
+  }
   &__input {
     width: 100%;
+    resize: none;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgb(202, 165, 96);
     color: rgb(202, 165, 96);
-    font-family: 'Pelagiad';
+    font-family: "Pelagiad";
     font-size: 20px;
     padding: 10px;
     border-radius: 8px;
     &:focus {
       outline: none !important;
       border: 1px solid white;
+    }
+  }
+  &_dark {
+    .modal-field__input {
+      background: rgba(0, 0, 0, 0.45);
+      border: 2px solid rgb(68, 59, 44);
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.2);
+      }
     }
   }
 }
@@ -119,7 +152,34 @@ body {
   max-width: 100px;
   border-radius: 4px;
   cursor: pointer;
-  transition: color .15s ease-in;
+  transition: color 0.15s ease-in;
+  &_dark {
+    min-width: 90px;
+        user-select: none;
+        border-radius: 4px;
+        cursor: pointer;
+        border: 2px solid rgb(120, 120, 120);
+        background: rgba(0, 0, 0, 0.85);
+        color: rgb(120, 120, 120);
+        font-family: "Pelagiad";
+        font-size: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.2s ease-in;
+        &:hover {
+          color: white;
+        }
+        &-active {
+          border: 2px solid rgb(204, 204, 204);
+          color: black;
+          background-color: rgb(204, 204, 204);
+          &:hover {
+            background-color: rgb(200, 200, 200);
+            color: black;
+          }
+        }
+  }
   &:hover {
     color: white;
   }
@@ -130,7 +190,7 @@ body {
   }
 }
 
-input[type='number'] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 

@@ -112,6 +112,7 @@ export default {
   methods: {
     handleFilter(filter) {
       if (filter.filter_function === "JournalType") {
+        this.$store.commit("setSidebarActive", 'Journal')
         this.$store.commit("setJournalHighlight", filter);
       } else {
         this.$store.commit("setJournalHighlight", {});

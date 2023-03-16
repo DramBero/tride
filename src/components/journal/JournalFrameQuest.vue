@@ -311,6 +311,7 @@ input[type="reset"] {
     text-align: left;
     user-select: none;
     padding: 5px 0 8px 0;
+    transition: all 0.1s ease-out;
     &:hover {
       color: rgb(180, 80, 60);
     }
@@ -328,11 +329,24 @@ input[type="reset"] {
     min-height: 50px;
     display: flex;
     transition: all 0.2s ease-in;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 12px,
+        transparent 12px,
+        transparent 24px
+      );
     &_finished {
       background-color: rgba(145, 215, 145, 0.5);
     }
     &_highlighted {
-      background-image: repeating-linear-gradient(-45deg, transparent, transparent 12px, rgb(216, 199, 122) 12px, rgb(216, 199, 122) 24px);
+      background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 12px,
+        rgb(216, 199, 122) 12px,
+        rgb(216, 199, 122) 24px
+      );
     }
     &__text {
       flex-grow: 1;
@@ -356,6 +370,11 @@ input[type="reset"] {
   text-align: center;
   cursor: pointer;
   padding: 15px;
+  color: rgba(44, 41, 34, 0.4);
+  transition: color 0.2s ease-in;
+  &:hover {
+    color: rgb(235, 219, 129);
+  }
 }
 
 .link {

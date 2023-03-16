@@ -1,29 +1,39 @@
 <template>
   <div>
-    
     <div class="window" :class="{ window_dialogue: dialogue }">
-      <vue-draggable-resizable class="window-frame" :prevent-deactivation="true" class-name-handle="my-handle-class" :w="1000" :h="600" :minHeight="320" :minWidth="550" :drag-handle="'.drag-handle'" @dragging="onDrag" @resizing="onResize">
-      <div class="window-header drag-handle">
-        <div class="window-header__left"></div>
-        <div class="window-header__name">{{ header }}</div>
-        <div class="window-header__right">
-          <div class="window-header__close" @click="closeModal">
-            <icon name="times" scale="1.3"></icon>
+      <vue-draggable-resizable
+        class="window-frame"
+        :prevent-deactivation="true"
+        class-name-handle="my-handle-class"
+        :w="1000"
+        :h="600"
+        :minHeight="320"
+        :minWidth="550"
+        :drag-handle="'.drag-handle'"
+        @dragging="onDrag"
+        @resizing="onResize"
+        :parent="true"
+      >
+        <div class="window-header drag-handle">
+          <div class="window-header__left"></div>
+          <div class="window-header__name">{{ header }}</div>
+          <div class="window-header__right">
+            <div class="window-header__close" @click="closeModal">
+              <icon name="times" scale="1.3"></icon>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="window__content">
-        <slot> </slot>
-      </div>
-    </vue-draggable-resizable>
+        <div class="window__content">
+          <slot> </slot>
+        </div>
+      </vue-draggable-resizable>
     </div>
-  
   </div>
 </template>
 
 <script>
 import Icon from "vue-awesome/components/Icon";
-import VueDraggableResizable from 'vue-draggable-resizable';
+import VueDraggableResizable from "vue-draggable-resizable";
 import "vue-awesome/icons";
 
 export default {
@@ -37,7 +47,7 @@ export default {
       height: 0,
       x: 0,
       y: 0
-    }
+    };
   },
   props: {
     modalHide: String,
@@ -49,14 +59,14 @@ export default {
       this.$store.commit(this.modalHide);
     },
     onResize: function (x, y, width, height) {
-      this.x = x
-      this.y = y
-      this.width = width
-      this.height = height
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
     },
     onDrag: function (x, y) {
-      this.x = x
-      this.y = y
+      this.x = x;
+      this.y = y;
     }
   }
 };
@@ -64,16 +74,15 @@ export default {
 
 <style lang="scss">
 .my-handle-class {
-    position: absolute;
-    background-color: pink;
-    border: 1px solid black;
-    height: 14px;
-    width: 14px;
-    opacity: 0;
-    box-model: border-box;
-    -webkit-transition: all 300ms linear;
-    -ms-transition: all 300ms linear;
-    transition: all 300ms linear;
+  position: absolute;
+  background-color: pink;
+  border: 1px solid black;
+  height: 14px;
+  width: 14px;
+  opacity: 0;
+  -webkit-transition: all 300ms linear;
+  -ms-transition: all 300ms linear;
+  transition: all 300ms linear;
 }
 
 .my-handle-class-tl {
@@ -136,6 +145,7 @@ export default {
 .my-handle-class-br {
   bottom: -5px;
   right: -5px;
+  z-index: 1;
   cursor: se-resize;
 }
 
@@ -146,20 +156,15 @@ export default {
     border: 2px solid rgb(202, 165, 96);
     border-radius: 4px;
     overflow: hidden;
+    pointer-events: all;
   }
-  position: relative;
-  
-  top: 50%;
-  left: 50%;
-  width: 33%;
-  max-height: 80vh;
+  position: fixed;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 99;
-  display: flex;
-  flex-direction: column;
-  transform: translate(-50%, -50%);
-  border-radius: 4px;
-  
-  
   font-family: "Pelagiad";
   font-size: 20px;
   color: rgb(202, 165, 96);
@@ -185,9 +190,10 @@ export default {
       background-color: rgba(0, 0, 0, 0);
       border-top: 2px solid rgb(182, 145, 76);
       border-radius: 2px;
+      user-select: none;
       padding: 8px 20px;
       height: 35px;
-      transition: all .2s ease-in;
+      transition: all 0.2s ease-in;
     }
     &__close {
       color: black;
@@ -214,5 +220,16 @@ export default {
     height: 100%;
     max-height: calc(100% - 35px);
   }
+}
+
+.fadeHeight-enter-active,
+.fadeHeight-leave-active {
+  transition: all 0.15s cubic-bezier(1, 1, 1, 1);
+  opacity: 100;
+}
+
+.fadeHeight-enter,
+.fadeHeight-leave-to {
+  opacity: 0%;
 }
 </style>

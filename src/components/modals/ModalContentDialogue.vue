@@ -32,7 +32,7 @@
           mode="out-in"
           :style="{ width: '100%' }"
         >
-        <div v-for="(answer, index) in currentAnswers" :key="index" class="highlight-even">
+        <div v-for="answer in currentAnswers" :key="answer.info_id" class="highlight-even">
           <div class="dialogue-answers-answer__above">
 
           </div>

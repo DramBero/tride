@@ -89,32 +89,16 @@
       />
     </transition-group>
   </div>
-  <transition
-      name="fadeHeight"
-      class="frame-dialogue"
-      mode="out-in"
-      :style="{ width: '100%' }"
-    >
-    <ModalMain
-      dialogue
-      v-show="getOpenModalDialogue"
-      modalHide="hideDialogue"
-      :header="getOpenModalDialogue"
-    >
-      <ModalContentDialogue :speaker="getOpenModalDialogue" />
-    </ModalMain>
-  </transition>
+
   </div>
 </template>
 
 <script>
 import Icon from "vue-awesome/components/Icon";
 import "vue-awesome/icons";
-import ModalContentDialogue from "../modals/ModalContentDialogue.vue";
-import ModalMain from "../modals/ModalMain.vue";
 import DialogueFrameCard from "./DialogueFrameCard.vue";
 export default {
-  components: { Icon, DialogueFrameCard, ModalMain, ModalContentDialogue },
+  components: { Icon, DialogueFrameCard },
   data() {
     return {
       speakerTypes: ["speaker_id"]
@@ -123,9 +107,6 @@ export default {
   computed: {
     getNPCs() {
       return this.$store.getters["getDialogueSpeaker"](this.speakerTypes);
-    },
-    getOpenModalDialogue() {
-      return this.$store.getters["getDialogueModal"];
     },
     getSpeakerIdLength() {
       return (
@@ -182,6 +163,7 @@ export default {
   background-size: 33px 33px;
   background-color: #2c3a42;
   position: relative;
+  transition: all 0.3s cubic-bezier(1, 1, 1, 1);
   height: 100%;
   width: 100%;
   flex-direction: column;
@@ -211,7 +193,6 @@ export default {
           color: white;
         }
         &_generic {
-          min-width: 140px;
           border: 2px solid rgba(255, 255, 255, 0.4);
           color: black;
           background-color: rgba(160, 160, 160, 1);

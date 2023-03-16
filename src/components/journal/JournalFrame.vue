@@ -1,24 +1,27 @@
 <template>
-  <div class="journal-frame">
-    <div class="journal-frame__controls" v-if="true">
-      <div class="add-quest" @click="addQuest()">
-        New <icon name="plus-circle" class="add-quest__button" scale="1"></icon>
+    <div class="journal-frame">
+      <div class="journal-frame__header" v-if="true">
+        <div class="frame-title">Journal</div>
+        <div class="journal-frame__controls">
+        <div class="add-quest" @click="addQuest()">
+          New <icon name="plus-circle" class="add-quest__button" scale="1"></icon>
+        </div>
+      </div>
+      </div>
+      <div v-if="getJournal.length" class="quests">
+        <transition-group
+          name="fadeHeight"
+          mode="out-in"
+          :style="{ width: '100%' }"
+        >
+          <JournalFrameQuest
+            v-for="quest in getJournal"
+            :key="quest.id || 0"
+            :quest="quest"
+          />
+        </transition-group>
       </div>
     </div>
-    <div v-if="getJournal.length" class="quests">
-      <transition-group
-        name="fadeHeight"
-        mode="out-in"
-        :style="{ width: '100%' }"
-      >
-        <JournalFrameQuest
-          v-for="quest in getJournal"
-          :key="quest.id || 0"
-          :quest="quest"
-        />
-      </transition-group>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -41,32 +44,52 @@ export default {
 </script>
 
 <style lang="scss">
+.frame-title {
+  width: 100%;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  color: rgb(202, 165, 96);
+  background: rgb(48, 48, 48);
+}
 .journal-frame {
   background-color: #986;
-  box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.25);
+  //box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.25);
   z-index: 2;
-  padding: 10px;
+  //padding: 10px;
   min-width: 500px;
   max-width: 500px;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   max-height: 100%;
   font-family: "Pelagiad";
   position: relative;
+  &__header {
+    background-color: rgb(71, 71, 71);
+    box-shadow: 2px 2px 8px 2px rgba(0, 0, 0, 0.25);
+    z-index: 2;
+   
+  }
   &__controls {
     font-size: 22px;
-    position: absolute;
-    top: 10px;
+    padding: 10px;
+    
+    //display: flex;
+    width: 100%;
+    //top: 10px;
   }
 }
 .quests {
   display: flex;
-  height: calc(100% - 40px);
+  height: 100%;
   width: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
   flex-grow: 1;
-  margin-top: 40px;
-  padding-right: 10px;
+  padding: 10px 15px 10px 10px;
   gap: 5px;
   flex-direction: column;
   align-items: center;

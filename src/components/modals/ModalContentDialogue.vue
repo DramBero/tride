@@ -21,101 +21,133 @@
               color="#E1FF00"
               class="icon_gold"
               scale="1"
-              @click="editMode = false; editedEntry = ''"
+              @click="
+                editMode = false;
+                editedEntry = '';
+              "
             ></icon>
           </div>
         </div>
       </div>
-        <transition-group
-          name="fadeHeight"
-          class="dialogue-answers__frame"
-          mode="out-in"
-          :style="{ width: '100%' }"
+      <transition-group
+        name="fadeHeight"
+        class="dialogue-answers__frame"
+        mode="out-in"
+        :style="{ width: '100%' }"
+      >
+        <div
+          v-for="answer in currentAnswers"
+          :key="answer.info_id"
+          class="highlight-even"
         >
-        <div v-for="answer in currentAnswers" :key="answer.info_id" class="highlight-even">
-          <div class="dialogue-answers-answer__above">
-
-          </div>
-        <form
-          
-          @submit.prevent="editDialogue"
-          
-          class="dialogue-answers-answer-wrapper"
-        >
-          <div
-
-            class="dialogue-answers-answer"
-            :class="{ 'dialogue-answers-answer_edit': editMode }"
+          <div class="dialogue-answers-answer__above"></div>
+          <form
+            @submit.prevent="editDialogue"
+            class="dialogue-answers-answer-wrapper"
           >
-            <div class="dialogue-answers-answer__ids" v-if="false">
-              <div class="prev-id">{{ answer.prev_id || "-" }} (before)</div>
-              <div class="curr-id">id: {{ answer.info_id }}</div>
-            </div>
-
-            <DialogueEntryFilters :answer="answer" :speaker="speaker" :editMode="editMode"/>
-
             <div
-              v-if="editedEntry !== answer.info_id"
-              class="dialogue-answers-answer__text"
-              v-html="getHyperlinkedAnswer(answer.text)"
-              @click="handleAnswerClick($event)"
-            ></div>
+              class="dialogue-answers-answer"
+              :class="{
+                'dialogue-answers-answer_modified':
+                  answer.old_values && answer.old_values.length,
+                'dialogue-answers-answer_edit': editMode
+              }"
+            >
+              <div
+                class="dialogue-answers-answer-modified"
+                v-if="answer.old_values && answer.old_values.length"
+              >
+                * Modified in {{ answer.old_values.slice(-1)[0].TMP_dep }}
+                <span
+                  class="dialogue-answers-answer-modified_dirty"
+                  v-if="
+                    checkDirtied(answer.old_values.slice(-1)[0], answer)
+                  "
+                >
+                  (possibly dirtied by CS)
+            </span>
+              </div>
+              <div class="dialogue-answers-answer__ids" v-if="false">
+                <div class="prev-id">{{ answer.prev_id || "-" }} (before)</div>
+                <div class="curr-id">id: {{ answer.info_id }}</div>
+              </div>
 
-            <textarea
-              v-else
-              v-text="answer.text"
-              name="entryText"
-              class="dialogue-entry-textarea"
-            ></textarea>
+              <DialogueEntryFilters
+                :answer="answer"
+                :speaker="speaker"
+                :editMode="editMode"
+              />
 
-            <DialogueEntryResults :editMode="editMode" :code="getLanguage(answer.result, 'Lua')" language="Lua" />
-            <DialogueEntryResults :editMode="editMode" :code="getLanguage(answer.result, 'MWScript')" language="MWScript" />
+              <div
+                v-if="editedEntry !== answer.info_id"
+                class="dialogue-answers-answer__text"
+                v-html="getHyperlinkedAnswer(answer.text)"
+                @click="handleAnswerClick($event)"
+              ></div>
 
-            <div class="dialogue-answers-answer__ids" v-if="false">
-              <div class="prev-id">{{ answer.info_id }} (id)</div>
-              <div class="curr-id">next id: {{ answer.next_id || "-" }}</div>
+              <textarea
+                v-else
+                v-text="answer.text"
+                name="entryText"
+                class="dialogue-entry-textarea"
+              ></textarea>
+
+              <DialogueEntryResults
+                :editMode="editMode"
+                :code="getLanguage(answer.result, 'Lua')"
+                language="Lua"
+              />
+              <DialogueEntryResults
+                :editMode="editMode"
+                :code="getLanguage(answer.result, 'MWScript')"
+                language="MWScript"
+              />
+
+              <div class="dialogue-answers-answer__ids" v-if="false">
+                <div class="prev-id">{{ answer.info_id }} (id)</div>
+                <div class="curr-id">next id: {{ answer.next_id || "-" }}</div>
+              </div>
             </div>
-          </div>
-          <icon
-            v-if="editMode && editedEntry !== answer.info_id"
-            name="pen"
-            color="#E1FF00"
-            class="icon_gold"
-            scale="1"
-            @click="editedEntry = answer.info_id"
-          ></icon>
+            <icon
+              v-if="editMode && editedEntry !== answer.info_id"
+              name="pen"
+              color="#E1FF00"
+              class="icon_gold"
+              scale="1"
+              @click="editedEntry = answer.info_id"
+            ></icon>
+            <div
+              class="entry-edit-controls"
+              v-if="editMode && editedEntry == answer.info_id"
+            >
+              <button type="submit">
+                <icon
+                  name="save"
+                  color="#E1FF00"
+                  class="icon_gold"
+                  scale="1"
+                ></icon>
+              </button>
+              <icon
+                name="ban"
+                color="#E1FF00"
+                class="icon_gold"
+                scale="1"
+                @click.prevent="editedEntry = ''"
+              ></icon>
+              <icon
+                name="trash"
+                color="#E1FF00"
+                class="icon_gold"
+                scale="1"
+                @click.prevent="deleteEntry(answer.info_id)"
+              ></icon>
+            </div>
+          </form>
           <div
-            class="entry-edit-controls"
-            v-if="editMode && editedEntry == answer.info_id"
-          >
-          <button type="submit">
-            <icon
-              name="save"
-              color="#E1FF00"
-              class="icon_gold"
-              scale="1"
-            ></icon>
-          </button>
-            <icon
-              name="ban"
-              color="#E1FF00"
-              class="icon_gold"
-              scale="1"
-              @click.prevent="editedEntry = ''"
-            ></icon>
-            <icon
-              name="trash"
-              color="#E1FF00"
-              class="icon_gold"
-              scale="1"
-              @click.prevent="deleteEntry(answer.info_id)"
-            ></icon>
-          </div>
-        </form>
-        <div class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin">
-
-</div>
-      </div>
+            class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin"
+          ></div>
+        </div>
       </transition-group>
       <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
         {{ getOrderedEntries.error_text }}
@@ -157,8 +189,8 @@
 <script>
 import Icon from "vue-awesome/components/Icon";
 import "vue-awesome/icons";
-import DialogueEntryResults from '../dialogue/DialogueEntryResults.vue';
-import DialogueEntryFilters from '../dialogue/DialogueEntryFilters.vue';
+import DialogueEntryResults from "../dialogue/DialogueEntryResults.vue";
+import DialogueEntryFilters from "../dialogue/DialogueEntryFilters.vue";
 
 export default {
   components: {
@@ -177,7 +209,7 @@ export default {
       editMode: false,
       showDependencies: false,
       editedEntry: "",
-      topicType: "",
+      topicType: ""
     };
   },
 
@@ -214,34 +246,62 @@ export default {
       ]);
     },
     currentAnswers() {
+      let answers = this.getOrderedEntries
+        .filter((val) => val.TMP_topic === this.currentTopic)
+        .filter((topic) =>
+          [
+            topic["speaker_id"],
+            topic["speaker_cell"],
+            topic["speaker_faction"],
+            topic["speaker_class"],
+            topic["speaker_rank"]
+          ].includes(this.speaker)
+        );
       if (this.showDependencies) {
-        return this.getSpeakerData(this.topicType).filter(
+        return answers;
+
+        /*         return this.getSpeakerData(this.topicType).filter(
           (val) => val.TMP_topic == this.currentTopic
-        );
+        ); */
       } else {
-        return this.getSpeakerData(this.topicType).filter(
+        return answers.filter((val) => !val.TMP_dep);
+        /*         return this.getSpeakerData(this.topicType).filter(
           (val) => val.TMP_topic == this.currentTopic && !val.TMP_dep
-        );
+        ); */
       }
-    },
+    }
   },
 
   methods: {
     addEntry() {
-      if (!this.currentTopic) return
-      let location = this.$store.getters['getBestOrderLocationForNpc']([this.speaker, this.currentTopic, this.topicType])
-      this.$store.commit('addDialogue', [this.speaker, this.currentTopic, this.topicType, location[0], location[1], "New entry"])
+      if (!this.currentTopic) return;
+      let location = this.$store.getters["getBestOrderLocationForNpc"]([
+        this.speaker,
+        this.currentTopic,
+        this.topicType
+      ]);
+      this.$store.commit("addDialogue", [
+        this.speaker,
+        this.currentTopic,
+        this.topicType,
+        location[0],
+        location[1],
+        "New entry"
+      ]);
     },
     editDialogue() {
-      this.$store.commit('editDialogueEntry', [this.editedEntry, event.target.elements.entryText.value])
-      this.editedEntry = ''
+      this.$store.commit("editDialogueEntry", [
+        this.editedEntry,
+        event.target.elements.entryText.value
+      ]);
+      this.editedEntry = "";
     },
     setCurrentAnswers(topic, topicType) {
-      this.topicType = topicType
+      this.topicType = topicType;
       this.currentTopic = topic;
     },
     deleteEntry(info_id) {
-      this.$store.commit('deleteDialogueEntry', info_id)
+      this.$store.commit("deleteDialogueEntry", info_id);
     },
     getSpeakerData(topicType) {
       return this.$store.getters["getDialogueBySpeaker"]([
@@ -250,10 +310,10 @@ export default {
       ]);
     },
     getLanguage(code, language) {
-      if (!code) return ''
+      if (!code) return "";
       if (language === "Lua") {
         return code
-        .split("\r\n")
+          .split("\r\n")
           .filter((val) => val.includes(";lua "))
           .map((val) => val.replace(";lua ", ""))
           .join("\r\n");
@@ -264,11 +324,14 @@ export default {
           .join("\r\n");
       }
     },
+    checkDirtied(entryOne, entryTwo) {
+      let entryOneNonId = Object.fromEntries(Object.entries(entryOne).filter(([key]) => !key.includes('_id') && !key.includes('TMP_') && !key.includes('old_values')));
+      let entryTwoNonId = Object.fromEntries(Object.entries(entryTwo).filter(([key]) => !key.includes('_id') && !key.includes('TMP_') && !key.includes('old_values')));
+      return JSON.stringify(entryOneNonId) === JSON.stringify(entryTwoNonId)
+    },
     handleAnswerClick(e) {
       //if (this.editMode) return;
-      if (
-        e.target.className == "dialogue-answers-answer__text_hyperlink"
-      ) {
+      if (e.target.className == "dialogue-answers-answer__text_hyperlink") {
         this.setCurrentAnswers(e.target.innerText, "Topic");
         this.currentTopic = e.target.innerText;
       }
@@ -317,7 +380,7 @@ export default {
       position: absolute;
       cursor: pointer;
       left: 5px;
-      transition: color .15s ease-in;
+      transition: color 0.15s ease-in;
       &:hover {
         color: rgba(233, 214, 180, 1);
       }
@@ -346,7 +409,7 @@ export default {
       overflow-x: hidden;
       padding: 5px;
       scroll-behavior: smooth;
-/*       ::-webkit-scrollbar {
+      /*       ::-webkit-scrollbar {
         width: 5px;
         scrollbar-width: thin;
         background: rgba(25, 56, 31, 0.02);
@@ -365,11 +428,23 @@ export default {
         justify-content: center;
         margin-bottom: 20px;
         height: 1px;
-        
+
         background: rgba(202, 165, 96, 0.4);
-        background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(134, 134, 134, 0.4) 20%, rgba(134, 134, 134, 0.4) 80%, rgba(0,0,0,0) 100%);
+        background: linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(134, 134, 134, 0.4) 20%,
+          rgba(134, 134, 134, 0.4) 80%,
+          rgba(0, 0, 0, 0) 100%
+        );
         &_no-margin {
           margin: 0;
+        }
+      }
+      &-modified {
+        color: rgb(126, 126, 179);
+        &_dirty {
+          color: rgb(206, 206, 206);
         }
       }
       &-wrapper {
@@ -445,11 +520,23 @@ export default {
 }
 
 .highlight-even {
-  background: rgb(0,0,0);
-  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(92, 85, 44, 0.20) 20%, rgba(92, 85, 44,0.20) 80%, rgba(0,0,0,0) 100%);
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(92, 85, 44, 0.2) 20%,
+    rgba(92, 85, 44, 0.2) 80%,
+    rgba(0, 0, 0, 0) 100%
+  );
   &:nth-child(even) {
-    background: rgb(0,0,0);
-  background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(92, 85, 44,0.12) 20%, rgba(92, 85, 44,0.12) 80%, rgba(0,0,0,0) 100%);
+    background: rgb(0, 0, 0);
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(92, 85, 44, 0.12) 20%,
+      rgba(92, 85, 44, 0.12) 80%,
+      rgba(0, 0, 0, 0) 100%
+    );
   }
 }
 
@@ -464,7 +551,7 @@ export default {
   fill: rgb(202, 165, 96);
   margin-left: 10px;
   min-width: 20px;
-  transition: fill .2s ease-in;
+  transition: fill 0.2s ease-in;
   cursor: pointer;
   &:hover {
     fill: rgba(233, 214, 180, 1);
@@ -474,7 +561,7 @@ export default {
 .icon_gray {
   fill: rgba(255, 255, 255, 0.7);
   margin-left: 10px;
-  transition: fill .2s ease-in;
+  transition: fill 0.2s ease-in;
   cursor: pointer;
   &:hover {
     fill: rgba(255, 255, 255, 0.5);

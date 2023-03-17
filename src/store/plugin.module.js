@@ -113,14 +113,13 @@ const getters = {
 
   getOrderedEntriesByTopic:
     (state) =>
-    ([topicId, dialogueType]) => {
+    ([topicId]) => {
+      if (!topicId) return []
       let depDialogue = [];
       for (let dep of state.dependencies) {
         depDialogue.push(
           dep.data
-            .filter(
-              (val) => val.type === "Info"
-            )
+            .filter((val) => val.type === "Info")
             .filter((topic) => topic.TMP_topic == topicId)
         );
       }
@@ -137,12 +136,17 @@ const getters = {
           .map((plugin) => plugin.filter((entry) => entry[idType] === id))
           .flat(1);
         if (!entries.length) return false;
+        let lastValue = entries.slice(-1)[0]
+        let oldValues =  depDialogue
+        .map((plugin) =>
+          plugin.filter(
+            (entry) => entry.info_id === lastValue.info_id
+          )
+        )
+        .flat(1)
         return {
-          ...entries.slice(-1)[0],
-          old_values: depDialogue.map((plugin) =>
-            plugin
-              .filter((entry) => entry.info_id === entries.slice(-1)[0].info_id)
-          ).filter(val => val).slice(0, -1).filter(val => val).flat(1)
+          ...lastValue,
+          old_values: oldValues.length > 1 ? oldValues.filter((val) => val && val.TMP_dep) : []
         };
       };
 
@@ -158,17 +162,20 @@ const getters = {
 
       let orderedDialogue = [firstElement];
       let nextEntry;
+      let nextEntries
       while (true) {
-        if (findByIdType("prev_id", orderedDialogue.slice(-1)[0].info_id))
-          nextEntry = findByIdType(
-            "prev_id",
-            orderedDialogue.slice(-1)[0].info_id
-          );
-        else if (findByIdType("info_id", orderedDialogue.slice(-1)[0].next_id))
-          nextEntry = findByIdType(
-            "info_id",
-            orderedDialogue.slice(-1)[0].next_id
-          );
+        nextEntries = [...new Set([
+          findByIdType("prev_id", orderedDialogue.slice(-1)[0].info_id),
+          findByIdType("info_id", orderedDialogue.slice(-1)[0].next_id)
+        ])]
+        for (let dependency of state.dependencies) {
+          if (nextEntries.find(val => val.TMP_dep === dependency.name)) {
+            nextEntry = nextEntries.find(val => val.TMP_dep === dependency.name)
+          }
+        }
+        if (nextEntries.find(val => !val.TMP_dep)) {
+          nextEntry = nextEntries.find(val => !val.TMP_dep)
+        }
         if (nextEntry) {
           orderedDialogue.push(nextEntry);
           if (!nextEntry.next_id) break;
@@ -176,81 +183,6 @@ const getters = {
       }
 
       return orderedDialogue;
-    },
-
-  getOrderedEntriesByTopicBak:
-    (state) =>
-    ([topicId, dialogueType]) => {
-      let depDialogue = [];
-      for (let dep of state.dependencies) {
-        depDialogue = [
-          ...depDialogue,
-          ...dep.data
-            .filter(
-              (val) => val.TMP_type === dialogueType && val.type === "Info"
-            )
-            .filter((topic) => topic.TMP_topic == topicId)
-        ];
-      }
-      let activePlugin = JSON.parse(JSON.stringify(state.activePlugin));
-      let activeDialogue = activePlugin
-        .filter((val) => val.TMP_type === dialogueType && val.type === "Info")
-        .filter((topic) => topic.TMP_topic == topicId);
-      let allTopics = [...depDialogue, ...activeDialogue];
-      let orderedTopics = [];
-      while (allTopics.length > 0) {
-        if (!orderedTopics.length) {
-          let firstEntry = allTopics.filter((val) => val.prev_id == "");
-          if (firstEntry.length === 0) {
-            return {
-              error_code: "NO_PREV_ID",
-              error_text:
-                "Ordering error! No elements with defined 'prev_id'. Make sure you uploaded all dependencies.",
-              error_details: firstEntry
-            };
-          } else if (firstEntry.length > 1) {
-            orderedTopics.push(firstEntry[0]);
-            //return {error_code: "MULTIPLE_PREV_ID", error_text: "Ordering error! More than one elements have an undefined 'prev_id'. Make sure you uploaded all dependencies.", error_details: firstEntry}
-          }
-          orderedTopics.push(firstEntry[0]);
-          allTopics = allTopics.filter((val) => val !== firstEntry[0]);
-        } else {
-          let currentOrderedTopicId = orderedTopics.slice(-1)[0].info_id;
-          let nextEntry = allTopics.filter(
-            (val) => val.prev_id === currentOrderedTopicId
-          );
-          if (nextEntry.length == 0) {
-            let currentOrderedTopicNextId = orderedTopics.slice(-1)[0].next_id;
-            nextEntry = allTopics.filter(
-              (val) => val.info_id === currentOrderedTopicNextId
-            );
-          }
-          if (nextEntry.length > 1) {
-            let currentOrderedTopicNextId = orderedTopics.slice(-1)[0].next_id;
-            nextEntry = nextEntry.filter(
-              (val) => val.info_id === currentOrderedTopicNextId
-            );
-          }
-          if (nextEntry.length === 0 && allTopics.length > 1) {
-            let noPrevEntry = allTopics.filter((val) => val.prev_id == "");
-            if (noPrevEntry.length) orderedTopics.push(noPrevEntry[0]);
-            else {
-              let noNextTopic = allTopics.filter((val) => val.prev_id == "");
-              if (noNextTopic.length) orderedTopics.push(noNextTopic[0]);
-              else orderedTopics.push(allTopics[0]);
-              //return {error_code: "NO_NEXT_ENTRY", error_text: "Ordering error! The entry ordering chain is broken (NO_NEXT_ENTRY). Make sure you uploaded all dependencies.", error_details: {'orderedTopics': orderedTopics, 'allTopics': allTopics}}
-            }
-          } else if (nextEntry.length > 1) {
-            orderedTopics.push[nextEntry[0]];
-            //return {error_code: "MULTIPLE_NEXT_ENTRIES", error_text: "Ordering error! The entry ordering chain is broken (MULTIPLE_NEXT_ENTRIES). Make sure you uploaded all dependencies.", error_details: nextEntry}
-          }
-          allTopics = allTopics.filter((val) => val !== nextEntry[0]);
-          if (nextEntry[0] && allTopics.length)
-            orderedTopics.push(nextEntry[0]);
-          else break;
-        }
-      }
-      return orderedTopics;
     },
 
   getBestOrderLocationForNpc:

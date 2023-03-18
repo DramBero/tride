@@ -94,8 +94,8 @@
 
               <DialogueEntryResults
                 :editMode="editMode"
-                :code="getLanguage(answer.result, 'Lua')"
-                language="Lua"
+                :code="getLanguage(answer.result, 'Lua (MWSE)')"
+                language="Lua (MWSE)"
               />
               <DialogueEntryResults
                 :editMode="editMode"
@@ -273,9 +273,9 @@ export default {
   },
 
   methods: {
-    addEntry() {
+    addEntry(location) {
       if (!this.currentTopic) return;
-      let location = this.$store.getters["getBestOrderLocationForNpc"]([
+      if (!location) location = this.$store.getters["getBestOrderLocationForNpc"]([
         this.speaker,
         this.currentTopic,
         this.topicType
@@ -311,7 +311,7 @@ export default {
     },
     getLanguage(code, language) {
       if (!code) return "";
-      if (language === "Lua") {
+      if (language === "Lua (MWSE)") {
         return code
           .split("\r\n")
           .filter((val) => val.includes(";lua "))

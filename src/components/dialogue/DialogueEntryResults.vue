@@ -1,9 +1,9 @@
 <template>
   <div v-if="code">
-    <div class="results" :class="{ results_lua: language === 'Lua' }">
+    <div class="results" :class="{ results_lua: language === 'Lua (MWSE)' }">
       <span
         class="script-language"
-        :class="{ 'script-language_lua': language === 'Lua' }"
+        :class="{ 'script-language_lua': language === 'Lua (MWSE)' }"
         >{{ language }}</span
       >
       <prism-editor

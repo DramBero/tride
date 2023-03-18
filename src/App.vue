@@ -98,6 +98,10 @@ export default {
 body {
   overflow: hidden;
   font-family: "Pelagiad";
+  background-image: linear-gradient(#465057 1px, transparent 1px),
+    linear-gradient(to right, #465057 1px, transparent 1px);
+  background-size: 33px 33px;
+  background-color: #2c3a42;
 }
 
 ::-webkit-scrollbar {

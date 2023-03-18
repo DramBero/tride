@@ -158,10 +158,7 @@ export default {
 <style lang="scss">
 .frame {
   display: flex;
-  background-image: linear-gradient(#465057 1px, transparent 1px),
-    linear-gradient(to right, #465057 1px, transparent 1px);
-  background-size: 33px 33px;
-  background-color: #2c3a42;
+
   position: relative;
   transition: all 0.3s cubic-bezier(1, 1, 1, 1);
   height: 100%;

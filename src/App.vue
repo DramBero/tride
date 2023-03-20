@@ -1,22 +1,6 @@
 <template>
   <div id="app">
-    <ModalMain v-show="getOpenModal" modalHide="hideOpenFile" header="Load">
-      <ModalContentUpload />
-    </ModalMain>
-    <ModalMain
-      v-show="getDialogueCreateModal"
-      header="New dialogue"
-      modalHide="hideDialogueCreateModal"
-    >
-      <ModalContentNewDialogue />
-    </ModalMain>
-    <ModalMain
-      v-show="getQuestCreateModal"
-      header="New quest"
-      modalHide="hideQuestCreateModal"
-    >
-      <ModalContentNewQuest />
-    </ModalMain>
+    <modal-frame />
     <transition
       name="fadeHeight"
       class="frame-dialogue"
@@ -39,13 +23,11 @@
 import ToolbarReadFile from "./components/toolbar/ToolbarReadFile.vue";
 import JournalFrame from "./components/journal/JournalFrame.vue";
 import ToolBarOpen from "./components/toolbar/ToolBarOpen.vue";
-import ModalContentUpload from "./components/modals/ModalContentUpload.vue";
 import ModalMain from "./components/modals/ModalMain.vue";
 import BookFrame from "./components/books/BookFrame.vue";
 import CWorkspace from "./components/CWorkspace.vue";
 import ModalContentDialogue from "./components/modals/ModalContentDialogue.vue";
-import ModalContentNewQuest from "./components/modals/ModalContentNewQuest.vue";
-import ModalContentNewDialogue from "./components/modals/ModalContentNewDialogue.vue";
+import ModalFrame from "@/components/primary-modals/ModalFrame.vue";
 
 export default {
   name: "App",
@@ -53,13 +35,11 @@ export default {
     ToolbarReadFile,
     JournalFrame,
     ToolBarOpen,
-    ModalContentUpload,
     ModalMain,
     BookFrame,
     CWorkspace,
     ModalContentDialogue,
-    ModalContentNewQuest,
-    ModalContentNewDialogue
+    ModalFrame,
   },
   computed: {
     getOpenModal() {
@@ -104,6 +84,12 @@ body {
   background-color: #2c3a42;
 }
 
+h2 {
+  color: black;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   scrollbar-width: thin;
@@ -127,17 +113,20 @@ body {
   &__input {
     width: 100%;
     resize: none;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgb(202, 165, 96);
-    color: rgb(202, 165, 96);
+    background: rgba(255, 255, 255, 0.18);
+    border: 2px solid rgb(202, 165, 96);
+    color: black;
     font-family: "Pelagiad";
     font-size: 20px;
     padding: 10px;
     border-radius: 8px;
     &:focus {
       outline: none !important;
-      border: 1px solid white;
+      border: 2px solid rgba(255, 255, 255, 0.18);
     }
+    &::placeholder {
+        color: rgba(0, 0, 0, 0.3);
+      }
   }
   &_dark {
     .modal-field__input {

@@ -37,7 +37,7 @@ export default {
   components: { JournalFrameQuest, Icon },
   methods: {
     addQuest() {
-      this.$store.commit("setQuestCreateModal", true);
+      this.$store.commit("setPrimaryModal", "NewQuest");
     }
   }
 };

@@ -146,7 +146,7 @@ export default {
       }
     },
     addDialogue() {
-      this.$store.commit("setDialogueCreateModal", true);
+      this.$store.commit("setPrimaryModal", "NewDialogue");
     },
     openGeneric() {
       this.$store.commit("setDialogueModal", "Global Dialogue");

@@ -3,9 +3,13 @@ const state = {
   dialogueModal: "",
   questCreateModal: false,
   dialogueCreateModal: null,
+  primaryModal: "",
 };
 
 const mutations = {
+  setPrimaryModal(state, value) {
+    state.primaryModal = value
+  },
   toggleOpenFile(state, value) {
     state.openFile = value;
   },
@@ -39,6 +43,7 @@ const getters = {
   getDialogueModal: (s) => s.dialogueModal,
   getQuestCreateModal: (s) => s.questCreateModal,
   getDialogueCreateModal: (s) => s.dialogueCreateModal,
+  getPrimaryModal: (s) => s.primaryModal,
 };
 
 export default {

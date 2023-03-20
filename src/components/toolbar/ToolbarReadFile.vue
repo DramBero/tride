@@ -67,18 +67,31 @@ input[type="file"] {
   display: none;
 }
 .text-reader {
-  border: 2px solid rgb(202, 165, 96);
-  border-radius: 2px;
-  display: inline-block;
-  padding: 6px 12px;
-  cursor: pointer;
   &__wrapper {
     display: flex;
-    align-items: center;
     gap: 15px;
-    &_dep {
-      flex-direction: row-reverse;
+    align-items: center;
+    flex-direction: row-reverse;
+  }
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.65);
+  color: rgb(202, 165, 96);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  padding: 10px 15px;
+  border-radius: 4px;
+  transition: all 0.1s ease-in;
+  &:hover {
+    color: white;
+    .add-quest__button {
+      fill: white;
     }
+  }
+  &__button {
+    transition: all 0.1s ease-in;
+    fill: rgb(202, 165, 96);
   }
 }
 </style>

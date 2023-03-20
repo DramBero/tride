@@ -39,11 +39,15 @@
           v-for="answer in currentAnswers"
           :key="answer.info_id"
           class="highlight-even"
+          draggable
         >
-          <div class="dialogue-answers-answer__above"></div>
+          <div class="dialogue-answers-answer__above">
+            <div class="dialogue-answers-answer__above-add" @click="addEntry([answer.prev_id, answer.info_id])" v-if="editMode">+</div>
+          </div>
           <form
             @submit.prevent="editDialogue"
             class="dialogue-answers-answer-wrapper"
+            
           >
             <div
               class="dialogue-answers-answer"
@@ -52,6 +56,7 @@
                   answer.old_values && answer.old_values.length,
                 'dialogue-answers-answer_edit': editMode
               }"
+              
             >
               <div
                 class="dialogue-answers-answer-modified"
@@ -144,9 +149,9 @@
               ></icon>
             </div>
           </form>
-          <div
-            class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin"
-          ></div>
+          <div class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin">
+            <div class="dialogue-answers-answer__above-add" @click="addEntry()" v-if="editMode">+</div>
+          </div>
         </div>
       </transition-group>
       <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
@@ -427,7 +432,10 @@ export default {
         display: flex;
         justify-content: center;
         margin-bottom: 20px;
-        height: 1px;
+        min-height: 1px;
+        font-size: 25px;
+        
+        transition: all .2s ease-out;
 
         background: rgba(202, 165, 96, 0.4);
         background: linear-gradient(
@@ -437,6 +445,19 @@ export default {
           rgba(134, 134, 134, 0.4) 80%,
           rgba(0, 0, 0, 0) 100%
         );
+        &:hover {
+          .dialogue-answers-answer__above-add {
+            height: fit-content;
+          }
+        }
+        &-add {
+          height: 0;
+          cursor: pointer;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+
+        }
         &_no-margin {
           margin: 0;
         }
@@ -454,12 +475,9 @@ export default {
         margin-bottom: 20px;
       }
       &_edit {
-        border: 1px dotted rgb(202, 165, 96);
+        cursor: grab;
         border-radius: 8px;
         padding: 10px;
-        background: rgba(202, 165, 96, 0.02);
-        transition: all 0.15s ease-in-out;
-        cursor: grab;
         &:hover {
           background: rgba(202, 165, 96, 0.08);
         }

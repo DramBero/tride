@@ -54,6 +54,8 @@
 </template>
 
 <script>
+import Icon from "vue-awesome/components/Icon";
+import "vue-awesome/icons";
 export default {
   props: {
     answer: {
@@ -65,6 +67,9 @@ export default {
     editMode: {
         type: Boolean
     }
+  },
+  components: {
+    Icon
   },
   computed: {
     getOtherSpeakers() {

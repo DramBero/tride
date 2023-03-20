@@ -13,7 +13,7 @@ export default {
   },
   methods: {
     toggleOpenModal() {
-      this.$store.commit("toggleOpenFile", true);
+      this.$store.commit("setPrimaryModal", "Upload");
     }
   }
 };

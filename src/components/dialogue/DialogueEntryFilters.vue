@@ -174,6 +174,7 @@ export default {
       }
     },
     addFilter() {
+      this.$store.commit("setSelectedFilter", {});
       this.$store.commit("setPrimaryModal", "NewFilter");
     },
     editFilter(filter) {

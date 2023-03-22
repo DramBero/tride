@@ -29,6 +29,7 @@
           </div>
         </div>
       </div>
+      <div>
       <transition-group
         name="fadeHeight"
         class="dialogue-answers__frame"
@@ -38,12 +39,12 @@
         <div
           v-for="answer in currentAnswers"
           :key="answer.info_id"
-          class="highlight-even"
-          draggable
+          :class="{'highlight-even': !editMode}"
         >
-          <div class="dialogue-answers-answer__above">
-            <div class="dialogue-answers-answer__above-add" @click="addEntry([answer.prev_id, answer.info_id])" v-if="editMode">+</div>
+          <div class="dialogue-answers-answer__above" v-if="!editMode">
+            
           </div>
+          <div class="dialogue-answers-answer__above-add" @click="addEntry([answer.prev_id, answer.info_id])" v-if="editMode">+</div>
           <form
             @submit.prevent="editDialogue"
             class="dialogue-answers-answer-wrapper"
@@ -149,12 +150,15 @@
               ></icon>
             </div>
           </form>
-          <div class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin">
-            <div class="dialogue-answers-answer__above-add" @click="addEntry()" v-if="editMode">+</div>
-          </div>
+
         </div>
       </transition-group>
-      <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
+      <div class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin" v-if="!editMode">
+            
+          </div>
+          <div class="dialogue-answers-answer__above-add" @click="addEntry()" v-if="editMode">+</div>
+      </div>
+          <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
         {{ getOrderedEntries.error_text }}
       </div>
     </div>
@@ -465,8 +469,17 @@ export default {
           }
         }
         &-add {
-          height: 0;
           cursor: pointer;
+          background: rgba(202, 165, 96, 0.4);
+        background: linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(134, 134, 134, 0.4) 20%,
+          rgba(134, 134, 134, 0.4) 80%,
+          rgba(0, 0, 0, 0) 100%
+        );
+          color: black;
+          font-size: 30px;
           width: 100%;
           display: flex;
           justify-content: center;
@@ -489,12 +502,11 @@ export default {
         margin-bottom: 20px;
       }
       &_edit {
-        cursor: grab;
         border-radius: 8px;
         padding: 10px;
-        &:hover {
+/*         &:hover {
           background: rgba(202, 165, 96, 0.08);
-        }
+        } */
       }
       &__text {
         border-left: 2px dotted rgb(202, 165, 96);

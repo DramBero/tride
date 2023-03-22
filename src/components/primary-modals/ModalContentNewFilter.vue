@@ -251,6 +251,7 @@ export default {
             {
               id: "function_item",
               name: "Item",
+              filter_function: "ItemType",
               operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
               fields: ["item_id", "item_amount"]
             },
@@ -264,6 +265,7 @@ export default {
             {
               id: "function_choice",
               name: "Choice",
+              filter_function: "ChoiceType",
               operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
               fields: ["choice"]
             }
@@ -308,24 +310,28 @@ export default {
                 {
                     id: "not_class",
                     name: "NotClass",
+                    filter_function: "NotClass",
                     operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
                     fields: ["class", "value"]
                 },
                 {
                     id: "not_faction",
                     name: "NotFaction",
+                    filter_function: "NotFaction",
                     operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
                     fields: ["faction", "value"]
                 },
                 {
                     id: "not_race",
                     name: "NotRace",
+                    filter_function: "NotRace",
                     operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
                     fields: ["race", "value"]
                 },
                 {
                     id: "not_local",
                     name: "NotLocal",
+                    filter_function: "VariableCompare",
                     operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
                     fields: ["local", "value"]
                 },
@@ -370,10 +376,17 @@ export default {
   },
   beforeMount() {
     let filter = this.getSelectedFilter
-    if (!filter) return
-    else if (!filter.info_id) {
+    if (!filter.filter_type) {
+        this.currentOperand = ""
+        this.currentFilter = {}
+        this.currentValueSecondary = ""
+        this.inputValueSecondary = ""
+        this.currentValue = ""
+        this.inputValue = ""
+    }
+    else {
         this.currentOperand = filter.filter_comparison
-        this.currentFilter = this.filterGroups.map(val => val.filters).flat(1).find(val => val.name === filter.filter_type)
+        this.currentFilter = this.filterGroups.map(val => val.filters).flat(1).find(val => val && val.name === filter.filter_type)
         this.currentValueSecondary = filter.id
         this.inputValueSecondary = filter.id
         this.currentValue = Object.values(filter.value)[0]

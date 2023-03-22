@@ -52,25 +52,22 @@ export default {
 </script>
 
 <style lang="scss">
+.modal__title {
+  color: rgba(0, 0, 0, 0.65);
+  padding: 10px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
 
 .modal-tip {
   margin-bottom: 20px;
 }
 .frame-upload {
-  padding: 10px;
+  //padding: 10px;
   margin: 2px;
   height: 100%;
   overflow-y: scroll;
-  &-deps {
-    font-size: 16px;
-    margin-top: 10px;
-    &__element {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 10px;
-    }
-  }
 }
 
 .add-quest-form {

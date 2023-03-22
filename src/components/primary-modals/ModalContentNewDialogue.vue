@@ -1,8 +1,8 @@
 <template>
   <div>
-    <h2 class="modal__title">Create a new dialogue</h2>
-  <div class="frame-upload">
     
+  <div class="frame-upload">
+    <h2 class="modal__title">Create a new dialogue</h2>
     <form class="add-dialogue-form" @submit.prevent="">
       <div v-if="!speakerName">
         <div class="add-dialogue-label">Choose an NPC:</div>
@@ -141,27 +141,17 @@ export default {
 
 <style lang="scss">
 .modal__title {
-  color: rgb(202, 165, 96);
-    background: rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    font-weight: 500;
-    margin-bottom: 20px;
+  color: rgba(0, 0, 0, 0.65);
+  padding: 10px;
+  font-weight: 500;
+  margin-bottom: 20px;
 }
+
 .frame-upload {
   padding: 10px;
   margin: 2px;
   height: 100%;
   overflow-y: scroll;
-  &-deps {
-    font-size: 16px;
-    margin-top: 10px;
-    &__element {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 10px;
-    }
-  }
 }
 
 .topic-create-controls {
@@ -216,7 +206,7 @@ export default {
       border-bottom: 1px solid rgba(202, 165, 96, 0.5);
     }
     &:hover {
-      background: rgba(202, 165, 96, 0.16);
+      background: rgba(0, 0, 0, 0.16);
     }
     &__title {
       margin-right: 20px;

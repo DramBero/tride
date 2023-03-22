@@ -3,6 +3,7 @@ const state = {
   dialogueModal: "",
   questCreateModal: false,
   dialogueCreateModal: null,
+  selectedFilter: {},
   primaryModal: "",
 };
 
@@ -25,6 +26,9 @@ const mutations = {
   setQuestCreateModal(state, value) {
     state.questCreateModal = value
   },
+  setSelectedFilter(state, value) {
+    state.selectedFilter = value
+  },
   setDialogueCreateModal(state, value) {
     state.dialogueCreateModal = value
   },
@@ -44,6 +48,7 @@ const getters = {
   getQuestCreateModal: (s) => s.questCreateModal,
   getDialogueCreateModal: (s) => s.dialogueCreateModal,
   getPrimaryModal: (s) => s.primaryModal,
+  getSelectedFilter: (s) => s.selectedFilter,
 };
 
 export default {

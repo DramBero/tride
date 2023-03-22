@@ -251,7 +251,9 @@ export default {
       ]);
     },
     currentAnswers() {
-      let answers = this.getOrderedEntries
+      let answers
+      if (this.speaker !== 'Global Dialogue') {
+      answers = this.getOrderedEntries
         .filter((val) => val.TMP_topic === this.currentTopic)
         .filter((topic) =>
           [
@@ -262,6 +264,18 @@ export default {
             topic["speaker_rank"]
           ].includes(this.speaker)
         );
+      }
+      else {
+        answers = this.getOrderedEntries
+        .filter((val) => val.TMP_topic === this.currentTopic)
+        .filter((topic) =>
+            !topic["speaker_id"] &&
+            !topic["speaker_cell"] &&
+            !topic["speaker_faction"] &&
+            !topic["speaker_class"] &&
+            !topic["speaker_rank"]
+        );
+      }
       if (this.showDependencies) {
         return answers;
 

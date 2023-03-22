@@ -12,6 +12,23 @@
       <span class="filter__function">{{ speakerType.type }} </span>
       <span class="filter__comparison">== </span>
       <span class="filter__value">{{ speakerType.value }}</span>
+      <span>
+        <icon
+          v-if="editMode"
+          @click.stop="
+            editFilter({
+              filter_comparison: 'Equal',
+              filter_type: speakerType.type,
+              value: {
+                Integer: speakerType.value
+              }
+            })
+          "
+          name="pen"
+          class="filter__edit"
+          scale="1"
+        ></icon>
+      </span>
     </div>
 
     <div
@@ -26,6 +43,21 @@
       <span class="filter__function">Disposition </span>
       <span class="filter__comparison">> </span>
       <span class="filter__value">{{ answer.data.disposition }}</span>
+      <span>
+        <icon
+          v-if="editMode"
+          @click.stop="editFilter({
+              filter_comparison: 'Greater',
+              filter_type: 'Disposition',
+              value: {
+                Integer: speakerType.value
+              }
+            })"
+          name="pen"
+          class="filter__edit"
+          scale="1"
+        ></icon>
+      </span>
     </div>
 
     <div
@@ -37,15 +69,25 @@
       @focusout="handleFilter({})"
     >
       <span class="filter__if">if </span>
-      <span class="filter__function">{{ filter.filter_function }} </span>
+      <span class="filter__function">{{ filter.filter_type }} </span>
       <span class="filter__id">{{ filter.id }} </span>
       <span class="filter__comparison"
         >{{ parseComparison(filter.filter_comparison) }}
       </span>
       <span class="filter__value">{{ Object.values(filter.value)[0] }}</span>
+      <span>
+        <icon
+          v-if="editMode"
+          @click.stop="editFilter(filter)"
+          name="pen"
+          class="filter__edit"
+          scale="1"
+        ></icon>
+      </span>
     </div>
     <icon
       v-if="editMode"
+      @click="addFilter()"
       name="plus-circle"
       class="icon_gray"
       scale="1.5"
@@ -65,7 +107,7 @@ export default {
       type: String
     },
     editMode: {
-        type: Boolean
+      type: Boolean
     }
   },
   components: {
@@ -75,53 +117,68 @@ export default {
     getOtherSpeakers() {
       return [
         {
-            type: 'Speaker ID',
-            value: this.answer.speaker_id
+          type: "Speaker ID",
+          value: this.answer.speaker_id
         },
         {
-            type: 'Speaker Cell',
-            value: this.answer.speaker_cell
+          type: "Speaker Cell",
+          value: this.answer.speaker_cell
         },
         {
-            type: 'Speaker Faction',
-            value: this.answer.speaker_faction
+          type: "Speaker Faction",
+          value: this.answer.speaker_faction
         },
         {
-            type: 'Speaker Class',
-            value: this.answer.speaker_class
+          type: "Speaker Class",
+          value: this.answer.speaker_class
         },
         {
-            type: 'Speaker Sex',
-            value: this.answer.data.speaker_sex !== 'Any' ? this.answer.data.speaker_sex : ''
+          type: "Speaker Sex",
+          value:
+            this.answer.data.speaker_sex !== "Any"
+              ? this.answer.data.speaker_sex
+              : ""
         },
         {
-            type: 'Speaker Rank',
-            value: this.answer.data.speaker_rank !== -1 ? this.answer.data.speaker_rank : ''
+          type: "Speaker Rank",
+          value:
+            this.answer.data.speaker_rank !== -1
+              ? this.answer.data.speaker_rank
+              : ""
         },
         {
-            type: 'Speaker Race',
-            value: this.answer.speaker_rank
+          type: "Speaker Race",
+          value: this.answer.speaker_rank
         },
         {
-            type: 'Player Rank',
-            value: this.answer.data.player_rank !== -1 ? this.answer.data.player_rank : ''
+          type: "Player Rank",
+          value:
+            this.answer.data.player_rank !== -1
+              ? this.answer.data.player_rank
+              : ""
         },
         {
-            type: 'Player Faction',
-            value: this.answer.player_faction
-        },
-      ].filter(val => val.value && val.value !== this.speaker)
-      ;
+          type: "Player Faction",
+          value: this.answer.player_faction
+        }
+      ].filter((val) => val.value && val.value !== this.speaker);
     }
   },
   methods: {
     handleFilter(filter) {
       if (filter.filter_function === "JournalType") {
-        this.$store.commit("setSidebarActive", 'Journal')
+        this.$store.commit("setSidebarActive", "Journal");
         this.$store.commit("setJournalHighlight", filter);
       } else {
         this.$store.commit("setJournalHighlight", {});
       }
+    },
+    addFilter() {
+      this.$store.commit("setPrimaryModal", "NewFilter");
+    },
+    editFilter(filter) {
+      this.$store.commit("setSelectedFilter", filter);
+      this.$store.commit("setPrimaryModal", "NewFilter");
     },
     parseComparison(comparison) {
       switch (comparison) {
@@ -175,6 +232,13 @@ export default {
 .filter {
   &__if {
     color: rgb(56, 134, 60);
+  }
+  &__edit {
+    margin-left: 15px;
+    transition: all 0.2s ease-out;
+    &:hover {
+      fill: rgba(0, 0, 0, 0.5);
+    }
   }
 }
 </style>

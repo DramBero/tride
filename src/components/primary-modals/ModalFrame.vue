@@ -35,6 +35,7 @@
 import ModalContentUpload from '@/components/primary-modals/ModalContentUpload.vue';
 import ModalContentNewQuest from '@/components/primary-modals/ModalContentNewQuest.vue';
 import ModalContentNewDialogue from '@/components/primary-modals/ModalContentNewDialogue.vue';
+import ModalContentNewFilter from './ModalContentNewFilter.vue';
   
   export default {
     data() {
@@ -67,12 +68,21 @@ import ModalContentNewDialogue from '@/components/primary-modals/ModalContentNew
     components: {
         ModalContentUpload,
         ModalContentNewQuest,
-        ModalContentNewDialogue
+        ModalContentNewDialogue,
+        ModalContentNewFilter
     },
   };
   </script>
   
   <style scoped lang="scss">
+  .modal__title {
+  color: rgb(202, 165, 96);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
   
   .modal {
   &__overlay {
@@ -163,7 +173,7 @@ import ModalContentNewDialogue from '@/components/primary-modals/ModalContentNew
     &-wrapper {
       box-shadow: 2px 2px 8px rgba(25, 56, 31, 0.04);
       border-radius: 8px;
-      padding: 32px;
+      //padding: 32px;
       background: rgb(202, 165, 96);
       max-height: 100%;
       @media (max-width: 800px) {

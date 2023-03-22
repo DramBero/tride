@@ -483,7 +483,10 @@ export default {
           width: 100%;
           display: flex;
           justify-content: center;
-
+          transition: all .15s ease-out;
+          &:hover {
+            color: rgb(202, 165, 96);
+          }
         }
         &_no-margin {
           margin: 0;

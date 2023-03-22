@@ -10,7 +10,7 @@
         <span class="filter__if">if </span>
         <span class="filter__function filter-editable" v-if="currentFilter.name"
             @click="editable = 'name'"
-          >{{ currentFilter.name }}
+          >{{ currentFilter.name === 'Function' ? currentFilter.filter_function : currentFilter.name }}
         </span>
         <span
           class="filter__value filter-editable"
@@ -67,7 +67,7 @@
               :key="filter.id"
             >
               <span class="filter__if">if </span>
-              <span class="filter__function">{{ filter.name }} </span>
+              <span class="filter__function">{{ filter.name === 'Function' ? filter.filter_function : filter.name }} </span>
             </div>
           </div>
         </div>
@@ -264,8 +264,8 @@ export default {
             },
             {
               id: "function_choice",
-              name: "Choice",
-              filter_function: "ChoiceType",
+              name: "Function",
+              filter_function: "Choice",
               operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
               fields: ["choice"]
             }

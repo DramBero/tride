@@ -5,7 +5,14 @@
         <div class="dialogue-answers__add" v-if="editMode" @click="addEntry">
           Add entry
         </div>
-        {{ currentTopic }}
+        <transition
+        name="fadeHeight"
+        class="dialogue-answers__frame"
+        mode="out-in"
+        :style="{ width: '100%' }"
+      >
+        <span v-show="currentTopic.trim().length">{{ currentTopic }}</span>
+      </transition>
         <div class="dialogue-answers__edit">
           <icon
             v-if="!editMode"
@@ -152,11 +159,12 @@
           </form>
 
         </div>
-      </transition-group>
-      <div class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin" v-if="!editMode">
+        <div class="dialogue-answers-answer__above dialogue-answers-answer__above_no-margin" v-if="!editMode" :key="'separator'">
             
           </div>
           <div class="dialogue-answers-answer__above-add" @click="addEntry()" v-if="editMode">+</div>
+      </transition-group>
+
       </div>
           <div class="dialogue-answers__error" v-if="getOrderedEntries.error_text">
         {{ getOrderedEntries.error_text }}
@@ -319,7 +327,10 @@ export default {
       ]);
       this.editedEntry = "";
     },
-    setCurrentAnswers(topic, topicType) {
+    async setCurrentAnswers(topic, topicType) {
+      this.topicType = "Topic";
+      this.currentTopic = " ";
+      await new Promise((resolve) => setTimeout(resolve, 160));
       this.topicType = topicType;
       this.currentTopic = topic;
     },
@@ -375,7 +386,7 @@ export default {
 
   watch: {
     speaker() {
-      this.setCurrentAnswers(["", ""]);
+      this.setCurrentAnswers("", "");
       this.currentTopic = "";
     }
   }

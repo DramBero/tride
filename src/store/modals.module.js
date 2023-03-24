@@ -5,6 +5,8 @@ const state = {
   dialogueCreateModal: null,
   selectedFilter: {},
   primaryModal: "",
+  selectedInfoId: '',
+  selectedFilterIndex: '',
 };
 
 const mutations = {
@@ -29,6 +31,12 @@ const mutations = {
   setSelectedFilter(state, value) {
     state.selectedFilter = value
   },
+  setSelectedInfoId(state, info_id) {
+    state.selectedInfoId = info_id
+  },
+  setSelectedFilterIndex(state, index) {
+    state.selectedFilterIndex = index
+  },
   setDialogueCreateModal(state, value) {
     state.dialogueCreateModal = value
   },
@@ -49,6 +57,8 @@ const getters = {
   getDialogueCreateModal: (s) => s.dialogueCreateModal,
   getPrimaryModal: (s) => s.primaryModal,
   getSelectedFilter: (s) => s.selectedFilter,
+  getSelectedFilterIndex: (s) => s.selectedFilterIndex,
+  getSelectedInfoId: (s) => s.selectedInfoId,
 };
 
 export default {

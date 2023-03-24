@@ -22,7 +22,7 @@
               value: {
                 Integer: speakerType.value
               }
-            })
+            }, speakerType.type)
           "
           name="pen"
           class="filter__edit"
@@ -52,7 +52,7 @@
               value: {
                 Integer: speakerType.value
               }
-            })"
+            }, 'Disposition')"
           name="pen"
           class="filter__edit"
           scale="1"
@@ -62,11 +62,9 @@
 
     <div
       class="dialogue-filters__filter"
-      v-for="(filter, index) in answer.filters"
+      v-for="(filter, index) in getFiltersByInfoId"
       :key="index"
       tabindex="0"
-      @focus="handleFilter(filter)"
-      @focusout="handleFilter({})"
     >
       <span class="filter__if">if </span>
       <span class="filter__function">{{ filter.filter_type === 'Function' ? filter.filter_function : filter.filter_type }} </span>
@@ -78,7 +76,7 @@
       <span>
         <icon
           v-if="editMode"
-          @click.stop="editFilter(filter)"
+          @click.stop="editFilter(filter, index)"
           name="pen"
           class="filter__edit"
           scale="1"
@@ -114,6 +112,9 @@ export default {
     Icon
   },
   computed: {
+    getFiltersByInfoId() {
+      return this.$store.getters['getFiltersByInfoId'](this.answer.info_id)
+    },
     getOtherSpeakers() {
       return [
         {
@@ -175,10 +176,14 @@ export default {
     },
     addFilter() {
       this.$store.commit("setSelectedFilter", {});
+      this.$store.commit("setSelectedInfoId", this.answer.info_id);
+      this.$store.commit("setSelectedFilterIndex", '');
       this.$store.commit("setPrimaryModal", "NewFilter");
     },
-    editFilter(filter) {
+    editFilter(filter, index) {
       this.$store.commit("setSelectedFilter", filter);
+      this.$store.commit("setSelectedInfoId", this.answer.info_id);
+      this.$store.commit("setSelectedFilterIndex", index);
       this.$store.commit("setPrimaryModal", "NewFilter");
     },
     parseComparison(comparison) {

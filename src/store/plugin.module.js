@@ -111,71 +111,50 @@ const getters = {
     return uniqueObjects;
   },
 
+  getFiltersByInfoId:
+    (state) =>
+    (info_id) =>
+    state.activePlugin.find(val => val.info_id == info_id).filters,
+
   getOrderedEntriesByTopic:
     (state) =>
     ([topicId]) => {
       if (!topicId) return []
-      let depDialogue = [];
-      for (let dep of state.dependencies) {
-        depDialogue.push(
-          dep.data
-            .filter((val) => val.type === "Info")
-            .filter((topic) => topic.TMP_topic == topicId)
-        );
-      }
-      let activePlugin = JSON.parse(JSON.stringify(state.activePlugin));
-      depDialogue.push(
-        activePlugin
-          .filter((val) => val.type === "Info")
-          .filter((topic) => topic.TMP_topic == topicId)
-      );
-      depDialogue = depDialogue.filter((val) => val);
+      let pluginDialogue = [...state.dependencies.map(val => val.data), state.activePlugin]
+        .map(val => val.filter((val) => val.type === "Info" && val.TMP_topic === topicId));
+
+      if (!pluginDialogue.flat(1).length) return []
 
       const findByIdType = function (idType, id) {
-        let entries = depDialogue
-          .map((plugin) => plugin.filter((entry) => entry[idType] === id))
-          .flat(1);
+        let entries = pluginDialogue.flatMap((plugin) => plugin.filter((entry) => entry[idType] === id));
         if (!entries.length) return false;
-        let lastValue = entries.slice(-1)[0]
-        let oldValues =  depDialogue
-        .map((plugin) =>
-          plugin.filter(
-            (entry) => entry.info_id === lastValue.info_id
-          )
-        )
-        .flat(1)
-        return {
-          ...lastValue,
-          old_values: oldValues.length > 1 ? oldValues.filter((val) => val && val.TMP_dep) : []
-        };
+        let lastValue = entries.at(-1)
+        let oldValues = pluginDialogue.flatMap((plugin) => plugin.filter((entry) => entry.info_id === lastValue.info_id))
+        return { ...lastValue, old_values: oldValues.length > 1 ? oldValues.filter((val) => val && val.TMP_dep) : [] };
       };
 
       let firstElement = findByIdType("prev_id", "");
 
-      if (!firstElement)
-        return {
-          error_code: "NO_PREV_ID",
-          error_text:
-            "Ordering error! No elements with defined 'prev_id'. Make sure you uploaded all dependencies.",
-          error_details: {}
-        };
+      const errorNoPrevId = {
+        error_code: "NO_PREV_ID",
+        error_text:
+          "Ordering error! No elements with defined 'prev_id'. Make sure you uploaded all dependencies.",
+        error_details: {}
+      };
+
+      if (!firstElement) return errorNoPrevId
 
       let orderedDialogue = [firstElement];
       let nextEntry;
-      let nextEntries
       while (true) {
-        nextEntries = [...new Set([
-          findByIdType("prev_id", orderedDialogue.slice(-1)[0].info_id),
-          findByIdType("info_id", orderedDialogue.slice(-1)[0].next_id)
+        let nextEntries = [...new Set([
+          findByIdType("prev_id", orderedDialogue.at(-1).info_id),
+          findByIdType("info_id", orderedDialogue.at(-1).next_id)
         ])]
         for (let dependency of state.dependencies) {
-          if (nextEntries.find(val => val.TMP_dep === dependency.name)) {
-            nextEntry = nextEntries.find(val => val.TMP_dep === dependency.name)
-          }
+          nextEntry = nextEntries.find(val => val.TMP_dep === dependency.name) || nextEntry
         }
-        if (nextEntries.find(val => !val.TMP_dep)) {
-          nextEntry = nextEntries.find(val => !val.TMP_dep)
-        }
+        nextEntry = nextEntries.find(val => !val.TMP_dep) || nextEntry
         if (nextEntry) {
           orderedDialogue.push(nextEntry);
           if (!nextEntry.next_id) break;
@@ -340,6 +319,12 @@ const actions = {
 const mutations = {
   setActiveHeader(state, header) {
     state.activeHeader = header;
+  },
+
+  addFilter(state, [filter, info_id]) {
+    let slotCount = state.activePlugin.find(val => val.info_id == info_id).filters.length
+    filter = {...filter, slot: 'Slot' + slotCount.toString()}
+    state.activePlugin.find(val => val.info_id == info_id).filters.push(filter)
   },
 
   addDialogue(state, [npcId, topicId, dialogueType, prev_id, next_id, text]) {

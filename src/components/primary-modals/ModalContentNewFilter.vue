@@ -8,9 +8,15 @@
         :class="{ 'filter-constructor-start_rounded': currentValue !== '' }"
       >
         <span class="filter__if">if </span>
-        <span class="filter__function filter-editable" v-if="currentFilter.name"
-            @click="editable = 'name'"
-          >{{ currentFilter.name === 'Function' ? currentFilter.filter_function : currentFilter.name }}
+        <span
+          class="filter__function filter-editable"
+          v-if="currentFilter.name"
+          @click="editable = 'name'"
+          >{{
+            currentFilter.name === "Function"
+              ? currentFilter.filter_function
+              : currentFilter.name
+          }}
         </span>
         <span
           class="filter__value filter-editable"
@@ -19,12 +25,18 @@
         >
           {{ currentValueSecondary }}
         </span>
-        <span class="filter__operand filter-editable" v-if="currentOperand"
-        @click="editable = 'operand'">
+        <span
+          class="filter__operand filter-editable"
+          v-if="currentOperand"
+          @click="editable = 'operand'"
+        >
           {{ parseComparison(currentOperand) }}
         </span>
-        <span class="filter__value filter-editable" v-if="currentValue !== ''"
-        @click="editable = 'value'">
+        <span
+          class="filter__value filter-editable"
+          v-if="currentValue !== ''"
+          @click="editable = 'value'"
+        >
           {{ currentValue }}
         </span>
       </div>
@@ -51,8 +63,33 @@
         <span class="filter__value"> ... </span>
       </div>
     </div>
+    <div
+      class="save-changes"
+      v-if="currentFilter.name && currentOperand && currentValue"
+    >
+      <div class="save-changes__tip">
+        Tip: to edit the filter click on the parts of the filter text above.
+      </div>
+      <div class="save-changes__save">
+        <button
+          type="submit"
+          class="modal-button"
+          @click="
+            commitFilter()
+          "
+        >
+          Save
+        </button>
+        <button type="submit" class="modal-button" @click="cancelFilter()">
+          Cancel
+        </button>
+      </div>
+    </div>
     <div class="filter-editor">
-      <div class="filter-select" v-if="!currentFilter.id || editable === 'name'">
+      <div
+        class="filter-select"
+        v-if="!currentFilter.id || editable === 'name'"
+      >
         <div
           class="filter-group"
           v-for="group in filterGroups"
@@ -63,88 +100,114 @@
             <div
               class="dialogue-filters__filter"
               v-for="filter in group.filters"
-              @click="currentFilter = filter; editable = ''"
+              @click="
+                currentFilter = filter;
+                editable = '';
+              "
               :key="filter.id"
             >
               <span class="filter__if">if </span>
-              <span class="filter__function">{{ filter.name === 'Function' ? filter.filter_function : filter.name }} </span>
+              <span class="filter__function"
+                >{{
+                  filter.name === "Function"
+                    ? filter.filter_function
+                    : filter.name
+                }}
+              </span>
             </div>
           </div>
         </div>
       </div>
       <div
         class="value-select"
-        v-else-if="(currentFilter.fields.length > 1 && !currentValueSecondary) || editable === 'value-secondary'"
+        v-else-if="
+          (currentFilter.fields.length > 1 && !currentValueSecondary) ||
+          editable === 'value-secondary'
+        "
       >
-      <div class="input-area">
-        <label class="modal-field">
-          <input
-            class="modal-field__input"
-            name="dialogue-topic"
-            :placeholder="'Type the value'"
-            autocomplete="off"
-            required
-            v-model="inputValueSecondary"
-          />
-        </label>
-        <button
-          type="submit"
-          class="modal-button"
-          :disabled="!inputValueSecondary"
-          @click="currentValueSecondary = inputValueSecondary; editable = ''"
-        >
-          Save
-        </button>
+        <div class="input-area">
+          <label class="modal-field">
+            <input
+              class="modal-field__input"
+              name="dialogue-topic"
+              :placeholder="'Type the value'"
+              autocomplete="off"
+              required
+              v-model="inputValueSecondary"
+            />
+          </label>
+          <button
+            type="submit"
+            class="modal-button"
+            :disabled="!inputValueSecondary.trim()"
+            @click="
+              currentValueSecondary = inputValueSecondary;
+              editable = '';
+            "
+          >
+            Save
+          </button>
+        </div>
       </div>
-    </div>
-      <div class="operand-select" v-else-if="!currentOperand || editable === 'operand'">
+      <div
+        class="operand-select"
+        v-else-if="!currentOperand || editable === 'operand'"
+      >
         Select an operand:
         <div
           class="operand"
           v-for="operand in currentFilter.operands"
           :key="operand"
-          @click="currentOperand = operand; editable = ''"
+          @click="
+            currentOperand = operand;
+            editable = '';
+          "
         >
           {{ parseComparison(operand) }}
         </div>
       </div>
-      <div class="value-select" v-else-if="currentValue === '' || editable === 'value'">
+      <div
+        class="value-select"
+        v-else-if="currentValue === '' || editable === 'value'"
+      >
         <div class="input-area">
-        <label class="modal-field">
-          <input
-            class="modal-field__input"
-            name="dialogue-topic"
-            :placeholder="'Type the value'"
-            autocomplete="off"
-            required
-            v-model="inputValue"
-          />
-        </label>
-        <button
-          type="submit"
-          class="modal-button"
-          :disabled="!inputValue"
-          @click="currentValue = inputValue; editable = ''"
+          <label class="modal-field">
+            <input
+              class="modal-field__input"
+              name="dialogue-topic"
+              :placeholder="'Type the value'"
+              autocomplete="off"
+              required
+              v-model="inputValue"
+            />
+          </label>
+          <button
+            type="submit"
+            class="modal-button"
+            :disabled="!inputValue.trim()"
+            @click="
+              currentValue = inputValue;
+              editable = '';
+            "
+          >
+            Save
+          </button>
+        </div>
+        <div
+          class="found-names"
+          v-if="currentFilter.fields.slice(-1)[0] === 'npc'"
         >
-          Save
-        </button>
-    </div>
-        <div class="found-names" v-if="currentFilter.fields.slice(-1)[0] === 'npc'">
           <div
             class="found-names-name"
-            :class="{'found-names-name_active': !npc.TMP_dep}"
+            :class="{ 'found-names-name_active': !npc.TMP_dep }"
             v-for="npc in getNpcs"
             :key="npc.id"
-            @click="
-              inputValue = npc.id
-            "
+            @click="inputValue = npc.id"
           >
             <div class="found-names-name__title">{{ npc.name }}</div>
             <div class="found-names-name__id">{{ npc.id }}</div>
           </div>
         </div>
-
-
       </div>
     </div>
   </div>
@@ -168,44 +231,44 @@ export default {
             {
               id: "speaker_id",
               name: "Speaker ID",
-              operands: [ "Equal"],
+              operands: ["Equal"],
               fields: ["npc"]
             },
             {
               id: "speaker_cell",
               name: "Speaker Cell",
-              operands: [ "Equal"],
+              operands: ["Equal"],
               fields: ["cell"]
             },
             {
               id: "speaker_class",
               name: "Speaker Class",
-              operands: [ "Equal"],
+              operands: ["Equal"],
               fields: ["class"]
             },
             {
               id: "speaker_faction",
               name: "Speaker Faction",
-              operands: [ "Equal"],
+              operands: ["Equal"],
               fields: ["faction"]
             },
             {
               id: "speaker_race",
               name: "Speaker Race",
-              operands: [ "Equal"],
+              operands: ["Equal"],
               fields: ["race"]
             },
             {
               id: "speaker_rank",
               name: "Speaker Rank",
-              operands: [ "Equal"],
+              operands: ["Equal"],
               fields: ["rank"]
             },
 
             {
               id: "speaker_sex",
               name: "Speaker Sex",
-              operands: [ "Equal"],
+              operands: ["Equal"],
               fields: ["sex"]
             }
           ]
@@ -245,20 +308,41 @@ export default {
               id: "function_journal",
               name: "Journal",
               filter_function: "JournalType",
-              operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
               fields: ["journal_id", "journal_disposition"]
             },
             {
               id: "function_item",
               name: "Item",
               filter_function: "ItemType",
-              operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
               fields: ["item_id", "item_amount"]
             },
             {
               id: "function_dead",
               name: "Dead",
-              operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
               filter_function: "DeadType",
               fields: ["npc"]
             },
@@ -266,7 +350,14 @@ export default {
               id: "function_choice",
               name: "Function",
               filter_function: "Choice",
-              operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
               fields: ["choice"]
             }
           ]
@@ -278,72 +369,156 @@ export default {
               id: "function_global",
               name: "Global",
               filter_function: "VariableCompare",
-              operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
               fields: ["global_dropdown", "global_value"]
             },
             {
               id: "function_local",
               name: "Local",
               filter_function: "VariableCompare",
-              operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
               fields: ["local_input", "local_value"]
             }
           ]
         },
         {
-            name: "Not:",
-            filters: [
-                {
-                    id: "not_id",
-                    name: "NotId",
-                    filter_function: "NotIdType",
-                    operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
-                    fields: ["npc", "value"]
-                },
-                {
-                    id: "not_cell",
-                    name: "NotCell",
-                    filter_function: "NotCell",
-                    operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
-                    fields: ["cell", "value"]
-                },
-                {
-                    id: "not_class",
-                    name: "NotClass",
-                    filter_function: "NotClass",
-                    operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
-                    fields: ["class", "value"]
-                },
-                {
-                    id: "not_faction",
-                    name: "NotFaction",
-                    filter_function: "NotFaction",
-                    operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
-                    fields: ["faction", "value"]
-                },
-                {
-                    id: "not_race",
-                    name: "NotRace",
-                    filter_function: "NotRace",
-                    operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
-                    fields: ["race", "value"]
-                },
-                {
-                    id: "not_local",
-                    name: "NotLocal",
-                    filter_function: "VariableCompare",
-                    operands: ["Less", "LesserEqual", "NotEqual", "Equal", "GreaterEqual", "Greater"],
-                    fields: ["local", "value"]
-                },
-                
-
-            ]
+          name: "Not:",
+          filters: [
+            {
+              id: "function_not_id",
+              name: "NotId",
+              filter_function: "NotIdType",
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
+              fields: ["npc", "value"]
+            },
+            {
+              id: "function_not_cell",
+              name: "NotCell",
+              filter_function: "NotCell",
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
+              fields: ["cell", "value"]
+            },
+            {
+              id: "function_not_class",
+              name: "NotClass",
+              filter_function: "NotClass",
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
+              fields: ["class", "value"]
+            },
+            {
+              id: "function_not_faction",
+              name: "NotFaction",
+              filter_function: "NotFaction",
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
+              fields: ["faction", "value"]
+            },
+            {
+              id: "function_not_race",
+              name: "NotRace",
+              filter_function: "NotRace",
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
+              fields: ["race", "value"]
+            },
+            {
+              id: "function_not_local",
+              name: "NotLocal",
+              filter_function: "VariableCompare",
+              operands: [
+                "Less",
+                "LesserEqual",
+                "NotEqual",
+                "Equal",
+                "GreaterEqual",
+                "Greater"
+              ],
+              fields: ["local", "value"]
+            }
+          ]
         }
       ]
     };
   },
+
+/*
+Alarm
+Alarmed
+Attacked
+Choice
+Creature Target
+
+*/
+
+
   methods: {
-    createQuest() {
+    commitFilter() {
+      if (this.currentFilter.id.includes("function")) {
+        if (this.getSelectedFilterIndex === "") {
+          let filter = {
+            filter_comparison: this.currentOperand,
+            filter_function: this.currentFilter.filter_function,
+            filter_type: this.currentFilter.name,
+            id: this.currentValueSecondary,
+            //slot: "Slot1",
+            value: {
+                Integer: parseInt(this.currentValue)
+            }
+          };
+          if (!this.currentValueSecondary) delete filter.id
+          this.$store.commit('addFilter', [filter, this.getSelectedInfoId])
+        }
+      }
+      this.$store.commit("setPrimaryModal", "");
+    },
+    cancelFilter() {
       this.$store.commit("setPrimaryModal", "");
     },
     parseComparison(comparison) {
@@ -371,26 +546,34 @@ export default {
       else return this.$store.getters["searchNpcs"](this.inputValue);
     },
     getSelectedFilter() {
-        return this.$store.getters['getSelectedFilter']
+      return this.$store.getters["getSelectedFilter"];
+    },
+    getSelectedFilterIndex() {
+      return this.$store.getters["getSelectedFilterIndex"];
+    },
+    getSelectedInfoId() {
+      return this.$store.getters["getSelectedInfoId"];
     }
   },
   beforeMount() {
-    let filter = this.getSelectedFilter
+    let filter = this.getSelectedFilter;
     if (!filter.filter_type) {
-        this.currentOperand = ""
-        this.currentFilter = {}
-        this.currentValueSecondary = ""
-        this.inputValueSecondary = ""
-        this.currentValue = ""
-        this.inputValue = ""
-    }
-    else {
-        this.currentOperand = filter.filter_comparison
-        this.currentFilter = this.filterGroups.map(val => val.filters).flat(1).find(val => val && val.name === filter.filter_type)
-        this.currentValueSecondary = filter.id
-        this.inputValueSecondary = filter.id
-        this.currentValue = Object.values(filter.value)[0]
-        this.inputValue = Object.values(filter.value)[0]
+      this.currentOperand = "";
+      this.currentFilter = {};
+      this.currentValueSecondary = "";
+      this.inputValueSecondary = "";
+      this.currentValue = "";
+      this.inputValue = "";
+    } else {
+      this.currentOperand = filter.filter_comparison;
+      this.currentFilter = this.filterGroups
+        .map((val) => val.filters)
+        .flat(1)
+        .find((val) => val && val.name === filter.filter_type);
+      this.currentValueSecondary = filter.id;
+      this.inputValueSecondary = filter.id;
+      this.currentValue = Object.values(filter.value)[0];
+      this.inputValue = Object.values(filter.value)[0];
     }
   }
 };
@@ -422,19 +605,19 @@ export default {
   }
 }
 .input-area {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 .filter-editor {
   height: 550px;
 }
 .filter-editable {
-    color: black;
-    transition: all .15s ease-out;
-    cursor: pointer;
-    &:hover {
-        color: rgb(112, 126, 207);
-    }
+  color: black;
+  transition: all 0.15s ease-out;
+  cursor: pointer;
+  &:hover {
+    color: rgb(112, 126, 207);
+  }
 }
 .filter-constructor {
   display: flex;
@@ -443,6 +626,7 @@ export default {
   gap: 10px;
   align-items: center;
   font-size: 25px;
+  margin-bottom: 20px;
   &-start {
     align-items: center;
     background: rgba(255, 255, 255, 0.7);

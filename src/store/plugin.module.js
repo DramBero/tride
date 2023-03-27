@@ -6,7 +6,7 @@ const state = {
   activeHeader: {},
   activePluginTitle: "",
   journalHighlight: {},
-  dependencies: []
+  dependencies: [],
 };
 
 const getters = {
@@ -401,6 +401,66 @@ const mutations = {
     else state.activePlugin = [...state.activePlugin, newEntry];
 
     //getBestOrderLocationForNpc: (state, getters) => ([npcId, topicId, dialogueType]) => {
+  },
+
+  pasteDialogue(state, [entry, npcId, topicId, dialogueType, prev_id, next_id]) {
+    let generatedId =
+      Math.random().toString().slice(2, 15) +
+      Math.random().toString().slice(2, 9);
+
+    
+      let questEntries = state.activePlugin
+      .filter((val) => val.TMP_type === dialogueType)
+      .filter((val) => val.TMP_topic === topicId);
+
+    if (!questEntries.length) {
+      state.activePlugin = [...state.activePlugin, topicObject];
+    }
+
+    let lastIdIndex = null;
+    if (questEntries.length && questEntries[0].info_id) {
+      lastId = questEntries[0].info_id;
+      lastIdIndex = state.activePlugin.findIndex(
+        (item) => item.info_id === lastId
+      );
+    }
+
+    let newEntry = {
+      ...entry, 
+      speaker_id: npcId,
+      info_id: generatedId,
+      next_id: next_id,
+      prev_id: prev_id,
+      TMP_topic: topicId,
+      TMP_type: dialogueType
+    }
+
+
+    if (
+      state.activePlugin
+        .filter((val) => val.TMP_type === dialogueType)
+        .filter((val) => val.TMP_topic === topicId)
+        .filter((val) => val.info_id === prev_id).length
+    ) {
+      state.activePlugin
+        .filter((val) => val.TMP_type === dialogueType)
+        .filter((val) => val.TMP_topic === topicId)
+        .filter((val) => val.info_id === prev_id)[0].next_id = generatedId;
+    }
+
+    if (
+      state.activePlugin
+        .filter((val) => val.TMP_type === dialogueType)
+        .filter((val) => val.TMP_topic === topicId)
+        .filter((val) => val.info_id === next_id).length
+    ) {
+      state.activePlugin
+        .filter((val) => val.TMP_type === dialogueType)
+        .filter((val) => val.TMP_topic === topicId)
+        .filter((val) => val.info_id === next_id)[0].prev_id = generatedId;
+    }
+    if (lastIdIndex) state.activePlugin.splice(lastIdIndex + 1, 0, newEntry);
+    else state.activePlugin = [...state.activePlugin, newEntry];
   },
 
   deleteDialogueEntry(state, info_id) {

@@ -7,6 +7,7 @@ const state = {
   primaryModal: "",
   selectedInfoId: '',
   selectedFilterIndex: '',
+  clipboardDialogue: {},
 };
 
 const mutations = {
@@ -37,6 +38,12 @@ const mutations = {
   setSelectedFilterIndex(state, index) {
     state.selectedFilterIndex = index
   },
+  setClipboardDialogue(state, [entry, speaker]) {
+    let cleanedEntry = Object.fromEntries(Object.entries(entry)
+        .filter(([key, value]) => value != speaker)
+      );
+    state.clipboardDialogue = cleanedEntry
+  },
   setDialogueCreateModal(state, value) {
     state.dialogueCreateModal = value
   },
@@ -59,6 +66,7 @@ const getters = {
   getSelectedFilter: (s) => s.selectedFilter,
   getSelectedFilterIndex: (s) => s.selectedFilterIndex,
   getSelectedInfoId: (s) => s.selectedInfoId,
+  getClipboardDialogue: (s) => s.clipboardDialogue
 };
 
 export default {

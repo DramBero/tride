@@ -59,7 +59,6 @@
                   class="entry-control-button__icon"
                   color="#E1FF00"
                   scale="1"
-                  @click.prevent="deleteEntry(answer.info_id)"
                 ></icon>
               </button>
               <button
@@ -74,7 +73,6 @@
                   class="entry-control-button__icon"
                   color="#E1FF00"
                   scale="1"
-                  @click.prevent="deleteEntry(answer.info_id)"
                 ></icon>
               </button>
             </div>
@@ -196,14 +194,33 @@
             v-if="!editMode"
             :key="'separator'"
           ></div>
-          <div
-            class="dialogue-answers-answer__above-add"
-            @click="addEntry()"
-            v-if="editMode"
-            :key="'answer-lowest'"
-          >
-            +
-          </div>
+          <div class="dialogue-answers-answer__above-add" v-if="editMode" :key="'add-lowest'">
+              <button
+                class="entry-control-button"
+                @click.prevent="addEntry([answer.prev_id, answer.info_id])"
+              >
+                <icon
+                  name="plus"
+                  class="entry-control-button__icon"
+                  color="#E1FF00"
+                  scale="1"
+                ></icon>
+              </button>
+              <button
+                class="entry-control-button"
+                v-if="Object.keys(getClipboardDialogue).length"
+                @click.prevent="
+                  pasteDialogueFromClipboard([answer.prev_id, answer.info_id])
+                "
+              >
+                <icon
+                  name="clipboard"
+                  class="entry-control-button__icon"
+                  color="#E1FF00"
+                  scale="1"
+                ></icon>
+              </button>
+            </div>
         </transition-group>
       </div>
       <div

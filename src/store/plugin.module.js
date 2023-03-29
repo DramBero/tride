@@ -321,16 +321,19 @@ const mutations = {
     state.activeHeader = header;
   },
 
+
   addFilter(state, [filter, info_id]) {
     let slotCount = state.activePlugin.find(val => val.info_id == info_id).filters.length
     filter = {...filter, slot: 'Slot' + slotCount.toString()}
     state.activePlugin.find(val => val.info_id == info_id).filters.push(filter)
   },
 
-  addDialogue(state, [npcId, topicId, dialogueType, prev_id, next_id, text]) {
+
+  addDialogue(state, [npcId, topicId, dialogueType, prev_id, next_id, text,]) {
     let generatedId =
       Math.random().toString().slice(2, 15) +
       Math.random().toString().slice(2, 9);
+      
     let topicObject = {
       dialogue_type: "Topic",
       flags: [0, 0],
@@ -341,20 +344,17 @@ const mutations = {
     };
 
     let questEntries = state.activePlugin
-      .filter((val) => val.TMP_type === dialogueType)
-      .filter((val) => val.TMP_topic === topicId);
+      .filter((val) => val.TMP_type === dialogueType && val.TMP_topic === topicId)
 
-    if (!questEntries.length) {
-      state.activePlugin = [...state.activePlugin, topicObject];
-    }
+    if (!questEntries.length) state.activePlugin = [...state.activePlugin, topicObject];
 
     let lastIdIndex = null;
-    if (questEntries.length && questEntries[0].info_id) {
-      lastId = questEntries[0].info_id;
+    if (questEntries.length && questEntries.at(-1).info_id) {
       lastIdIndex = state.activePlugin.findIndex(
-        (item) => item.info_id === lastId
+        (item) => item.info_id === questEntries.at(-1).info_id
       );
     }
+
     let newEntry = {
       data: {
         dialogue_type: "Topic",
@@ -374,54 +374,28 @@ const mutations = {
       TMP_topic: topicId,
       TMP_type: dialogueType
     };
-    if (
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === prev_id).length
-    ) {
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === prev_id)[0].next_id = generatedId;
-    }
 
-    if (
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === next_id).length
-    ) {
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === next_id)[0].prev_id = generatedId;
-    }
-    if (lastIdIndex) state.activePlugin.splice(lastIdIndex + 1, 0, newEntry);
+    state.activePlugin.find((val) => val.info_id === prev_id) && (state.activePlugin.find((val) => val.info_id === prev_id).next_id = generatedId);
+    state.activePlugin.find((val) => val.info_id === next_id) && (state.activePlugin.find((val) => val.info_id === next_id).prev_id = generatedId);
+
+    if (lastIdIndex) state.activePlugin.splice(lastIdIndex, 0, newEntry);
     else state.activePlugin = [...state.activePlugin, newEntry];
-
-    //getBestOrderLocationForNpc: (state, getters) => ([npcId, topicId, dialogueType]) => {
   },
+
 
   pasteDialogue(state, [entry, npcId, topicId, dialogueType, prev_id, next_id]) {
     let generatedId =
       Math.random().toString().slice(2, 15) +
       Math.random().toString().slice(2, 9);
-
     
-      let questEntries = state.activePlugin
-      .filter((val) => val.TMP_type === dialogueType)
-      .filter((val) => val.TMP_topic === topicId);
+    let questEntries = state.activePlugin.filter((val) => val.TMP_type === dialogueType && val.TMP_topic === topicId)
 
-    if (!questEntries.length) {
-      state.activePlugin = [...state.activePlugin, topicObject];
-    }
+    if (!questEntries.length) state.activePlugin = [...state.activePlugin, topicObject];
 
     let lastIdIndex = null;
     if (questEntries.length && questEntries[0].info_id) {
-      lastId = questEntries[0].info_id;
       lastIdIndex = state.activePlugin.findIndex(
-        (item) => item.info_id === lastId
+        (item) => item.info_id === questEntries.at(-1).info_id
       );
     }
 
@@ -435,33 +409,13 @@ const mutations = {
       TMP_type: dialogueType
     }
 
+    state.activePlugin.find((val) => val.info_id === prev_id) && (state.activePlugin.find((val) => val.info_id === prev_id).next_id = generatedId);
+    state.activePlugin.find((val) => val.info_id === next_id) && (state.activePlugin.find((val) => val.info_id === next_id).prev_id = generatedId);
 
-    if (
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === prev_id).length
-    ) {
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === prev_id)[0].next_id = generatedId;
-    }
-
-    if (
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === next_id).length
-    ) {
-      state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType)
-        .filter((val) => val.TMP_topic === topicId)
-        .filter((val) => val.info_id === next_id)[0].prev_id = generatedId;
-    }
-    if (lastIdIndex) state.activePlugin.splice(lastIdIndex + 1, 0, newEntry);
+    if (lastIdIndex) state.activePlugin.splice(lastIdIndex, 0, newEntry);
     else state.activePlugin = [...state.activePlugin, newEntry];
   },
+
 
   deleteDialogueEntry(state, info_id) {
     let prev_id = state.activePlugin.find(
@@ -481,11 +435,13 @@ const mutations = {
     );
   },
 
+
   editDialogueEntry(state, [info_id, text]) {
     state.activePlugin.find(
       (val) => val.type === "Info" && val.info_id === info_id
     ).text = text;
   },
+
 
   addJournalQuest(state, [id, name]) {
     let generatedId =
@@ -521,6 +477,7 @@ const mutations = {
     state.activePlugin = [...state.activePlugin, idEntry];
     state.activePlugin = [...state.activePlugin, nameEntry];
   },
+
 
   addJournalEntry(state, [questId, entryText, entryDisposition]) {
     let generatedId =
@@ -563,6 +520,7 @@ const mutations = {
     else state.activePlugin = [...state.activePlugin, newEntry];
   },
 
+
   deleteJournalEntry(state, info_id) {
     let questEntries = state.activePlugin.filter(
       (val) => val.info_id === info_id
@@ -591,6 +549,7 @@ const mutations = {
     }
   },
 
+
   editJournalEntry(state, [entryId, entryText, entryDisp, entryFinished]) {
     let questEntries = state.activePlugin.filter(
       (val) => val.info_id === entryId
@@ -618,18 +577,25 @@ const mutations = {
       }
     }
   },
+
+
   setActivePluginTitle(state, title) {
     state.activePluginTitle = title;
   },
+
   setJournalHighlight(state, filter) {
     state.journalHighlight = filter;
   },
+
   resetActivePlugin(state) {
     state.activePlugin = [];
   },
+  
   addEntryToActive(state, entry) {
     state.activePlugin = [...state.activePlugin, entry];
   },
+
+
   parsePluginData(state, plugin) {
     let dialogueType;
     let dialogueId;
@@ -650,6 +616,8 @@ const mutations = {
       }
     }
   },
+
+
   setDependencies(state, [plugin, fileName]) {
     let dialogueType;
     let dialogueId;
@@ -673,6 +641,8 @@ const mutations = {
     }
     state.dependencies.push({ name: fileName, data: pluginData });
   },
+
+
   addToActiveArray(state, [destination, entry]) {
     if (state.activePlugin[destination]) {
       state.activePlugin[destination] = [

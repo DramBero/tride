@@ -8,11 +8,20 @@ const state = {
   selectedInfoId: '',
   selectedFilterIndex: '',
   clipboardDialogue: {},
+  classicView: false,
+  classicViewTopic: "",
 };
 
 const mutations = {
   setPrimaryModal(state, value) {
     state.primaryModal = value
+  },
+  setClassicView(state, value) {
+    state.classicView = value
+  },
+  setClassicViewTopic(state, topic) {
+    state.classicView = true
+    state.classicViewTopic = topic
   },
   toggleOpenFile(state, value) {
     state.openFile = value;
@@ -66,7 +75,9 @@ const getters = {
   getSelectedFilter: (s) => s.selectedFilter,
   getSelectedFilterIndex: (s) => s.selectedFilterIndex,
   getSelectedInfoId: (s) => s.selectedInfoId,
-  getClipboardDialogue: (s) => s.clipboardDialogue
+  getClipboardDialogue: (s) => s.clipboardDialogue,
+  getClassicView: (s) => s.classicView,
+  getClassicViewTopic: (s) => s.classicViewTopic,
 };
 
 export default {

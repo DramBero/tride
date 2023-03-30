@@ -9,6 +9,13 @@
         >
           Add <icon name="plus-circle" scale="1"></icon>
         </div>
+        <div
+          class="frame-controls-types__secondary"
+          :style="{ gap: '10px' }"
+          @click="openClassicView()"
+        >
+          Classic view
+        </div>
       </div>
       <div class="frame-controls-types" v-if="getNPCs">
         <div
@@ -145,6 +152,9 @@ export default {
         this.speakerTypes.push(type);
       }
     },
+    openClassicView() {
+      this.$store.commit("setClassicView", true)
+    },
     addDialogue() {
       this.$store.commit("setPrimaryModal", "NewDialogue");
     },
@@ -168,9 +178,23 @@ export default {
     display: flex;
     justify-content: space-between;
     padding: 10px;
+    &-left {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
     &-types {
       display: flex;
       gap: 5px;
+      &__secondary {
+        font-size: 20px;
+        color: rgb(202, 165, 96);
+        cursor: pointer;
+        transition: color .15s ease-in;
+        &:hover {
+          color: rgb(223, 200, 157);
+        }
+      }
       &__type {
         min-width: 90px;
         user-select: none;

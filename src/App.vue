@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <modal-frame />
+    <modal-classic-view />
     <transition
       name="fadeHeight"
       class="frame-dialogue"
@@ -28,6 +29,7 @@ import BookFrame from "./components/books/BookFrame.vue";
 import CWorkspace from "./components/CWorkspace.vue";
 import ModalContentDialogue from "./components/modals/ModalContentDialogue.vue";
 import ModalFrame from "@/components/primary-modals/ModalFrame.vue";
+import ModalClassicView from './components/primary-modals/ModalClassicView.vue';
 
 export default {
   name: "App",
@@ -40,9 +42,10 @@ export default {
     CWorkspace,
     ModalContentDialogue,
     ModalFrame,
+    ModalClassicView
   },
   computed: {
-    getOpenModal() {
+    OpenModal() {
       return this.$store.getters["getOpenFile"];
     },
     getQuestCreateModal() {

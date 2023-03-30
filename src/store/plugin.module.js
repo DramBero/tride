@@ -103,7 +103,7 @@ const getters = {
     ];
     const uniqueObjMap = {};
     for (const object of allTopics) {
-      uniqueObjMap[object.id] = object;
+      uniqueObjMap[object.id] = uniqueObjMap[object.id] ? [...uniqueObjMap[object.id], object] : [object];
     }
 
     const uniqueObjects = Object.values(uniqueObjMap);
@@ -590,7 +590,7 @@ const mutations = {
   resetActivePlugin(state) {
     state.activePlugin = [];
   },
-  
+
   addEntryToActive(state, entry) {
     state.activePlugin = [...state.activePlugin, entry];
   },

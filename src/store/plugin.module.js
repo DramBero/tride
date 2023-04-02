@@ -86,18 +86,18 @@ const getters = {
     return uniqueObjects;
   },
 
-  getAllTopics(state) {
+  getAllTopics: (state) => (topicType) => {
     let depTopics = [];
     for (let dep of state.dependencies) {
       depTopics.push(
         ...dep.data.filter(
-          (val) => val.TMP_type === "Topic" && val.type === "Dialogue"
+          (val) => val.TMP_type === topicType && val.type === "Dialogue"
         )
       );
     }
     let allTopics = [
       ...state.activePlugin.filter(
-        (val) => val.TMP_type === "Topic" && val.type === "Dialogue"
+        (val) => val.TMP_type === topicType && val.type === "Dialogue"
       ),
       ...depTopics
     ];
@@ -318,7 +318,14 @@ const actions = {
 
 const mutations = {
   setActiveHeader(state, header) {
-    state.activeHeader = header;
+    let oldHeader = state.activePlugin.find(val => val.type === 'Header')
+    console.log('setter', header)
+    oldHeader.author = header.author
+    oldHeader.description = header.description
+    oldHeader.version = header.version
+    oldHeader.masters = header.masters
+    oldHeader.file_type = header.file_type
+    console.log(state.activePlugin.find(val => val.type === 'Header'))
   },
 
 
@@ -414,6 +421,29 @@ const mutations = {
 
     if (lastIdIndex) state.activePlugin.splice(lastIdIndex, 0, newEntry);
     else state.activePlugin = [...state.activePlugin, newEntry];
+  },
+
+
+  moveDialogueEntry(state, [info_id, old_prev_id, old_next_id, new_prev_id, new_next_id]) {
+    console.log([info_id, old_prev_id, old_next_id, new_prev_id, new_next_id])
+    if (state.activePlugin.find(val => val.info_id == info_id)) {
+      state.activePlugin.find(val => val.info_id == info_id).prev_id = new_prev_id
+      state.activePlugin.find(val => val.info_id == info_id).next_id = new_next_id
+    } else console.log('none INFO ID')
+
+    if (state.activePlugin.find(val => val.info_id == old_prev_id)) {
+      state.activePlugin.find(val => val.info_id == old_prev_id).next_id = old_next_id
+    } else console.log('none OLD PREV')
+    if (state.activePlugin.find(val => val.info_id == old_next_id)) {
+      state.activePlugin.find(val => val.info_id == old_next_id).prev_id = old_prev_id
+    } else console.log('none OLD NEXT')
+
+    if (state.activePlugin.find(val => val.info_id == new_prev_id)) {
+      state.activePlugin.find(val => val.info_id == new_prev_id).next_id = info_id
+    } else console.log('none NEW PREV')
+    if (state.activePlugin.find(val => val.info_id == new_next_id)) {
+      state.activePlugin.find(val => val.info_id == new_next_id).prev_id = info_id
+    } else console.log('none NEW NEXT')
   },
 
 

@@ -135,6 +135,7 @@ h2 {
     .modal-field__input {
       background: rgba(0, 0, 0, 0.45);
       border: 2px solid rgb(68, 59, 44);
+      color: rgb(202, 165, 96);
       &::placeholder {
         color: rgba(255, 255, 255, 0.2);
       }

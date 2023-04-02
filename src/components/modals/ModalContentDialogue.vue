@@ -15,6 +15,13 @@
         </transition>
         <div class="dialogue-answers__edit">
           <icon
+            name="list"
+            color="#E1FF00"
+            class="icon_gold"
+            scale="1"
+            @click="openClassicView"
+          ></icon>
+          <icon
             v-if="!editMode"
             name="pen"
             color="#E1FF00"
@@ -482,6 +489,10 @@ export default {
         location[0],
         location[1]
       ]);
+    },
+    openClassicView() {
+      this.$store.commit("setClassicViewTopic", this.currentTopic)
+      this.$store.commit("setClassicView", true)
     }
   },
 
@@ -529,11 +540,16 @@ export default {
     }
     &__edit {
       position: absolute;
+      display: flex;
+      align-items: center;
       right: 5px;
     }
     &__header {
       width: 100%;
-      position: relative;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background-color: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;

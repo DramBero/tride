@@ -151,7 +151,7 @@ export default {
 
 .window {
   &-frame {
-    background-color: rgba(0, 0, 0, 0.85);
+    background-color: rgba(0, 0, 0, 0.95);
     box-shadow: 0px 0px 9px 5px rgba(0, 0, 0, 0.15);
     border: 2px solid rgb(202, 165, 96);
     border-radius: 4px;

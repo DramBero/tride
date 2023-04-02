@@ -58,7 +58,7 @@
         </label>
       </div>
       <label class="modal-field modal-field_dark">
-        <span class="modal-field__name"> Author: </span>
+        <span class="modal-field__name"> Description: </span>
         <textarea
           class="modal-field__input modal-field__input_textarea"
           name="speaker-name"
@@ -67,12 +67,50 @@
           v-model="description"
         ></textarea>
       </label>
+      <span class="modal-field__name"> Dependencies: </span>
+      <div class="header-dependencies">
+        <transition-group
+          is="draggable"
+          tag="tbody"
+          :list="dependencies"
+          :name="!drag ? 'flip-list' : null"
+          :handle="'.grab'"
+          @start="drag = true"
+          @end="drag = false"
+          :scroll-sensitivity="500"
+          animation="200"
+        >
+          <div
+            class="header-dependencies__item"
+            v-for="dep in dependencies"
+            :key="dep[0]"
+          >
+            <span>{{ dep[0] }}</span>
+            <icon name="grip-horizontal" class="grab" scale="1"></icon>
+          </div>
+        </transition-group>
+      </div>
+      <div class="header-buttons">
+        <button
+          class="modal-button header-buttons__button"
+          @click="saveHeader"
+        >
+          Save
+        </button>
+        <button
+          class="modal-button header-buttons__button"
+          @click="cancelChanges"
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Icon from "vue-awesome/components/Icon";
+import draggable from "vuedraggable";
 import "vue-awesome/icons";
 export default {
   data() {
@@ -82,15 +120,18 @@ export default {
       file_type: "",
       author: "",
       description: "",
-      dependencies: []
+      dependencies: [],
+      drag: false
     };
   },
   watch: {
     getActiveHeader(newValue) {
-      this.version = newValue.version;
-      this.author = newValue.author;
-      this.file_type = newValue.file_type;
-      this.description = newValue.description;
+      let newHeader = newValue
+      this.version = newHeader.version;
+      this.author = newHeader.author;
+      this.file_type = newHeader.file_type;
+      this.description = newHeader.description;
+      this.dependencies = JSON.parse(JSON.stringify(newHeader.masters));
     },
     getActivePluginTitle(newValue) {
       this.name = newValue;
@@ -101,13 +142,32 @@ export default {
       return this.$store.getters["getActiveHeader"];
     },
     getActivePluginTitle() {
-      return this.$store.getters["getActivePluginTitle"];
+      return JSON.parse(JSON.stringify(this.$store.getters["getActivePluginTitle"]));
     }
   },
-  components: { Icon },
+  components: { Icon, draggable },
   methods: {
     addQuest() {
       this.$store.commit("setQuestCreateModal", true);
+    },
+    saveHeader() {
+      let newHeader = JSON.parse(JSON.stringify(this.getActiveHeader))
+      newHeader.version = this.version
+      newHeader.author = this.author;
+      newHeader.file_type = this.file_type;
+      newHeader.description = this.description;
+      newHeader.masters = this.dependencies;
+      console.log(newHeader)
+      this.$store.commit("setActiveHeader", newHeader)
+      this.$store.commit("setActivePluginTitle", this.name)
+    },
+    cancelChanges() {
+      this.version = this.getActiveHeader.version;
+      this.author = this.getActiveHeader.author;
+      this.file_type = this.getActiveHeader.file_type;
+      this.description = this.getActiveHeader.description;
+      this.dependencies = this.getActiveHeader.masters;
+      this.name = this.getActivePluginTitle
     }
   }
 };
@@ -118,6 +178,7 @@ export default {
   padding: 15px;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
   gap: 5px;
   &__row {
     display: flex;
@@ -125,6 +186,38 @@ export default {
     gap: 15px;
   }
 }
+
+.header-buttons {
+  display: flex;
+  margin-top: 10px;
+  gap: 15px;
+  &__button {
+    font-size: 20px;
+  }
+}
+
+.header-dependencies {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  &__item {
+    border-top: 1px solid rgba(0, 0, 0, 0.25);
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 18px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    &:last-child {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    }
+    .grab {
+      cursor: grab;
+    }
+  }
+}
+
 .frame-title {
   width: 100%;
   height: 35px;

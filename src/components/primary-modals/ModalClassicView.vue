@@ -993,7 +993,7 @@ export default {
       //overflow-x: scroll;
       &__item {
         cursor: pointer;
-        transition: color 0.15s ease-in-out;
+        transition: color 0.05s linear;
         color: rgb(202, 165, 96);
         &:hover {
           color: rgb(223, 200, 157);

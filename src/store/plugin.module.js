@@ -526,7 +526,7 @@ const mutations = {
   ) {
     let prev_id = ''
     let next_id = ''
-
+    console.log(speakerType, speakerId, topicId, dialogueType, location_id, location_direction, text)
     if (location_direction === 'next') {
       prev_id = location_id
       if (state.activePlugin.find(val => val.prev_id === location_id)) next_id = state.activePlugin.find(val => val.prev_id === location_id).info_id

@@ -376,7 +376,7 @@ export default {
       return this.$store.getters["getClipboardDialogue"];
     },
     getSpeakerType() {
-      return this.getOrderedEntries[0] ? Object.keys(this.getOrderedEntries[0]).find(key => this.getOrderedEntries[0][key] === this.speaker) : ''
+      return this.currentAnswers[0] ? Object.keys(this.currentAnswers[0]).find(key => this.currentAnswers[0][key] === this.speaker) : ''
     },
     getLastEntryId() {
       return this.currentAnswers.at(-1).info_id

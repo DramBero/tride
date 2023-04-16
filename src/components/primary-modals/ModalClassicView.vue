@@ -105,6 +105,7 @@
               <tr
                 class="container-entries__entry"
                 :class="{
+                  'container-entries__entry_active': currentId === entry,
                   'container-entries__entry_new': !getOrderedEntries.find(
                     (val) => val.info_id == entry
                   ).TMP_dep,
@@ -131,9 +132,7 @@
                     )
                 }"
                 v-for="entry in rows"
-                @click="
-                    editEntry(entry)
-                "
+                @click="currentId === entry ? cancelEdit() : editEntry(entry)"
                 :key="entry"
               >
                 <td class="container-entries__grip" @click.stop>
@@ -261,20 +260,260 @@
         </div>
       </div>
       <div class="classic-view-frame__edit" v-if="currentId">
-        <button class="edit__close" @click="(currentId = ''), (editCode = '')">
-          <icon name="times" class="edit__close-icon" scale="1.5"></icon>
+        <button
+          class="edit__close"
+          :disabled="!checkChanges"
+          @click="saveEdit()"
+        >
+          <icon
+            name="save"
+            class="edit__close-icon"
+            :class="{ 'edit__close-icon_disabled': !checkChanges }"
+            scale="1.5"
+          ></icon>
+        </button>
+        <button
+          class="edit__cancel"
+          :disabled="!checkChanges"
+          @click="editEntry(currentId)"
+        >
+          <icon
+            name="ban"
+            class="edit__close-icon"
+            :class="{ 'edit__close-icon_disabled': !checkChanges }"
+            scale="1.5"
+          ></icon>
         </button>
         <div class="edit__text">
-          {{
-            getOrderedEntries.find((val) => val.info_id == currentId) &&
-            getOrderedEntries.find((val) => val.info_id == currentId).text
-          }}
+          <textarea class="modal-field__input" v-model="currentText"></textarea>
         </div>
-        <div class="edit__filters"></div>
+        <div class="edit__filters">
+          <label class="modal-field modal-field_dark modal-field_speaker-edit">
+            <span
+              >{{
+                getOrderedEntries.find((val) => val.info_id === currentId) &&
+                getOrderedEntries.find((val) => val.info_id === currentId)
+                  .TMP_type === "Journal"
+                  ? "Index"
+                  : "Disposition"
+              }}:</span
+            >
+            <input
+              class="modal-field__input"
+              name="speaker-name"
+              autocomplete="off"
+              :placeholder="'Player Rank'"
+              v-model="currentDisp"
+            />
+          </label>
+          <div
+            class="edit__filters-group-header"
+            v-if="
+              getOrderedEntries.find((val) => val.info_id === currentId) &&
+              getOrderedEntries.find((val) => val.info_id === currentId)
+                .TMP_type !== 'Journal'
+            "
+          >
+            <span>Speaker conditions:</span
+            ><span
+              class="link"
+              @click="showEmptySpeakers = !showEmptySpeakers"
+              >{{ showEmptySpeakers ? "Hide empty" : "Show all" }}</span
+            >
+          </div>
+          <div
+            class="edit__filters-group"
+            v-if="
+              getOrderedEntries.find((val) => val.info_id === currentId) &&
+              getOrderedEntries.find((val) => val.info_id === currentId)
+                .TMP_type !== 'Journal'
+            "
+          >
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptySpeakers || currentSpeakerData.speaker_id"
+            >
+              <span>Speaker ID:</span>
+              <input
+                class="modal-field__input"
+                name="speaker_id"
+                autocomplete="off"
+                :placeholder="'Speaker ID'"
+                v-model="currentSpeakerData.speaker_id"
+              />
+            </label>
+
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptySpeakers || currentSpeakerData.speaker_cell"
+            >
+              <span>Speaker Cell:</span>
+              <input
+                class="modal-field__input"
+                name="speaker_cell"
+                autocomplete="off"
+                :placeholder="'Speaker Cell'"
+                v-model="currentSpeakerData.speaker_cell"
+              />
+            </label>
+
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptySpeakers || currentSpeakerData.speaker_faction"
+            >
+              <span>Speaker Faction:</span>
+              <input
+                class="modal-field__input"
+                name="speaker_faction"
+                autocomplete="off"
+                :placeholder="'Speaker Faction'"
+                v-model="currentSpeakerData.speaker_faction"
+              />
+            </label>
+
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptySpeakers || currentSpeakerData.speaker_rank"
+            >
+              <span>Speaker Rank:</span>
+              <input
+                class="modal-field__input"
+                name="speaker_rank"
+                autocomplete="off"
+                :placeholder="'Speaker Rank'"
+                v-model="currentSpeakerData.speaker_rank"
+              />
+            </label>
+
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptySpeakers || currentSpeakerData.speaker_class"
+            >
+              <span>Speaker Class:</span>
+              <input
+                class="modal-field__input"
+                name="speaker_class"
+                autocomplete="off"
+                :placeholder="'Speaker Class'"
+                v-model="currentSpeakerData.speaker_class"
+              />
+            </label>
+
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptySpeakers || currentSpeakerData.speaker_race"
+            >
+              <span>Speaker Race:</span>
+              <input
+                class="modal-field__input"
+                name="speaker_race"
+                autocomplete="off"
+                :placeholder="'Speaker Race'"
+                v-model="currentSpeakerData.speaker_race"
+              />
+            </label>
+
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptySpeakers || currentSpeakerData.speaker_sex"
+            >
+              <span>Speaker Sex:</span>
+              <input
+                class="modal-field__input"
+                name="speaker_sex"
+                autocomplete="off"
+                :placeholder="'Speaker Sex'"
+                v-model="currentSpeakerData.speaker_sex"
+              />
+            </label>
+          </div>
+          <div
+            class="edit__filters-group-header"
+            v-if="
+              getOrderedEntries.find((val) => val.info_id === currentId) &&
+              getOrderedEntries.find((val) => val.info_id === currentId)
+                .TMP_type !== 'Journal'
+            "
+          >
+            <span>Player conditions:</span
+            ><span
+              class="link"
+              @click="showEmptyPlayerFilters = !showEmptyPlayerFilters"
+              >{{ showEmptyPlayerFilters ? "Hide empty" : "Show all" }}</span
+            >
+          </div>
+          <div
+            class="edit__filters-group"
+            v-if="
+              getOrderedEntries.find((val) => val.info_id === currentId) &&
+              getOrderedEntries.find((val) => val.info_id === currentId)
+                .TMP_type !== 'Journal'
+            "
+          >
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptyPlayerFilters || currentSpeakerData.player_faction"
+            >
+              <span>Player Faction:</span>
+              <input
+                class="modal-field__input"
+                name="speaker-name"
+                autocomplete="off"
+                :placeholder="'Player Faction'"
+                v-model="currentSpeakerData.player_faction"
+              />
+            </label>
+            <label
+              class="modal-field modal-field_dark modal-field_speaker-edit"
+              v-if="showEmptyPlayerFilters || currentSpeakerData.player_rank"
+            >
+              <span>Player Rank:</span>
+              <input
+                class="modal-field__input"
+                name="speaker-name"
+                autocomplete="off"
+                :placeholder="'Player Rank'"
+                v-model="currentSpeakerData.player_rank"
+              />
+            </label>
+          </div>
+          <div
+            class="edit__filters-group-header"
+            v-if="
+              getOrderedEntries.find((val) => val.info_id === currentId) &&
+              getOrderedEntries.find((val) => val.info_id === currentId)
+                .TMP_type !== 'Journal'
+            "
+          >
+            <span>Filters:</span
+            ><span
+              class="link"
+              @click="showEmptyDialogueFilters = !showEmptyDialogueFilters"
+              >{{ showEmptyDialogueFilters ? "Hide empty" : "Show all" }}</span
+            >
+          </div>
+          <div
+            class="edit__filters-group"
+            v-if="
+              getOrderedEntries.find((val) => val.info_id === currentId) &&
+              getOrderedEntries.find((val) => val.info_id === currentId)
+                .TMP_type !== 'Journal'
+            "
+          >
+            <DialogueEntryFilters editMode onlyFilters :answer="getOrderedEntries.find((val) => val.info_id === currentId)" speaker=""/>
+<!--             <div class="edit-dialogue-filter" v-for="filter, index in currentFilters" :key="index">
+                <v-select v-model="currentFilters[index].filter_type" :options="filterTypes"></v-select>
+                <v-select v-model="currentFilters[index].filter_function" :options="filterFunctions"></v-select>
+                <v-select v-model="currentFilters[index].filter_comparison" :options="filterComparisons"></v-select>
+            </div> -->
+          </div>
+
+
+        </div>
         <div class="edit__result">
-          <CodeEditor 
+          <CodeEditor
             class="edit__result-code"
-            v-model="editCode"
+            v-model="currentResult"
             :hide_header="true"
             :height="'100%'"
             :width="'100%'"
@@ -291,35 +530,164 @@
 import Icon from "vue-awesome/components/Icon";
 import draggable from "vuedraggable";
 import CodeEditor from "simple-code-editor";
+import vSelect from 'vue-select';
 
 import "vue-awesome/icons";
+import DialogueEntryFilters from '../dialogue/DialogueEntryFilters.vue';
 
 export default {
   data() {
     return {
       rows: [],
+      updateTrigger: 0,
       drag: false,
       currentId: "",
       editCode: "",
       topicType: "Topic",
       currentFilters: [],
       currentDisp: "",
+      showEmptySpeakers: false,
+      showEmptyPlayerFilters: false,
+      showEmptyDialogueFilters: false,
+      showDisp: false,
+      currentText: "",
+      currentResult: "",
       currentSpeakerData: {
         speaker_id: "",
         speaker_cell: "",
         speaker_faction: "",
         speaker_class: "",
         speaker_race: "",
+        speaker_sex: "",
+        speaker_rank: "",
+        player_faction: "",
+        player_rank: ""
       },
+      filterTypes: [
+        "None",
+        "Function",
+        "Global",
+        "Local",
+        "Journal",
+        "Item",
+        "Dead",
+        "NotId",
+        "NotCell",
+        "NotFaction",
+        "NotClass",
+        "NotRace",
+        "NotLocal",
+      ],
+      filterFunctions: [
+        "ReactionLow",
+        "ReactionHigh",
+        "RankRequirement",
+        "Reputation",
+        "HealthPercent",
+        "PcReputation",
+        "PcLevel",
+        "PcHealthPercent",
+        "PcMagicka",
+        "PcFatigue",
+        "PcStrength",
+        "PcBlock",
+        "PcArmorer",
+        "PcMediumArmor",
+        "PcHeavyArmor",
+        "PcBluntWeapon",
+        "PcLongBlade",
+        "PcAxe",
+        "PcSpear",
+        "PcAthletics",
+        "PcEnchant",
+        "PcDestruction",
+        "PcAlteration",
+        "PcIllusion",
+        "PcConjuration",
+        "PcMysticism",
+        "PcRestoration",
+        "PcAlchemy",
+        "PcUnarmored",
+        "PcSecurity",
+        "PcSneak",
+        "PcAcrobatics",
+        "PcLightArmor",
+        "PcShortBlade",
+        "PcMarksman",
+        "PcMercantile",
+        "PcSpeechcraft",
+        "PcHandToHand",
+        "PcSex",
+        "PcExpelled",
+        "PcCommonDisease",
+        "PcBlightDisease",
+        "PcClothingModifier",
+        "PcCrimeLevel",
+        "SameSex",
+        "SameRace",
+        "SameFaction",
+        "FactionRankDifference",
+        "Detected",
+        "Alarmed",
+        "Choice",
+        "PcIntelligence",
+        "PcWillpower",
+        "PcAgility",
+        "PcSpeed",
+        "PcEndurance",
+        "PcPersonality",
+        "PcLuck",
+        "PcCorprus",
+        "Weather",
+        "PcVampire",
+        "Level",
+        "Attacked",
+        "TalkedToPc",
+        "PcHealth",
+        "CreatureTarget",
+        "FriendHit",
+        "Fight",
+        "Hello",
+        "Alarm",
+        "Flee",
+        "ShouldAttack",
+        "Werewolf",
+        "WerewolfKills",
+        
+        "NotClass",
+        "DeadType",
+        "NotFaction",
+        "ItemType",
+        "JournalType",
+        "NotCell",
+        "NotRace",
+        "NotIdType",
+        "Global",
+
+        "Pcgold",
+        "CompareGlobal",
+        "CompareLocal"
+      ],
+      filterComparisons: [
+        "Less",
+        "LesserEqual",
+        "NotEqual",
+        "Equal",
+        "GreaterEqual",
+        "Greater"
+      ]
     };
   },
   components: {
     Icon,
     draggable,
-    CodeEditor
+    CodeEditor,
+    vSelect,
+    DialogueEntryFilters,
   },
   mounted() {
     this.rows = this.getOrderedEntries.map((val) => val.info_id);
+    //this.topicType = this.getOrderedEntries[0] ? this.getOrderedEntries[0].TMP_type : 'Topic'
   },
   watch: {
     getOrderedEntries(newValue) {
@@ -362,7 +730,7 @@ export default {
     getAllTopics() {
       return this.$store.getters["getAllTopics"](this.topicType);
     },
-    getOrderedEntriesUncached: {
+    /*     getOrderedEntriesUncached: {
       cache: false,
       get() {
         return this.$store.getters["getOrderedEntriesByTopic"]([
@@ -370,8 +738,9 @@ export default {
           this.topicType
         ]);
       }
-    },
+    }, */
     getOrderedEntries() {
+      this.updateTrigger;
       return this.$store.getters["getOrderedEntriesByTopic"]([
         this.getCurrentTopic,
         this.topicType
@@ -379,10 +748,16 @@ export default {
     },
     getTopicFilterAmount() {
       return 6;
+    },
+    checkChanges() {
+      let oldEntry = this.getOrderedEntries.find(
+        (val) => val.info_id === this.currentId
+      );
+      if (!oldEntry) return false;
+      if (oldEntry.text !== this.currentText)
+        return [oldEntry.text, this.currentText];
+      else return false;
     }
-    /*     rowsClone() {
-        return JSON.parse(JSON.stringify(this.rows))
-    } */
   },
   methods: {
     closeClassicView() {
@@ -392,16 +767,44 @@ export default {
       this.$store.commit("setClassicViewTopic", topic);
     },
     editEntry(entry_id) {
-        this.currentId = entry_id
-        let currentEntry = this.getOrderedEntries.find((val) => val.info_id === entry_id)
-        this.currentSpeakerData.speaker_id = currentEntry.speaker_id || ''
-        this.currentSpeakerData.speaker_cell = currentEntry.speaker_cell || ''
-        this.currentSpeakerData.speaker_faction = currentEntry.speaker_faction || ''
-        this.currentSpeakerData.speaker_class = currentEntry.speaker_class || ''
-        this.currentSpeakerData.speaker_race = currentEntry.speaker_race || ''
-        this.currentFilters = currentEntry.filters
-        this.currentDisp = currentEntry.data && currentEntry.data.disposition
-        this.editCode = currentEntry.result
+      this.currentId = entry_id;
+      this.updateTrigger++;
+      let currentEntry = this.getOrderedEntries.find(
+        (val) => val.info_id === entry_id
+      );
+      this.currentSpeakerData.speaker_id = currentEntry.speaker_id || "";
+      this.currentSpeakerData.speaker_cell = currentEntry.speaker_cell || "";
+      this.currentSpeakerData.speaker_faction =
+        currentEntry.speaker_faction || "";
+      this.currentSpeakerData.speaker_class = currentEntry.speaker_class || "";
+      this.currentSpeakerData.speaker_race = currentEntry.speaker_rank || "";
+      this.currentSpeakerData.speaker_sex =
+        currentEntry.data.speaker_sex !== "Any"
+          ? this.answer.data.speaker_sex
+          : "";
+      this.currentSpeakerData.speaker_rank =
+        currentEntry.data.speaker_rank !== -1
+          ? this.answer.data.speaker_rank
+          : "";
+      this.currentFilters = currentEntry.filters;
+      this.currentDisp = currentEntry.data && currentEntry.data.disposition;
+      this.currentResult = currentEntry.result;
+      this.currentText = currentEntry.text;
+    },
+    cancelEdit() {
+      this.currentId = "";
+    },
+    saveEdit() {
+      this.updateTrigger++;
+      let entry = this.getOrderedEntries.find(
+        (val) => val.info_id === this.currentId
+      );
+      entry.text = this.currentText;
+      if (this.currentResult)
+        entry.result = this.currentResult.replace(/\r?\n/g, "\r\n");
+      this.$store.dispatch("replaceDialogueEntry", [this.currentId, entry]);
+      this.rows = this.getOrderedEntries.map((val) => val.info_id);
+      this.editEntry(this.currentId);
     },
     handleReorder(event) {
       let info_id = event.moved.element;
@@ -420,16 +823,8 @@ export default {
         new_prev_id,
         new_next_id
       ]);
-      this.rows = this.getOrderedEntriesUncached.map((val) => val.info_id);
-      //await new Promise((resolve) => setTimeout(resolve, 1000));
-      //this.rows = this.getOrderedEntries.map((val) => val.info_id);
-      /*         console.log("")
-        console.log('====================================================================================')
-        console.log(`Entry moved. ID: ${info_id}, Text: ${this.getOrderedEntries.find(val => val.info_id === info_id).text}`);
-        console.log(`Old prev_id: ${old_prev_id}, Old next_id: ${old_next_id}`)
-        console.log(`New prev_id: ${new_prev_id}, New next_id: ${new_next_id}`)
-        console.log('====================================================================================')
-        console.log("") */
+      this.updateTrigger++;
+      this.rows = this.getOrderedEntries.map((val) => val.info_id);
     },
     getTmpDep(topic) {
       return topic.filter((val) => val.TMP_dep).length;
@@ -469,7 +864,15 @@ export default {
   background: rgba(0, 0, 0, 0.8);
   display: flex;
   flex-direction: column;
-  z-index: 100;
+  z-index: 90;
+  textarea {
+    height: 100%;
+    max-height: 100%;
+    overflow: scroll;
+    &:focus {
+      border-color: rgb(202, 165, 96);
+    }
+  }
   &__close {
     position: absolute;
     top: 15px;
@@ -511,10 +914,35 @@ export default {
       top: 10px;
       right: 15px;
     }
+    .edit__cancel {
+      position: absolute;
+      top: 50px;
+      right: 13px;
+    }
     .edit__text {
       font-size: 20px;
       padding: 10px;
       border-right: 2px solid rgb(117, 87, 31);
+    }
+    .edit__filters {
+      padding: 10px;
+      font-size: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      overflow-y: scroll;
+      &-group {
+        padding-left: 20px;
+        margin-left: 5px;
+        border-left: 2px dotted rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        &-header {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
     }
     .edit__result {
       font-family: "Consolas";
@@ -524,10 +952,10 @@ export default {
       background: rgb(46, 46, 34);
       color: rgb(237, 238, 167);
       width: 100%;
+      flex-grow: 0;
       max-height: 100%;
       &-code {
         max-height: 100%;
-
       }
     }
   }
@@ -647,6 +1075,12 @@ export default {
       transition: all 0.15s ease-in-out;
 
       padding: 10px;
+      &_active {
+        color: white;
+        .container-entries__grip .classic-view-frame__close-icon {
+          fill: white;
+        }
+      }
       &_new {
         background-color: rgba(89, 170, 106, 0.15);
       }
@@ -709,5 +1143,25 @@ export default {
 .sortable-ghost {
   opacity: 0.5;
   //background: #c8ebfb;
+}
+
+.edit__close-icon_disabled {
+  fill: rgba(0, 0, 0, 0.4);
+}
+
+.edit-dialogue-filter {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.vs__search {
+    display: none;
+}
+
+.v-select {
+    width: 25%;
+    overflow: hidden;
+    font-size: 16px;
 }
 </style>

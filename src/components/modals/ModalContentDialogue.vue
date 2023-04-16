@@ -204,7 +204,7 @@
           <div class="dialogue-answers-answer__above-add" v-if="editMode" :key="'add-lowest'">
               <button
                 class="entry-control-button"
-                @click.prevent="addEntry([answer.prev_id, answer.info_id])"
+                @click.prevent="addEntry([getLastEntryId, ''])"
               >
                 <icon
                   name="plus"
@@ -217,7 +217,7 @@
                 class="entry-control-button"
                 v-if="Object.keys(getClipboardDialogue).length"
                 @click.prevent="
-                  pasteDialogueFromClipboard([answer.prev_id, answer.info_id])
+                  pasteDialogueFromClipboard([getLastEntryId, ''])
                 "
               >
                 <icon
@@ -374,6 +374,12 @@ export default {
     },
     getClipboardDialogue() {
       return this.$store.getters["getClipboardDialogue"];
+    },
+    getSpeakerType() {
+      return this.getOrderedEntries[0] ? Object.keys(this.getOrderedEntries[0]).find(key => this.getOrderedEntries[0][key] === this.speaker) : ''
+    },
+    getLastEntryId() {
+      return this.currentAnswers.at(-1).info_id
     }
   },
 
@@ -393,16 +399,31 @@ export default {
         location = this.$store.getters["getBestOrderLocationForNpc"]([
           this.speaker,
           this.currentTopic,
-          this.topicType
+          this.topicType,
+          this.getSpeakerType
         ]);
-      this.$store.commit("addDialogue", [
-        this.speaker,
-        this.currentTopic,
-        this.topicType,
-        location[0],
-        location[1],
-        "New entry"
-      ]);
+        console.log(location)
+      if (location[0]) {
+        this.$store.commit("addDialogue", [
+          this.getSpeakerType,
+          this.speaker,
+          this.currentTopic,
+          this.topicType,
+          location[0],
+          'next',
+          "New entry"
+        ]);
+      } else if (!location[0] && location[1]) {
+        this.$store.commit("addDialogue", [
+          this.getSpeakerType,
+          this.speaker,
+          this.currentTopic,
+          this.topicType,
+          location[1],
+          'prev',
+          "New entry"
+        ]);
+      }
     },
     editDialogue() {
       this.$store.commit("editDialogueEntry", [
@@ -481,13 +502,13 @@ export default {
       return hyperlinkedAnswer;
     },
     pasteDialogueFromClipboard(location) {
+      let entry = {...this.getClipboardDialogue, speaker_id: this.speaker}
       this.$store.commit("pasteDialogue", [
-        this.getClipboardDialogue,
-        this.speaker,
+        entry,
         this.currentTopic,
         this.topicType,
         location[0],
-        location[1]
+        'next'
       ]);
     },
     openClassicView() {

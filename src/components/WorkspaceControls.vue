@@ -134,6 +134,13 @@ computed: {
                 height: 15px;
                 background: rgb(177, 64, 64);
             }
+            &:hover {
+                color: rgba(216, 216, 216, 0.5);
+                cursor: default;
+                .icon-controls {
+                    fill: rgba(216, 216, 216, 0.5);
+                }
+            }
         }
         &:disabled {
             cursor: default;

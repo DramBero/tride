@@ -106,6 +106,7 @@ import ModalContentNewFilter from './ModalContentNewFilter.vue';
     }
 
   }
+  
 
   &.PersonalFilters {
     .modal__content {
@@ -152,6 +153,16 @@ import ModalContentNewFilter from './ModalContentNewFilter.vue';
       width: 100%;
       max-width: 100%;
       border-radius: 0;
+    }
+
+    ::-webkit-scrollbar {
+      
+      &-thumb {
+        background-color: rgb(58, 45, 20);
+      }
+      &-trail {
+        background-color: rgba(58, 45, 20, 0.2);
+      }
     }
 
 

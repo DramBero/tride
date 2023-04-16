@@ -2,7 +2,7 @@
   <div class="dialogue-filters">
     <div
       class="dialogue-filters__filter dialogue-filters__filter_speaker"
-      v-for="speakerType in getOtherSpeakers"
+      v-for="speakerType in !onlyFilters ? getOtherSpeakers : []"
       :key="speakerType.value + speakerType.type"
       tabindex="0"
       @focus="handleFilter(filter)"
@@ -33,7 +33,7 @@
 
     <div
       class="dialogue-filters__filter dialogue-filters__filter_disp"
-      v-if="answer.data.disposition > 0"
+      v-if="!onlyFilters && answer.data.disposition > 0"
       key="disposition"
       tabindex="0"
       @focus="handleFilter(filter)"
@@ -106,7 +106,10 @@ export default {
     },
     editMode: {
       type: Boolean
-    }
+    },
+    onlyFilters: {
+      type: Boolean
+    },
   },
   components: {
     Icon

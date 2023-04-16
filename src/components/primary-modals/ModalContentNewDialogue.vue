@@ -3,9 +3,26 @@
     
   <div class="frame-upload">
     <h2 class="modal__title">Create a new dialogue</h2>
-    <form class="add-dialogue-form" @submit.prevent="">
+    <form class="add-dialogue-form" @submit.prevent="createTopic()">
       <div v-if="!speakerName">
-        <div class="add-dialogue-label">Choose an NPC:</div>
+        <div class="add-dialogue-label">
+          Choose {{ speakerSelectedType.typeId === 'speaker_id' ? 'an' : 'a' }} 
+          <span class="add-dialogue-label-select" tabindex="0" @focusout="speakerSelect = false">
+            <span class="speaker-change" @click="speakerSelect = !speakerSelect">
+              {{ speakerSelectedType.typeName }}
+            </span>
+            <transition name="fadeAppear">
+            <div class="add-dialogue-label-select-items" v-if="speakerSelect">
+              <div class="add-dialogue-label-select-items__item" v-for="speakerType in speakerTypes" :key="speakerType" @click="speakerSelectedType = speakerType, speakerSelect = false">
+                {{ speakerType.typeName }}
+              </div>
+            </div>
+          </transition>
+            :
+        </span>
+
+        </div>
+
         <label class="modal-field">
           <span class="error" v-if="nameError" :key="index">{{
             nameError
@@ -14,11 +31,12 @@
             class="modal-field__input"
             name="speaker-name"
             autocomplete="off"
-            :placeholder="'Type NPC name or ID'"
+            :placeholder="`Type ${speakerSelectedType.typeName} name`"
             v-model="inputName"
           />
         </label>
-        <div class="found-names">
+
+        <div class="found-names" v-if="speakerSelectedType.typeId === 'speaker_id'">
           <div
             class="found-names-name"
             :class="{'found-names-name_active': !npc.TMP_dep}"
@@ -33,6 +51,18 @@
             <div class="found-names-name__id">{{ npc.id }}</div>
           </div>
         </div>
+
+        <div class="found-names" v-else>
+          <div
+            class="found-names-name"
+            v-for="speaker in getSpeakersByType"
+            :key="speaker.toString()"
+            @click="speakerName = speaker, speakerId = ''"
+          >
+            {{ speaker }}
+          </div>
+        </div>
+
       </div>
       <div v-else>
         <div class="add-dialogue-label">
@@ -59,17 +89,17 @@
               v-model="inputTopic"
             />
           </label>
-          <button type="submit" class="modal-button" :disabled="!inputTopic" @click="createTopic()">Create</button>
+          <button type="submit" class="modal-button" :disabled="!inputTopic">Create</button>
         </div>
         <div class="found-names">
           <div
             class="found-names-name"
-            :class="{'found-names-name_active': !topic.TMP_dep}"
+            :class="{'found-names-name_active': !topic[0].TMP_dep}"
             v-for="topic in getTopics"
             :key="topic.id"
-            @click="inputTopic = topic.id"
+            @click.prevent="inputTopic = topic[0].id"
           >
-            {{ topic.id }}
+            {{ topic[0].id }}
             <!-- <div class="found-names-name__id">{{ npc.id }}</div> -->
           </div>
         </div>
@@ -90,6 +120,37 @@ export default {
       speakerName: "",
       speakerId: "",
       dialogueType: "Topic",
+      speakerSelectedType: {
+          typeName: "NPC/Creature",
+          typeId: "speaker_id"
+        },
+      speakerTypes: [
+        {
+          typeName: "NPC/Creature",
+          typeId: "speaker_id"
+        },
+        {
+          typeName: "Cell",
+          typeId: "speaker_cell"
+        },
+        {
+          typeName: "Faction",
+          typeId: "speaker_faction"
+        },
+        {
+          typeName: "Class",
+          typeId: "speaker_class"
+        },
+        {
+          typeName: "Race",
+          typeId: "speaker_rank"
+        },
+        {
+          typeName: "Global",
+          typeId: ""
+        }
+      ],
+      speakerSelect: false,
     };
   },
   watch: {
@@ -119,8 +180,10 @@ export default {
     createTopic() {
       if (!this.inputTopic) return
       else {
-        let location = this.$store.getters['getBestOrderLocationForNpc']([this.speakerId, this.inputTopic, this.dialogueType])
-        this.$store.commit('addDialogue', [this.speakerId, this.inputTopic, this.dialogueType, location[0], location[1], "New entry"])
+        console.log('SPEAKER_TYPE: ', this.speakerSelectedType.typeId)
+        let location = this.$store.getters['getBestOrderLocationForNpc']([this.speakerId, this.inputTopic, this.dialogueType, this.speakerSelectedType.typeId])
+        console.log(location[2])
+        this.$store.commit('addDialogue', [this.speakerSelectedType.typeId, this.speakerId || this.speakerName, this.inputTopic, this.dialogueType, location[0], 'next', "New entry"])
         this.$store.commit("setPrimaryModal", "");
         this.$store.commit("setDialogueModal", this.speakerId);
       }
@@ -134,6 +197,16 @@ export default {
     getTopics() {
       if (!this.inputTopic) return [];
       else return this.$store.getters["searchTopics"](this.inputTopic);
+    },
+    getSpeakersByType() {
+      switch(this.speakerSelectedType.typeId) {
+        case "speaker_id": return []
+        case "speaker_cell": return this.$store.getters["getCellList"].filter(val => val && val.toUpperCase().includes(this.inputName.toUpperCase()))
+        case "speaker_rank": return this.$store.getters["getRaceList"].filter(val => val && val.toUpperCase().includes(this.inputName.toUpperCase()))
+        case "speaker_class": return this.$store.getters["getClassList"].filter(val => val && val.toUpperCase().includes(this.inputName.toUpperCase()))
+        case "speaker_faction": return this.$store.getters["getFactionList"].filter(val => val && val.toUpperCase().includes(this.inputName.toUpperCase()))
+        default: return []
+      }
     }
   }
 };
@@ -168,14 +241,15 @@ export default {
 }
 
 .speaker-name {
-  color: rgb(189, 185, 185);
+  color: rgb(233, 233, 233);
+  text-shadow: 1px 1px 1px rgba(34, 34, 34, 1);
 }
 
 .speaker-change {
   cursor: pointer;
-  color: rgb(112, 126, 207);
+  color: rgb(71, 81, 138);
   &:hover {
-    color: rgb(159, 169, 223);
+    color: rgb(93, 103, 160);
   }
 }
 
@@ -183,6 +257,35 @@ export default {
   text-align: center;
   width: 100%;
   padding: 5px;
+  user-select: none;
+  &-select {
+    position: relative;
+    display: inline-block;
+    &-items {
+    background: #DDD;
+    position: absolute;
+    overflow: hidden;
+    top: 25px;
+    left: -10px;
+    width: fit-content;
+    padding: 5px 0;
+    border-radius: 8px;
+    box-shadow: 2px 2px 8px rgba(34, 34, 34, 0.15);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    &__item {
+      padding: 5px 15px;
+      color: black;
+      cursor: pointer;
+      transition: background-color .05s linear;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.16);
+      }
+    }
+    }
+
+  }
 }
 
 .found-names {
@@ -222,5 +325,16 @@ export default {
       }
     }
   }
+}
+
+.fadeAppear-enter-active,
+.fadeAppear-leave-active {
+  transition: all .1s cubic-bezier(1, 1, 1, 1);
+  opacity: 100;
+}
+
+.fadeAppear-enter,
+.fadeAppear-leave-to {
+  opacity: 0;
 }
 </style>

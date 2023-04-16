@@ -164,7 +164,7 @@ export default {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 99;
+  z-index: 89;
   font-family: "Pelagiad";
   font-size: 20px;
   color: rgb(202, 165, 96);

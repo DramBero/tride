@@ -94,11 +94,15 @@ h2 {
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 13px;
   scrollbar-width: thin;
   background: none;
   &-thumb {
     background-color: rgb(202, 165, 96);
+    border-radius: 3px;
+    background-clip: padding-box;
+    border: 3px solid transparent;
+    width: 7px;
   }
   &-corner {
     background: none;
@@ -135,10 +139,24 @@ h2 {
     .modal-field__input {
       background: rgba(0, 0, 0, 0.45);
       border: 2px solid rgb(68, 59, 44);
-      color: rgb(202, 165, 96);
+      color: rgb(216, 186, 131);
       &::placeholder {
         color: rgba(255, 255, 255, 0.2);
       }
+    }
+  }
+  &_speaker-edit {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: center;
+    .modal-field__input {
+      width: auto;
+      max-width: 70%;
+      flex-grow: 1;
+      padding: 5px;
+      font-size: 18px;
     }
   }
 }

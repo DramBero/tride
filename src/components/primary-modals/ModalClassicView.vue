@@ -563,14 +563,193 @@ export default {
         player_faction: "",
         player_rank: ""
       },
+      filterGroups: [
+        {
+          name: "Major filters",
+          types: [
+            {
+              name: "Journal",
+              functions: [
+                "JournalType"
+              ]
+            },
+            {
+              name: "Function",
+              functions: [
+                "Choice",
+                "Pcgold"
+              ]
+            },
+            {
+              name: "Dead",
+              functions: [
+                "DeadType"
+              ]
+            },
+            {
+              name: "Item",
+              functions: [
+                "ItemType"
+              ]
+            },
+          ]
+        },
+        {
+          name: "Variables",
+          types: [
+            {
+              name: "Global",
+              functions: [
+                "CompareGlobal"
+              ]
+            },
+            {
+              name: "Local",
+              functions: [
+                "CompareLocal"
+              ]
+            },
+          ]
+        },
+        {
+          name: "Not",
+          types: [
+            {
+              name: "NotId",
+              functions: [
+                "NotIdType"
+              ]
+            },
+            {
+              name: "NotCell",
+              functions: [
+                "NotCell"
+              ]
+            },
+            {
+              name: "NotFaction",
+              functions: [
+                "NotFaction"
+              ]
+            },
+            {
+              name: "NotClass",
+              functions: [
+                "NotClass"
+              ]
+            },
+            {
+              name: "NotRace",
+              functions: [
+              "NotRace"
+              ]
+            },
+            {
+              name: "NotLocal",
+              functions: [
+                "Global"
+              ]
+            },
+          ]
+        },
+        {
+          name: "Player filters",
+          types: [{
+            name: "Function",
+            functions: [
+              "PcReputation",
+              "PcLevel",
+              "PcHealthPercent",
+              "PcMagicka",
+              "PcFatigue",
+              "PcStrength",
+              "PcBlock",
+              "PcArmorer",
+              "PcMediumArmor",
+              "PcHeavyArmor",
+              "PcBluntWeapon",
+              "PcLongBlade",
+              "PcAxe",
+              "PcSpear",
+              "PcAthletics",
+              "PcEnchant",
+              "PcDestruction",
+              "PcAlteration",
+              "PcIllusion",
+              "PcConjuration",
+              "PcMysticism",
+              "PcRestoration",
+              "PcAlchemy",
+              "PcUnarmored",
+              "PcSecurity",
+              "PcSneak",
+              "PcAcrobatics",
+              "PcLightArmor",
+              "PcShortBlade",
+              "PcMarksman",
+              "PcMercantile",
+              "PcSpeechcraft",
+              "PcHandToHand",
+              "PcSex",
+              "PcExpelled",
+              "PcCommonDisease",
+              "PcBlightDisease",
+              "PcClothingModifier",
+              "PcCrimeLevel",
+              "PcIntelligence",
+              "PcWillpower",
+              "PcAgility",
+              "PcSpeed",
+              "PcEndurance",
+              "PcPersonality",
+              "PcLuck",
+              "PcCorprus",
+              "PcVampire",
+              "PcHealth"
+            ]
+          }]
+        },
+        {
+          name: "Other filters",
+          types: [{
+            name: "Function",
+            functions: [
+              "ReactionLow",
+              "ReactionHigh",
+              "RankRequirement",
+              "Reputation",
+              "HealthPercent",
+              "SameSex",
+              "SameRace",
+              "SameFaction",
+              "FactionRankDifference",
+              "Detected",
+              "Alarmed",
+              "Weather",
+              "Level",
+              "Attacked",
+              "TalkedToPc",
+              "CreatureTarget",
+              "FriendHit",
+              "Fight",
+              "Hello",
+              "Alarm",
+              "Flee",
+              "ShouldAttack",
+              "Werewolf",
+              "WerewolfKills"
+            ]
+          }]
+        }
+      ],
       filterTypes: [
         "None",
         "Function",
         "Global",
         "Local",
-        "Journal",
-        "Item",
-        "Dead",
+        //"Journal",
+        //"Item",
+        //"Dead",
         "NotId",
         "NotCell",
         "NotFaction",
@@ -579,12 +758,7 @@ export default {
         "NotLocal",
       ],
       filterFunctions: [
-        "ReactionLow",
-        "ReactionHigh",
-        "RankRequirement",
-        "Reputation",
-        "HealthPercent",
-        "PcReputation",
+/*         "PcReputation",
         "PcLevel",
         "PcHealthPercent",
         "PcMagicka",
@@ -623,13 +797,6 @@ export default {
         "PcBlightDisease",
         "PcClothingModifier",
         "PcCrimeLevel",
-        "SameSex",
-        "SameRace",
-        "SameFaction",
-        "FactionRankDifference",
-        "Detected",
-        "Alarmed",
-        "Choice",
         "PcIntelligence",
         "PcWillpower",
         "PcAgility",
@@ -638,12 +805,25 @@ export default {
         "PcPersonality",
         "PcLuck",
         "PcCorprus",
-        "Weather",
         "PcVampire",
+        "PcHealth", */
+
+/*         "ReactionLow",
+        "ReactionHigh",
+        "RankRequirement",
+        "Reputation",
+        "HealthPercent",
+        "SameSex",
+        "SameRace",
+        "SameFaction",
+        "FactionRankDifference",
+        "Detected",
+        "Alarmed", */
+        //"Choice",
+/*         "Weather",
         "Level",
         "Attacked",
         "TalkedToPc",
-        "PcHealth",
         "CreatureTarget",
         "FriendHit",
         "Fight",
@@ -652,19 +832,19 @@ export default {
         "Flee",
         "ShouldAttack",
         "Werewolf",
-        "WerewolfKills",
-        
+        "WerewolfKills", */
+        //"Pcgold",
+  
         "NotClass",
-        "DeadType",
+        //"DeadType",
         "NotFaction",
-        "ItemType",
-        "JournalType",
+        //"ItemType",
+        //"JournalType",
         "NotCell",
         "NotRace",
         "NotIdType",
         "Global",
 
-        "Pcgold",
         "CompareGlobal",
         "CompareLocal"
       ],

@@ -90,7 +90,8 @@
         class="filter-select"
         v-if="!currentFilter.id || editable === 'name'"
       >
-        <div
+
+<!--         <div
           class="filter-group"
           v-for="group in filterGroups"
           :key="group.name"
@@ -116,7 +117,35 @@
               </span>
             </div>
           </div>
+        </div> -->
+
+        <div
+          class="filter-group"
+          v-for="group in filterGroupsNew"
+          :key="group.name"
+        >
+          <div class="filter-group__title">{{ group.name }}</div>
+          <div class="filter-group-filters">
+            <div
+              class="dialogue-filters__filter"
+              v-for="filter in getFunctions(group)"
+              @click="
+                currentFilterFunction = filter;
+                editable = '';
+              "
+              :key="filter"
+            >
+              <span class="filter__if">if </span>
+              <span class="filter__function"
+                >{{
+                  filter
+                }}
+              </span>
+            </div>
+          </div>
         </div>
+
+
       </div>
       <div
         class="value-select"
@@ -224,6 +253,188 @@ export default {
       inputValue: "",
       inputValueSecondary: "",
       editable: "",
+
+      filterGroupsNew: [
+        {
+          name: "Major filters",
+          types: [
+            {
+              name: "Journal",
+              functions: [
+                "JournalType"
+              ]
+            },
+            {
+              name: "Function",
+              functions: [
+                "Choice",
+                "Pcgold"
+              ]
+            },
+            {
+              name: "Dead",
+              functions: [
+                "DeadType"
+              ]
+            },
+            {
+              name: "Item",
+              functions: [
+                "ItemType"
+              ]
+            },
+          ]
+        },
+        {
+          name: "Variables",
+          types: [
+            {
+              name: "Global",
+              functions: [
+                "CompareGlobal"
+              ]
+            },
+            {
+              name: "Local",
+              functions: [
+                "CompareLocal"
+              ]
+            },
+          ]
+        },
+        {
+          name: "Not",
+          types: [
+            {
+              name: "NotId",
+              functions: [
+                "NotIdType"
+              ]
+            },
+            {
+              name: "NotCell",
+              functions: [
+                "NotCell"
+              ]
+            },
+            {
+              name: "NotFaction",
+              functions: [
+                "NotFaction"
+              ]
+            },
+            {
+              name: "NotClass",
+              functions: [
+                "NotClass"
+              ]
+            },
+            {
+              name: "NotRace",
+              functions: [
+              "NotRace"
+              ]
+            },
+            {
+              name: "NotLocal",
+              functions: [
+                "Global"
+              ]
+            },
+          ]
+        },
+        {
+          name: "Player filters",
+          types: [{
+            name: "Function",
+            functions: [
+              "PcReputation",
+              "PcLevel",
+              "PcHealthPercent",
+              "PcMagicka",
+              "PcFatigue",
+              "PcStrength",
+              "PcBlock",
+              "PcArmorer",
+              "PcMediumArmor",
+              "PcHeavyArmor",
+              "PcBluntWeapon",
+              "PcLongBlade",
+              "PcAxe",
+              "PcSpear",
+              "PcAthletics",
+              "PcEnchant",
+              "PcDestruction",
+              "PcAlteration",
+              "PcIllusion",
+              "PcConjuration",
+              "PcMysticism",
+              "PcRestoration",
+              "PcAlchemy",
+              "PcUnarmored",
+              "PcSecurity",
+              "PcSneak",
+              "PcAcrobatics",
+              "PcLightArmor",
+              "PcShortBlade",
+              "PcMarksman",
+              "PcMercantile",
+              "PcSpeechcraft",
+              "PcHandToHand",
+              "PcSex",
+              "PcExpelled",
+              "PcCommonDisease",
+              "PcBlightDisease",
+              "PcClothingModifier",
+              "PcCrimeLevel",
+              "PcIntelligence",
+              "PcWillpower",
+              "PcAgility",
+              "PcSpeed",
+              "PcEndurance",
+              "PcPersonality",
+              "PcLuck",
+              "PcCorprus",
+              "PcVampire",
+              "PcHealth"
+            ]
+          }]
+        },
+        {
+          name: "Other filters",
+          types: [{
+            name: "Function",
+            functions: [
+              "ReactionLow",
+              "ReactionHigh",
+              "RankRequirement",
+              "Reputation",
+              "HealthPercent",
+              "SameSex",
+              "SameRace",
+              "SameFaction",
+              "FactionRankDifference",
+              "Detected",
+              "Alarmed",
+              "Weather",
+              "Level",
+              "Attacked",
+              "TalkedToPc",
+              "CreatureTarget",
+              "FriendHit",
+              "Fight",
+              "Hello",
+              "Alarm",
+              "Flee",
+              "ShouldAttack",
+              "Werewolf",
+              "WerewolfKills"
+            ]
+          }]
+        }
+      ],
+
+
       filterGroups: [
         {
           name: "Speaker filters:",
@@ -538,6 +749,9 @@ Creature Target
         default:
           return comparison;
       }
+    },
+    getFunctions(group) {
+      return group.types.map(val => val.functions).flat()
     }
   },
   computed: {
@@ -702,11 +916,12 @@ Creature Target
     align-items: center;
     background: rgba(255, 255, 255, 0.7);
     border-radius: 20px;
-    padding: 5px 10px;
+    padding: 3px 10px;
     margin: 5px;
     color: black;
     height: fit-content;
     width: fit-content;
+    font-size: 18px;
   }
 }
 

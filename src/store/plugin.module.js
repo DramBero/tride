@@ -677,7 +677,7 @@ const mutations = {
       TMP_topic: topicId,
       TMP_type: dialogueType
     };
-    if (speakerType) newEntry[speakerType] = speakerId;
+    if (speakerType && speakerType !== 'Global') newEntry[speakerType] = speakerId;
 
     state.activePlugin.find((val) => val.info_id === prev_id) &&
       (state.activePlugin.find((val) => val.info_id === prev_id).next_id =

@@ -4,7 +4,7 @@
   <div class="frame-upload">
     <h2 class="modal__title">Create a new dialogue</h2>
     <form class="add-dialogue-form" @submit.prevent="createTopic()">
-      <div v-if="!speakerName">
+      <div v-if="!speakerName && speakerSelectedType.typeName !== 'Global'">
         <div class="add-dialogue-label">
           Choose {{ speakerSelectedType.typeId === 'speaker_id' ? 'an' : 'a' }} 
           <span class="add-dialogue-label-select" tabindex="0" @focusout="speakerSelect = false">
@@ -80,7 +80,7 @@
             </transition>
           </span>
           <span> to: </span>
-          <span class="speaker-name">{{ speakerName }}.</span>
+          <span class="speaker-name">{{ speakerSelectedType.typeName === 'Global' ? 'Global' : speakerName }}.</span>
           <!-- <span class="speaker-id">{{ ' (id: ' + speakerId + ')' }}</span> -->
           <a
             class="speaker-change"

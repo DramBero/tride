@@ -66,7 +66,20 @@
       </div>
       <div v-else>
         <div class="add-dialogue-label">
-          {{ "Add topic to: " }}
+          <span>Add </span>
+          <span class="add-dialogue-label-select" tabindex="0" @focusout="speakerSelect = false">
+              <span class="speaker-change" @click="speakerSelect = !speakerSelect">
+                {{ dialogueSelectedType.typeName.toLowerCase() }}
+              </span>
+              <transition name="fadeAppear">
+              <div class="add-dialogue-label-select-items" v-if="speakerSelect">
+                <div class="add-dialogue-label-select-items__item" v-for="dialogueType in dialogueTypes" :key="dialogueType" @click="dialogueSelectedType = dialogueType, speakerSelect = false">
+                  {{ dialogueType.typeName }}
+                </div>
+              </div>
+            </transition>
+          </span>
+          <span> to: </span>
           <span class="speaker-name">{{ speakerName }}.</span>
           <!-- <span class="speaker-id">{{ ' (id: ' + speakerId + ')' }}</span> -->
           <a
@@ -79,11 +92,11 @@
           >
         </div>
         <div class="topic-create-controls">
-          <label class="modal-field">
+          <label class="modal-field" v-if="dialogueSelectedType.typeId === 'Topic'">
             <input
               class="modal-field__input"
               name="dialogue-topic"
-              :placeholder="'Type the topic'"
+              :placeholder="`Type ${dialogueSelectedType.typeId === 'Topic' ? 'the' : 'a'} ${dialogueSelectedType.typeName.toLowerCase()}`"
               autocomplete="off"
               required
               v-model="inputTopic"
@@ -91,7 +104,7 @@
           </label>
           <button type="submit" class="modal-button" :disabled="!inputTopic">Create</button>
         </div>
-        <div class="found-names">
+        <div class="found-names" v-if="dialogueSelectedType.typeId === 'Topic'">
           <div
             class="found-names-name"
             :class="{'found-names-name_active': !topic[0].TMP_dep}"
@@ -100,9 +113,31 @@
             @click.prevent="inputTopic = topic[0].id"
           >
             {{ topic[0].id }}
-            <!-- <div class="found-names-name__id">{{ npc.id }}</div> -->
           </div>
         </div>
+
+        <div class="found-names" v-else-if="dialogueSelectedType.typeId === 'Greeting'">
+          <div
+            class="found-names-name"
+            v-for="topic in greetings"
+            :key="topic"
+            @click.prevent="inputTopic = topic"
+          >
+            {{ topic }}
+          </div>
+        </div>
+
+        <div class="found-names" v-else-if="dialogueSelectedType.typeId === 'Persuasion'">
+          <div
+            class="found-names-name"
+            v-for="topic in persuasions"
+            :key="topic"
+            @click.prevent="inputTopic = topic"
+          >
+            {{ topic }}
+          </div>
+        </div>
+
       </div>
     </form>
   </div>
@@ -123,6 +158,10 @@ export default {
       speakerSelectedType: {
           typeName: "NPC/Creature",
           typeId: "speaker_id"
+        },
+      dialogueSelectedType: {
+          typeName: "Topic",
+          typeId: "Topic",
         },
       speakerTypes: [
         {
@@ -149,6 +188,44 @@ export default {
           typeName: "Global",
           typeId: ""
         }
+      ],
+      dialogueTypes: [
+        {
+          typeName: "Topic",
+          typeId: "Topic",
+        },
+        {
+          typeName: "Greeting",
+          typeId: "Greeting",
+        },
+        {
+          typeName: "Persuasion",
+          typeId: "Persuasion",
+        },
+      ],
+      greetings: [
+        "Greeting 0",
+        "Greeting 1",
+        "Greeting 2",
+        "Greeting 3",
+        "Greeting 4",
+        "Greeting 5",
+        "Greeting 6",
+        "Greeting 7",
+        "Greeting 8",
+        "Greeting 9",
+      ],
+      persuasions: [
+        "Bribe Fail",
+        "Bribe Success",
+        "Admire Fail",
+        "Admire Success",
+        "Intimidate Fail",
+        "Intimidate Success",
+        "Taunt Fail",
+        "Taunt Success",
+        "Info Refusal",
+        "Service Refusal",
       ],
       speakerSelect: false,
     };
@@ -181,9 +258,9 @@ export default {
       if (!this.inputTopic) return
       else {
         console.log('SPEAKER_TYPE: ', this.speakerSelectedType.typeId)
-        let location = this.$store.getters['getBestOrderLocationForNpc']([this.speakerId, this.inputTopic, this.dialogueType, this.speakerSelectedType.typeId])
+        let location = this.$store.getters['getBestOrderLocationForNpc']([this.speakerId, this.inputTopic, this.dialogueSelectedType.typeId, this.speakerSelectedType.typeId])
         console.log(location[2])
-        this.$store.commit('addDialogue', [this.speakerSelectedType.typeId, this.speakerId || this.speakerName, this.inputTopic, this.dialogueType, location[0], 'next', "New entry"])
+        this.$store.commit('addDialogue', [this.speakerSelectedType.typeId, this.speakerId || this.speakerName, this.inputTopic, this.dialogueSelectedType.typeId, location[0], 'next', "New entry"])
         this.$store.commit("setPrimaryModal", "");
         this.$store.commit("setDialogueModal", this.speakerId);
       }

@@ -333,14 +333,23 @@ const getters = {
                 : orderedTopics[0];
           }
         }
-        testString.push(selectedTopic)
-        let nextId
-        if (state.activePlugin.find(val => val.prev_id === selectedTopic.info_id)) {
-          nextId = state.activePlugin.find(val => val.prev_id === selectedTopic.info_id).info_id
+        testString.push(selectedTopic);
+        let nextId;
+        if (
+          state.activePlugin.find(
+            (val) => val.prev_id === selectedTopic.info_id
+          )
+        ) {
+          nextId = state.activePlugin.find(
+            (val) => val.prev_id === selectedTopic.info_id
+          ).info_id;
         } else {
           for (let dep of state.dependencies) {
-            nextId = selectedTopic.next_id
-            if (dep.data.find(val => val.prev_id === selectedTopic.info_id)) nextId = dep.data.find(val => val.prev_id === selectedTopic.info_id).info_id
+            nextId = selectedTopic.next_id;
+            if (dep.data.find((val) => val.prev_id === selectedTopic.info_id))
+              nextId = dep.data.find(
+                (val) => val.prev_id === selectedTopic.info_id
+              ).info_id;
           }
         }
 
@@ -396,6 +405,21 @@ const getters = {
       }
     }
     return dialogues;
+  },
+
+  getDialogueGlobalExist: (state) => {
+    return (
+      state.activePlugin.filter(
+        (val) =>
+          val.type === "Info" &&
+          val.TMP_type !== "Journal" &&
+          !val.speaker_id &&
+          !val.speaker_cell &&
+          !val.speaker_faction &&
+          !val.speaker_class &&
+          !val.speaker_rank
+      ).length > 0
+    );
   },
 
   getDialogueBySpeaker:
@@ -512,16 +536,28 @@ const mutations = {
   },
 
   addFilter(state, [filter, info_id]) {
-    let slotId = state.activePlugin.find((val) => val.info_id == info_id).filters.length;
+    let slotId = state.activePlugin.find((val) => val.info_id == info_id)
+      .filters.length;
     if (slotId > 5) {
-      return {error_code: "NO_FREE_FILTER_SLOTS", error_text: "All 6 filter slots are already filled. Remove one of them to add a new one."}
-    }
-    else {
-      slotId = "Slot" + slotId.toString()
-      if (state.activePlugin.find((val) => val.info_id == info_id).filters.map(val => val.slot).includes(slotId)) {
-        return {error_code: "FILTER_SLOT_ORDER_BREAK", error_text: "Filter slot order is broken. Autofix is not implemented yet."}
-      }
-      else {
+      return {
+        error_code: "NO_FREE_FILTER_SLOTS",
+        error_text:
+          "All 6 filter slots are already filled. Remove one of them to add a new one."
+      };
+    } else {
+      slotId = "Slot" + slotId.toString();
+      if (
+        state.activePlugin
+          .find((val) => val.info_id == info_id)
+          .filters.map((val) => val.slot)
+          .includes(slotId)
+      ) {
+        return {
+          error_code: "FILTER_SLOT_ORDER_BREAK",
+          error_text:
+            "Filter slot order is broken. Autofix is not implemented yet."
+        };
+      } else {
         filter = { ...filter, slot: slotId };
         state.activePlugin
           .find((val) => val.info_id == info_id)
@@ -531,36 +567,67 @@ const mutations = {
   },
 
   deleteDialogueFilter(state, [info_id, slot_id]) {
-    let filters = state.activePlugin.find((val) => val.info_id == info_id).filters
-    state.activePlugin.find((val) => val.info_id == info_id).filters = filters.filter(val => val.slot !== slot_id)
-    filters = state.activePlugin.find((val) => val.info_id == info_id).filters
+    let filters = state.activePlugin.find(
+      (val) => val.info_id == info_id
+    ).filters;
+    state.activePlugin.find((val) => val.info_id == info_id).filters =
+      filters.filter((val) => val.slot !== slot_id);
+    filters = state.activePlugin.find((val) => val.info_id == info_id).filters;
     for (let i in filters) {
-      state.activePlugin.find((val) => val.info_id == info_id).filters[i].slot = "Slot" + i.toString()
+      state.activePlugin.find((val) => val.info_id == info_id).filters[i].slot =
+        "Slot" + i.toString();
     }
   },
 
   addDialogue(
     state,
-    [speakerType, speakerId, topicId, dialogueType, location_id, location_direction, text]
+    [
+      speakerType,
+      speakerId,
+      topicId,
+      dialogueType,
+      location_id,
+      location_direction,
+      text
+    ]
   ) {
-    let prev_id = ''
-    let next_id = ''
-    console.log(speakerType, speakerId, topicId, dialogueType, location_id, location_direction, text)
-    if (location_direction === 'next') {
-      prev_id = location_id
-      if (state.activePlugin.find(val => val.prev_id === location_id)) next_id = state.activePlugin.find(val => val.prev_id === location_id).info_id
+    let prev_id = "";
+    let next_id = "";
+    console.log(
+      speakerType,
+      speakerId,
+      topicId,
+      dialogueType,
+      location_id,
+      location_direction,
+      text
+    );
+    if (location_direction === "next") {
+      prev_id = location_id;
+      if (state.activePlugin.find((val) => val.prev_id === location_id))
+        next_id = state.activePlugin.find(
+          (val) => val.prev_id === location_id
+        ).info_id;
       else {
         for (let dep of state.dependencies) {
-          if (dep.data.find(val => val.prev_id === location_id)) next_id = dep.data.find(val => val.prev_id === location_id).info_id
+          if (dep.data.find((val) => val.prev_id === location_id))
+            next_id = dep.data.find(
+              (val) => val.prev_id === location_id
+            ).info_id;
         }
       }
-    }
-    else if (location_direction === 'prev') {
-      next_id = location_id
-      if (state.activePlugin.find(val => val.next_id === location_id)) prev_id = state.activePlugin.find(val => val.next_id === location_id).info_id
+    } else if (location_direction === "prev") {
+      next_id = location_id;
+      if (state.activePlugin.find((val) => val.next_id === location_id))
+        prev_id = state.activePlugin.find(
+          (val) => val.next_id === location_id
+        ).info_id;
       else {
         for (let dep of state.dependencies) {
-          if (dep.data.find(val => val.next_id === location_id)) prev_id = dep.data.find(val => val.next_id === location_id).info_id
+          if (dep.data.find((val) => val.next_id === location_id))
+            prev_id = dep.data.find(
+              (val) => val.next_id === location_id
+            ).info_id;
         }
       }
     }
@@ -625,30 +692,49 @@ const mutations = {
 
   pasteDialogue(
     state,
-    [entry, npcId, topicId, dialogueType, location_id, location_direction, info_id]
+    [
+      entry,
+      npcId,
+      topicId,
+      dialogueType,
+      location_id,
+      location_direction,
+      info_id
+    ]
   ) {
     let generatedId = info_id
       ? info_id
       : Math.random().toString().slice(2, 15) +
         Math.random().toString().slice(2, 9);
 
-    let prev_id = ''
-    let next_id = ''
-    if (location_direction === 'next') {
-      prev_id = location_id
-      if (state.activePlugin.find(val => val.prev_id === location_id)) next_id = state.activePlugin.find(val => val.prev_id === location_id).info_id
+    let prev_id = "";
+    let next_id = "";
+    if (location_direction === "next") {
+      prev_id = location_id;
+      if (state.activePlugin.find((val) => val.prev_id === location_id))
+        next_id = state.activePlugin.find(
+          (val) => val.prev_id === location_id
+        ).info_id;
       else {
         for (let dep of state.dependencies) {
-          if (dep.data.find(val => val.prev_id === selectedTopic.info_id)) next_id = dep.data.find(val => val.prev_id === selectedTopic.info_id).info_id
+          if (dep.data.find((val) => val.prev_id === selectedTopic.info_id))
+            next_id = dep.data.find(
+              (val) => val.prev_id === selectedTopic.info_id
+            ).info_id;
         }
       }
-    }
-    else if (location_direction === 'prev') {
-      next_id = location_id
-      if (state.activePlugin.find(val => val.next_id === location_id)) prev_id = state.activePlugin.find(val => val.next_id === location_id).info_id
+    } else if (location_direction === "prev") {
+      next_id = location_id;
+      if (state.activePlugin.find((val) => val.next_id === location_id))
+        prev_id = state.activePlugin.find(
+          (val) => val.next_id === location_id
+        ).info_id;
       else {
         for (let dep of state.dependencies) {
-          if (dep.data.find(val => val.next_id === location_id)) prev_id = dep.data.find(val => val.next_id === location_id).info_id
+          if (dep.data.find((val) => val.next_id === location_id))
+            prev_id = dep.data.find(
+              (val) => val.next_id === location_id
+            ).info_id;
         }
       }
     }

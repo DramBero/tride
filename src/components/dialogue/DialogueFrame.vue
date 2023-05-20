@@ -16,6 +16,20 @@
         >
           Classic view
         </div>
+<!--         <form class="search-input" @submit.prevent="filterSpeakers">
+        <label class="modal-field modal-field_dark">
+          <input
+            class="modal-field__input"
+            name="speaker-name"
+            autocomplete="off"
+            :placeholder="'Find speaker'"
+            v-model="speakerSearch"
+          />
+        </label>
+        <button type="submit" class="search-input__button">
+          <icon name="search" class="search-input__icon" scale="1.3"></icon>
+        </button>
+      </form> -->
       </div>
       <div class="frame-controls-types" v-if="getNPCs">
         <div
@@ -76,6 +90,7 @@
         <div
           class="frame-controls-types__type frame-controls-types__type_generic"
           @click="openGeneric"
+          v-if="getDialogueGlobalExist"
         >
           Global
         </div>
@@ -108,7 +123,8 @@ export default {
   components: { Icon, DialogueFrameCard },
   data() {
     return {
-      speakerTypes: ["speaker_id"]
+      speakerTypes: ["speaker_id"],
+      speakerSearch: "",
     };
   },
   computed: {
@@ -143,6 +159,9 @@ export default {
         ""
       );
     },
+    getDialogueGlobalExist() {
+      return this.$store.getters["getDialogueGlobalExist"]
+    }
   },
   methods: {
     toggleType(type) {
@@ -160,7 +179,7 @@ export default {
     },
     openGeneric() {
       this.$store.commit("setDialogueModal", "Global Dialogue");
-    }
+    },
   }
 };
 </script>
@@ -253,6 +272,23 @@ export default {
     display: flex;
     justify-content: center;
     overflow-y: scroll;
+  }
+}
+
+.search-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  &__icon {
+    fill: rgb(202, 165, 96);
+    transition: opacity .3s ease-in-out;
+  }
+  &__button {
+    display: flex;
+    align-items: center;
+    &:hover {
+      opacity: 0.7;
+    }
   }
 }
 

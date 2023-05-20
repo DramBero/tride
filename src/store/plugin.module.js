@@ -512,12 +512,31 @@ const mutations = {
   },
 
   addFilter(state, [filter, info_id]) {
-    let slotCount = state.activePlugin.find((val) => val.info_id == info_id)
-      .filters.length;
-    filter = { ...filter, slot: "Slot" + slotCount.toString() };
-    state.activePlugin
-      .find((val) => val.info_id == info_id)
-      .filters.push(filter);
+    let slotId = state.activePlugin.find((val) => val.info_id == info_id).filters.length;
+    if (slotId > 5) {
+      return {error_code: "NO_FREE_FILTER_SLOTS", error_text: "All 6 filter slots are already filled. Remove one of them to add a new one."}
+    }
+    else {
+      slotId = "Slot" + slotId.toString()
+      if (state.activePlugin.find((val) => val.info_id == info_id).filters.map(val => val.slot).includes(slotId)) {
+        return {error_code: "FILTER_SLOT_ORDER_BREAK", error_text: "Filter slot order is broken. Autofix is not implemented yet."}
+      }
+      else {
+        filter = { ...filter, slot: slotId };
+        state.activePlugin
+          .find((val) => val.info_id == info_id)
+          .filters.push(filter);
+      }
+    }
+  },
+
+  deleteDialogueFilter(state, [info_id, slot_id]) {
+    let filters = state.activePlugin.find((val) => val.info_id == info_id).filters
+    state.activePlugin.find((val) => val.info_id == info_id).filters = filters.filter(val => val.slot !== slot_id)
+    filters = state.activePlugin.find((val) => val.info_id == info_id).filters
+    for (let i in filters) {
+      state.activePlugin.find((val) => val.info_id == info_id).filters[i].slot = "Slot" + i.toString()
+    }
   },
 
   addDialogue(

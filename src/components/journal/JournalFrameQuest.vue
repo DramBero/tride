@@ -19,6 +19,7 @@
                 parseInt(a.data.disposition) - parseInt(b.data.disposition)
             )"
             :key="entry.info_id"
+            :id="quest.id + entry.data.disposition"
           >
             <div
               v-if="entryEdit != entry.data.disposition"
@@ -33,6 +34,7 @@
                   )
                 }"
                 draggable
+                @dragstart="startDrag($event, entry)"
               >
                 <div class="quest-entry__text">{{ entry.text }}</div>
                 <div class="quest-entry__index">
@@ -211,6 +213,11 @@ export default {
         "New entry",
         this.getLatestDisposition
       ]);
+    },
+    startDrag(event, entry) {
+      event.dataTransfer.setData('type', 'Journal')
+      event.dataTransfer.setData('topic', entry.TMP_topic)
+      event.dataTransfer.setData('disposition', entry.data.disposition)
     }
   }
 };
@@ -344,8 +351,8 @@ input[type="reset"] {
         -45deg,
         transparent,
         transparent 12px,
-        rgb(216, 199, 122) 12px,
-        rgb(216, 199, 122) 24px
+        rgb(233, 203, 72) 12px,
+        rgb(233, 203, 72) 24px
       );
     }
     &__text {

@@ -32,6 +32,23 @@ export default {
   computed: {
     getJournal() {
       return this.$store.getters["getParsedQuests"];
+    },
+    getHighlighted() {
+      return this.$store.getters["getJournalHighlight"];
+    },
+    getHighlightedId() {
+      let valueObj = this.getHighlighted.value
+      if (valueObj) return this.getHighlighted.id + Object.values(valueObj)[0]
+    }
+  },
+  watch: {
+    async getHighlightedId(newValue) {
+      console.log(newValue)
+      await new Promise((resolve) => setTimeout(resolve, 300));
+       if (newValue) {
+        const el = document.getElementById(newValue);
+        if (el) el.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+      }
     }
   },
   components: { JournalFrameQuest, Icon },

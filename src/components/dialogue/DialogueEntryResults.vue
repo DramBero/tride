@@ -6,31 +6,36 @@
         :class="{ 'script-language_lua': language === 'Lua (MWSE)' }"
         >{{ language }}</span
       >
-      <prism-editor
+      <CodeEditor
+            v-model="luaCode"
+            :read_only="!editMode"
+            :hide_header="true"
+            :height="'100%'"
+            :width="'100%'"
+            font_size="14px"
+            :border_radius="'0'"
+          >
+          </CodeEditor>
+<!--       <prism-editor
         class="editor-code"
         v-model="luaCode"
         :readonly="!editMode"
         :wordwrap="false"
         :highlight="language === 'Lua' ? highlighterLua : highlighterBasic"
         lineNumbers
-      ></prism-editor>
+      ></prism-editor> -->
     </div>
   </div>
 </template>
 
 <script>
-import { PrismEditor } from "vue-prism-editor";
-import "vue-prism-editor/dist/prismeditor.min.css";
-
-import { highlight, languages } from "prismjs/components/prism-core";
-import "prismjs/components/prism-clike";
-import "prismjs/components/prism-lua";
-import "prismjs/components/prism-javascript";
+import hljs from 'highlight.js';
+import CodeEditor from "simple-code-editor";
 
 export default {
   components: {
-    PrismEditor
-  },
+    CodeEditor
+},
   props: {
     code: {
       type: String
@@ -74,13 +79,13 @@ export default {
   border: 1px solid rgba(170, 169, 98, 0.5);
   font-family: "Consolas";
   background: rgb(32, 32, 22);
-  line-height: 20px;
+  //line-height: 20px;
   position: relative;
   //overflow-x: scroll;
   //white-space: pre-line;
   min-width: 50%;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12px;
   padding: 0px;
   margin: 10px 30px;
   &:focus {

@@ -517,6 +517,7 @@
             :hide_header="true"
             :height="'100%'"
             :width="'100%'"
+            font-size="12px"
             :border_radius="'0'"
           >
           </CodeEditor>

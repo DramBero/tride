@@ -2,14 +2,18 @@
   "author": "Teodoro Bagwell",
   "dependencies": {
     "@ivanv/vue-collapse-transition": "^1.0.2",
+    "@vk-x/cp1251": "^2.0.4",
     "axios": "^0.19.0",
     "codemirror": "^6.0.1",
     "date-fns": "^1.30.1",
     "highlight.js": "^11.7.0",
+    "legacy-encoding": "^3.0.0",
     "marked": "^0.7.0",
     "prismjs": "^1.29.0",
     "register-service-worker": "^1.6.2",
+    "ruchardet": "0.0.2",
     "simple-code-editor": "^1.2.2",
+    "single-byte": "^1.0.7",
     "sortablejs": "^1.15.0",
     "vue": "^2.6.10",
     "vue-autosuggest": "^2.2.0",
@@ -24,7 +28,8 @@
     "vue-router": "^3.1.3",
     "vue-select": "^3.20.2",
     "vuedraggable": "^2.24.3",
-    "vuex": "^3.1.1"
+    "vuex": "^3.1.1",
+    "windows-1251": "^3.0.4"
   },
   "description": "TeoQEd",
   "devDependencies": {

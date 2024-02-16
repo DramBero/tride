@@ -16,15 +16,7 @@
         ></icon>
         <span>Header</span>
     </div>
-    <div class="workspace-controls__button workspace-controls__button_wip" disabled>
-        <icon
-            name="user"
-            class="icon-controls"
-            scale="2"
-        ></icon>
-        <span>NPCs</span>
-    </div>
-    <div class="workspace-controls__button workspace-controls__button_wip" disabled>
+    <div class="workspace-controls__button workspace-controls__button_wip" disabled :class="{'workspace-controls__button_active': getSidebarActive === 'Factions'}" >
         <icon
             name="users"
             class="icon-controls"
@@ -32,6 +24,14 @@
         ></icon>
         <span>Factions</span>
     </div>
+<!--     <div class="workspace-controls__button workspace-controls__button_wip" disabled>
+        <icon
+            name="user"
+            class="icon-controls"
+            scale="2"
+        ></icon>
+        <span>NPCs</span>
+    </div> -->
     <div class="workspace-controls__button workspace-controls__button_wip" disabled>
         <icon
             name="book"

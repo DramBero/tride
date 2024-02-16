@@ -46,13 +46,32 @@ export default {
         //console.log(e.loaded, e.total)
       }
       reader.onload = (e) => {
+
+        // TEST ENCODING
+
+/*         var legacy = require('legacy-encoding');
+
+        let plugin = legacy.decode(e.target.result, 'cp1251', {mode: 'replacement'}) */
+/* 
+        const { encode, decode } = require('single-byte');
+ 
+        const buffer = encode('windows-1252', e.target.result);
+        const plugin = decode('windows-1251', buffer)
+
+
+        console.log(plugin) */
+
+        // TEST ENCODING
+
+        let plugin = e.target.result
+
         if (!this.dep) {
           this.$store.dispatch("parseLocalPlugin", [
-            JSON.parse(e.target.result)
+            JSON.parse(plugin)
           ]);
         } else {
           this.$store.dispatch("parseDependency", [
-            JSON.parse(e.target.result), this.dep
+            JSON.parse(plugin), this.dep
           ]);
         }
       }; 

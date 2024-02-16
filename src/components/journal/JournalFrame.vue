@@ -3,10 +3,10 @@
       <div class="journal-frame__header" v-if="true">
         <div class="frame-title">Journal</div>
         <div class="journal-frame__controls">
-        <div class="add-quest" @click="addQuest()">
-          New <icon name="plus-circle" class="add-quest__button" scale="1"></icon>
+          <div class="add-quest" @click="addQuest()">
+            New <icon name="plus-circle" class="add-quest__button" scale="1"></icon>
+          </div>
         </div>
-      </div>
       </div>
       <div v-if="getJournal.length" class="quests">
         <transition-group
@@ -33,6 +33,10 @@ export default {
     getJournal() {
       return this.$store.getters["getParsedQuests"];
     },
+    getQuestNamesList() {
+      let questNames = this.getJournal.map(val => `["${val.id}"]: "${val.name}",`)
+      return questNames
+    },
     getHighlighted() {
       return this.$store.getters["getJournalHighlight"];
     },
@@ -56,7 +60,7 @@ export default {
     addQuest() {
       this.$store.commit("setPrimaryModal", "NewQuest");
     }
-  }
+  },
 };
 </script>
 

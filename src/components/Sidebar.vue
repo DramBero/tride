@@ -2,14 +2,16 @@
     <div class="sidebar">
         <JournalFrame v-show="getSidebarActive === 'Journal'" :key="4"/>
         <HeaderFrame v-show="getSidebarActive === 'Header'" :key="5" />
+        <SidebarFactions v-show="getSidebarActive === 'Factions'" :key="6" />
     </div>
 </template>
 
 <script>
 import JournalFrame from './journal/JournalFrame.vue'
 import HeaderFrame from './plugin-header/HeaderFrame.vue'
+import SidebarFactions from './sidebar/SidebarFactions.vue'
 export default {
-  components: { JournalFrame, HeaderFrame },
+  components: { JournalFrame, HeaderFrame, SidebarFactions },
     computed: {
         getSidebarActive() {
             return this.$store.getters['getSidebarActive']

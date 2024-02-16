@@ -10,10 +10,16 @@ const state = {
   cellList: [],
   raceList: [],
   classList: [],
-  factionList: []
+  factionList: [],
+  npcList: [],
 };
 
 const getters = {
+  getFactions(state) {
+    let masterFactions = state.dependencies.flatMap(val => val.data).filter(val => val.type === 'Faction')
+    let activeFactions = state.activePlugin.filter(val => val.type === 'Faction')
+    return [...masterFactions, ...activeFactions]
+  },
   getParsedQuests(state) {
     if (!state.activePlugin.length) return [];
     let quests = [];
@@ -32,6 +38,7 @@ const getters = {
       entries: []
     };
     for (let entry of state.activePlugin) {
+      if (!entry) continue
       if (entry.type === "Dialogue" && entry.TMP_type === "Journal") {
         if (entry.id !== questData.id && questData.id !== "") {
           quests.push(questData);
@@ -54,14 +61,16 @@ const getters = {
 
   getActivePlugin(state) {
     if (!state.activePlugin.length) return;
-    state.activePlugin.filter((val) => val.type === "Header")[0].num_objects =
-      state.activePlugin.length - 1;
+    let header = state.activePlugin.find((val) => val && val.type === "Header")
+    if (header) {
+      header.num_objects = state.activePlugin.length - 1;
+    }
 
     return state.activePlugin;
   },
 
   getActiveHeader(state) {
-    return state.activePlugin.filter((val) => val.type === "Header")[0];
+    return state.activeHeader;
   },
 
   getCellList(state) {
@@ -94,7 +103,7 @@ const getters = {
       depNpcs.push(...dep.data.filter((val) => val.type === "Npc"));
     }
     let allNpcs = [
-      ...state.activePlugin.filter((val) => val.type === "Npc"),
+      ...state.npcList,
       ...depNpcs
     ];
     const uniqueObjMap = {};
@@ -526,15 +535,6 @@ const actions = {
 };
 
 const mutations = {
-  setActiveHeader(state, header) {
-    let oldHeader = state.activePlugin.find((val) => val.type === "Header");
-    oldHeader.author = header.author;
-    oldHeader.description = header.description;
-    oldHeader.version = header.version;
-    oldHeader.masters = header.masters;
-    oldHeader.file_type = header.file_type;
-  },
-
   addFilter(state, [filter, info_id]) {
     let slotId = state.activePlugin.find((val) => val.info_id == info_id)
       .filters.length;
@@ -990,35 +990,46 @@ const mutations = {
   parsePluginData(state, plugin) {
     let dialogueType;
     let dialogueId;
-    state.activePlugin = plugin;
-    for (let entry in state.activePlugin) {
-      if (["Info", "Dialogue"].includes(state.activePlugin[entry].type)) {
-        if (state.activePlugin[entry].type === "Dialogue") {
-          dialogueType = state.activePlugin[entry].dialogue_type;
+    for (let entry in plugin) {
+      if (["Info", "Dialogue"].includes(plugin[entry].type)) {
+        if (plugin[entry].type === "Dialogue") {
+          dialogueType = plugin[entry].dialogue_type;
         }
-        if (state.activePlugin[entry].id)
-          dialogueId = state.activePlugin[entry].id;
+        if (plugin[entry].id)
+          dialogueId = plugin[entry].id;
         let dialogueEntry = {
-          ...state.activePlugin[entry],
+          ...plugin[entry],
           TMP_topic: dialogueId,
           TMP_type: dialogueType
         };
         state.activePlugin[entry] = dialogueEntry;
       }
-      if (["Cell"].includes(state.activePlugin[entry].type)) {
-        state.cellList = [...state.cellList, state.activePlugin[entry].id];
+      else if (["Cell"].includes(plugin[entry].type)) {
+        state.cellList = [...state.cellList, plugin[entry].id];
       }
-      if (["Race"].includes(state.activePlugin[entry].type)) {
-        state.raceList = [...state.raceList, state.activePlugin[entry].id];
+      else if (["Race"].includes(plugin[entry].type)) {
+        state.raceList = [...state.raceList, plugin[entry].id];
       }
-      if (["Class"].includes(state.activePlugin[entry].type)) {
-        state.classList = [...state.classList, state.activePlugin[entry].id];
+      else if (["Class"].includes(plugin[entry].type)) {
+        state.classList = [...state.classList, plugin[entry].id];
       }
-      if (["Faction"].includes(state.activePlugin[entry].type)) {
+      else if (["Faction"].includes(plugin[entry].type)) {
         state.factionList = [
           ...state.factionList,
-          state.activePlugin[entry].id
+          plugin[entry].id
         ];
+      }
+      else if (["Header"].includes(plugin[entry].type)) {
+        state.activeHeader = plugin[entry];
+      }
+      else if (["Npc"].includes(plugin[entry].type)) {
+        let npc = {
+          id: plugin[entry].id, 
+          name: plugin[entry].name,
+          race: plugin[entry].race,
+          class: plugin[entry].class,
+        }
+        state.npcList.push(Object.freeze(npc))
       }
     }
     state.cellList = [...new Set(state.cellList)];

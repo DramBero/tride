@@ -158,7 +158,7 @@ export default {
       newHeader.description = this.description;
       newHeader.masters = this.dependencies;
       console.log(newHeader)
-      this.$store.commit("setActiveHeader", newHeader)
+      //this.$store.commit("setActiveHeader", newHeader)
       this.$store.commit("setActivePluginTitle", this.name)
     },
     cancelChanges() {

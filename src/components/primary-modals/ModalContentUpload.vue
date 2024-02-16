@@ -23,7 +23,7 @@ export default {
   },
   computed: {
     getDependencies() {
-      if (this.$store.getters["getActiveHeader"]) {
+      if (this.$store.getters["getActiveHeader"] && this.$store.getters["getActiveHeader"].masters) {
         return this.$store.getters["getActiveHeader"].masters.map(
           (val) => val[0]
         );

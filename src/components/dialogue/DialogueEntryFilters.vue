@@ -205,8 +205,9 @@ export default {
   },
   computed: {
     getFiltersByInfoId() {
-      this.filterReactivityTrigger
-      return this.$store.getters['getFiltersByInfoId'](this.answer.info_id)
+      return this.answer.filters
+/*       this.filterReactivityTrigger
+      return this.$store.getters['getFiltersByInfoId'](this.answer.info_id) */
     },
     getOtherSpeakers() {
       return [

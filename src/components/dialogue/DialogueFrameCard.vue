@@ -1,12 +1,13 @@
 <template>
   <div class="dialogue-card" @click="openDialogueModal">
-    <span class="dialogue-card__name">{{ getNpc.name || speakerId }}</span>
+    <span class="dialogue-card__name">{{ speakerData.name || speakerId }}</span>
     <div v-if="getNpcFace" class="dialogue-card__decoration"></div>
-    <img class="dialogue-card__image" v-if="getNpcFace" :src="getNpcFace ? require('@/assets/images/faces/' + getNpcFace) : ''" :alt="getNpc.name || speakerId">
+    <img class="dialogue-card__image" v-if="getNpcFace" :src="getNpcFace ? require('@/assets/images/faces/' + getNpcFace) : ''" :alt="speakerData.name || speakerId">
   </div>
 </template>
 
 <script>
+import fetchNPCData from '@/api/idb'
 export default {
   props: {
     speakerType: {
@@ -16,13 +17,24 @@ export default {
       type: String
     }
   },
+  data() {
+    return {
+      speakerData: {}
+    }
+  },
+  async mounted() {
+    let speakerData
+    await this.$store.dispatch('fetchNPCData', [this.speakerId]).then((response) => {
+      speakerData = response
+    }).catch((error) => {
+      console.log('err: ', error)
+    })
+    this.speakerData = speakerData || {}
+  },
   computed: {
-    getNpc() {
-      return this.$store.getters['getNpcById'](this.speakerId)
-    },
     getNpcFace() {
-      let sex = this.getNpc.npc_flags % 2 ? 'f' : 'm'
-      switch(this.getNpc.race) {
+      let sex = this.speakerData.npc_flags % 2 ? 'f' : 'm'
+      switch(this.speakerData.race) {
         case "Argonian": return 'argonian-' + sex + '.png'
         case "High Elf": return 'altmer-' + sex + '.png'
         case "Dark Elf": return 'dunmer-' + sex + '.png'

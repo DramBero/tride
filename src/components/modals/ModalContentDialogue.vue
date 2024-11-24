@@ -241,20 +241,20 @@
       </div>
     </div>
     <div class="dialogue-questions">
-      <div class="dialogue-questions__container" v-if="getGreetings.length">
+      <div class="dialogue-questions__container" v-if="dialogue.greetings.length">
         <div
           class="dialogue-questions__topic"
-          v-for="(question, index) in getGreetings"
+          v-for="(question, index) in dialogue.greetings"
           :key="index"
           @click="setCurrentAnswers(question, 'Greeting')"
         >
           {{ question }}
         </div>
       </div>
-      <div class="dialogue-questions__container" v-if="getPersuasion.length">
+      <div class="dialogue-questions__container" v-if="dialogue.persuasions.length">
         <div
           class="dialogue-questions__topic"
-          v-for="(question, index) in getPersuasion"
+          v-for="(question, index) in dialogue.persuasions"
           :key="index"
           @click="setCurrentAnswers(question, 'Persuasion')"
         >
@@ -263,7 +263,7 @@
       </div>
       <div
         class="dialogue-questions__topic"
-        v-for="(question, index) in getTopics"
+        v-for="(question, index) in dialogue.topics"
         :key="index"
         @click="setCurrentAnswers(question, 'Topic')"
       >
@@ -294,39 +294,24 @@ export default {
       //currentAnswers: [],
       currentTopic: "",
       editMode: false,
-      showDependencies: false,
+      showDependencies: true,
       editedEntry: "",
       topicType: "",
-      infoMessage: ""
+      infoMessage: "",
+      dialogue: {
+        greetings: [],
+        persuasions: [],
+        topics: [],
+      },
+      orderedEntries: [],
     };
   },
 
-  mounted() {
+  async mounted() {
     this.editMode = false;
   },
 
   computed: {
-    getTopics() {
-      let topics = [...new Set(this.getSpeakerData("Topic"))];
-      if (!this.showDependencies) {
-        topics = topics.filter((val) => !val.TMP_dep);
-      }
-      return [...new Set(topics.map((val) => val.TMP_topic))];
-    },
-    getGreetings() {
-      let topics = [...new Set(this.getSpeakerData("Greeting"))];
-      if (!this.showDependencies) {
-        topics = topics.filter((val) => !val.TMP_dep);
-      }
-      return [...new Set(topics.map((val) => val.TMP_topic))];
-    },
-    getPersuasion() {
-      let topics = [...new Set(this.getSpeakerData("Persuasion"))];
-      if (!this.showDependencies) {
-        topics = topics.filter((val) => !val.TMP_dep);
-      }
-      return [...new Set(topics.map((val) => val.TMP_topic))];
-    },
     getOrderedEntries() {
       return this.$store.getters["getOrderedEntriesByTopic"]([
         this.currentTopic,
@@ -336,7 +321,7 @@ export default {
     currentAnswers() {
       let answers;
       if (this.speaker !== "Global Dialogue") {
-        answers = this.getOrderedEntries
+        answers = this.orderedEntries
           .filter((val) => val.TMP_topic === this.currentTopic)
           .filter((topic) =>
             [
@@ -348,7 +333,7 @@ export default {
             ].includes(this.speaker)
           );
       } else {
-        answers = this.getOrderedEntries
+        answers = this.orderedEntries
           .filter((val) => val.TMP_topic === this.currentTopic)
           .filter(
             (topic) =>
@@ -359,6 +344,7 @@ export default {
               !topic["speaker_rank"]
           );
       }
+      return answers
       if (this.showDependencies) {
         return answers;
 
@@ -491,7 +477,7 @@ export default {
     },
     getHyperlinkedAnswer(text) {
       let hyperlinkedAnswer = text;
-      for (let topic of this.getTopics) {
+      for (let topic of this.dialogue.topics) {
         if (hyperlinkedAnswer.includes(topic)) {
           hyperlinkedAnswer = hyperlinkedAnswer.replace(
             topic,
@@ -518,9 +504,17 @@ export default {
   },
 
   watch: {
-    speaker() {
+    async speaker() {
       this.setCurrentAnswers("", "");
       this.currentTopic = "";
+      this.dialogue = await this.$store.dispatch('fetchTopicListByNPC', [this.speaker])
+    },
+    async currentTopic(newValue) {
+      if (newValue.trim()) {
+        this.orderedEntries = await this.$store.dispatch('fetchOrderedEntriesByTopic', [newValue])
+      } else {
+        this.orderedEntries = []
+      }
     }
   }
 };

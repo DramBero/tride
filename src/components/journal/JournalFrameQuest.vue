@@ -1,12 +1,12 @@
 <template>
   <div class="quest">
     <div class="quest-title" @click="toggleCollapse">
-      {{ quest.name }}
+      {{ questData.name }}
     </div>
     <div class="quest-id" @click="toggleCollapse">
       {{ quest.id }}
     </div>
-    <collapse-transition v-if="quest.entries.length">
+    <collapse-transition v-if="questData.entries.length">
       <div v-show="isCollapsed">
         <transition-group
           name="fadeHeight"
@@ -14,7 +14,7 @@
           :style="{ width: '100%' }"
         >
           <div
-            v-for="entry in quest.entries.sort(
+            v-for="entry in questData.entries.filter(val => val.data).sort(
               (a, b) =>
                 parseInt(a.data.disposition) - parseInt(b.data.disposition)
             )"
@@ -134,8 +134,14 @@ export default {
       isCollapsed: false,
       highlightedComparison: "",
       highlightedId: "",
-      entryEdit: ""
+      entryEdit: "",
+      questData: {
+        entries: [],
+      },
     };
+  },
+  async mounted() {
+    this.questData = await this.$store.dispatch('fetchQuestByID', [this.quest.id])
   },
   watch: {
     getHighlight(newValue) {
@@ -155,12 +161,12 @@ export default {
       return this.$store.getters["getJournalHighlight"];
     },
     getLatestDisposition() {
-      if (!this.quest.entries.length || !this.quest.entries[0].data.disposition)
+      if (!this.questData.entries.length || !this.questData.entries[0].data.disposition)
         return "10";
       return (
         Math.floor(
           Math.max(
-            ...this.quest.entries.map((val) => parseInt(val.data.disposition))
+            ...this.questData.entries.map((val) => parseInt(val.data.disposition))
           ) /
             10 +
             1

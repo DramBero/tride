@@ -57,6 +57,9 @@ export default {
     getOpenModalDialogue() {
       return this.$store.getters["getDialogueModal"];
     }
+  },
+  mounted() {
+    this.$store.dispatch('initIndexedDB')
   }
 };
 </script>

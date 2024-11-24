@@ -1,4 +1,5 @@
 import Vue from "vue";
+import { importPlugin, getDB, initPlugin, fetchNPCData, fetchAllDialogueNPCs, fetchAllQuestIDs, fetchQuestByID, fetchTopicListByNPC, getOrderedEntriesByTopic } from '@/api/idb';
 
 const state = {
   activePlugin: [],
@@ -12,6 +13,12 @@ const state = {
   classList: [],
   factionList: [],
   npcList: [],
+  topicsList: [],
+  activePluginDB: null,
+  dependenciesDB: {},
+  questEntries: [],
+  allDialogueNPCs: [],
+  allQuestIDs: [],
 };
 
 const getters = {
@@ -20,43 +27,11 @@ const getters = {
     let activeFactions = state.activePlugin.filter(val => val.type === 'Faction')
     return [...masterFactions, ...activeFactions]
   },
+  getAllQuestIDs(state) {
+    return state.allQuestIDs
+  },
   getParsedQuests(state) {
-    if (!state.activePlugin.length) return [];
-    let quests = [];
-    let initialQuestData = {
-      id: "",
-      name: "",
-      nameId: "",
-      nameNextId: "",
-      entries: []
-    };
-    let questData = {
-      id: "",
-      name: "",
-      nameId: "",
-      nameNextId: "",
-      entries: []
-    };
-    for (let entry of state.activePlugin) {
-      if (!entry) continue
-      if (entry.type === "Dialogue" && entry.TMP_type === "Journal") {
-        if (entry.id !== questData.id && questData.id !== "") {
-          quests.push(questData);
-          questData = JSON.parse(JSON.stringify(initialQuestData));
-        }
-        questData.id = entry.id;
-      } else if (entry.TMP_type === "Journal") {
-        if (entry.quest_name === 1) {
-          questData.name = entry.text;
-          questData.nameId = entry.info_id;
-          questData.nameNextId = entry.next_id;
-        } else {
-          questData.entries.push(entry);
-        }
-      }
-    }
-    if (questData.id) quests.push(questData);
-    return quests;
+    return state.questEntries
   },
 
   getActivePlugin(state) {
@@ -98,6 +73,7 @@ const getters = {
   },
 
   getAllNpcs(state) {
+    return state.allDialogueNPCs;
     let depNpcs = [];
     for (let dep of state.dependencies) {
       depNpcs.push(...dep.data.filter((val) => val.type === "Npc"));
@@ -143,8 +119,8 @@ const getters = {
       );
     }
     let allTopics = [
-      ...state.activePlugin.filter(
-        (val) => val.TMP_type === topicType && val.type === "Dialogue"
+      ...state.topicsList.filter(
+        (val) => val.TMP_type === topicType
       ),
       ...depTopics
     ];
@@ -161,8 +137,8 @@ const getters = {
   },
 
   getFiltersByInfoId: (state) => (info_id) => {
-    if (state.activePlugin.find((val) => val.info_id == info_id))
-      return state.activePlugin.find((val) => val.info_id == info_id).filters;
+    if (state.topicsList.find((val) => val.info_id == info_id))
+      return state.topicsList.find((val) => val.info_id == info_id).filters;
     else if (
       state.dependencies
         .flatMap((val) => val.data)
@@ -179,7 +155,7 @@ const getters = {
       if (!topicId) return [];
       let pluginDialogue = [
         ...state.dependencies.map((val) => val.data),
-        state.activePlugin
+        state.topicsList
       ].map((val) =>
         val.filter((val) => val.type === "Info" && val.TMP_topic === topicId)
       );
@@ -229,7 +205,7 @@ const getters = {
             nextEntries.find((val) => val.TMP_dep === dependency.name) ||
             nextEntry;
         }
-        nextEntry = nextEntries.find((val) => !val.TMP_dep) || nextEntry;
+        nextEntry = nextEntries.find((val) => !val.TMP_is_active) || nextEntry;
         if (nextEntry) {
           orderedDialogue.push(nextEntry);
           if (!nextEntry.next_id) break;
@@ -399,12 +375,12 @@ const getters = {
       const dialogueTypes = ["Topic", "Greeting", "Persuasion"];
       for (let dialogueType of dialogueTypes) {
         if (
-          state.activePlugin.filter((val) => val.TMP_type === dialogueType)
+          state.topicsList.filter((val) => val.TMP_type === dialogueType)
             .length
         ) {
           dialogues = [
             ...dialogues,
-            ...state.activePlugin
+            ...state.topicsList
               .filter((val) => val.TMP_type === dialogueType)
               .map((topic) => topic[speakerType])
               .filter((speaker) => speaker)
@@ -441,7 +417,7 @@ const getters = {
             ...depDialogue,
             ...dep.data
               .filter(
-                (val) => val.TMP_type === dialogueType && val.type === "Info"
+                (val) => val.TMP_type === dialogueType
               )
               .filter(
                 (topic) =>
@@ -453,8 +429,8 @@ const getters = {
               )
           ];
         }
-        let activeDialogue = state.activePlugin
-          .filter((val) => val.TMP_type === dialogueType && val.type === "Info")
+        let activeDialogue = state.topicsList
+          .filter((val) => val.TMP_type === dialogueType)
           .filter(
             (topic) =>
               !topic["speaker_id"] &&
@@ -470,7 +446,7 @@ const getters = {
           ...depDialogue,
           ...dep.data
             .filter(
-              (val) => val.TMP_type === dialogueType && val.type === "Info"
+              (val) => val.TMP_type === dialogueType
             )
             .filter((topic) =>
               [
@@ -483,8 +459,8 @@ const getters = {
             )
         ];
       }
-      let activeDialogue = state.activePlugin
-        .filter((val) => val.TMP_type === dialogueType && val.type === "Info")
+      let activeDialogue = state.topicsList
+        .filter((val) => val.TMP_type === dialogueType)
         .filter((topic) =>
           [
             topic["speaker_id"],
@@ -499,13 +475,29 @@ const getters = {
 };
 
 const actions = {
-  parseLocalPlugin({ commit }, [plugin]) {
-    commit("resetActivePlugin");
-    commit("parsePluginData", plugin);
+
+  async fetchNPCData({}, [npcId]) {
+    return await fetchNPCData(npcId)
   },
 
-  parseDependency({ commit }, [plugin, fileName]) {
-    commit("setDependencies", [plugin, fileName]);
+  async fetchQuestByID({}, [npcId]) {
+    return await fetchQuestByID(npcId)
+  },
+
+  async fetchOrderedEntriesByTopic({}, [topicId]) {
+    return await getOrderedEntriesByTopic(topicId)
+  },
+
+  
+
+  async fetchTopicListByNPC({}, [npcId]) {
+    console.log(npcId)
+    return await fetchTopicListByNPC(npcId)
+  },
+
+  parseLocalPlugin({ commit, dispatch }, [plugin, fileName]) {
+    commit("resetActivePlugin");
+    dispatch("parsePluginData", [plugin, fileName]);
   },
 
   replaceDialogueEntry({ state, commit }, [info_id, newEntry]) {
@@ -531,7 +523,117 @@ const actions = {
         ]);
       }
     }
-  }
+  },
+
+  async initIndexedDB({state, dispatch}) {
+    state.activePluginDB = await initPlugin('activePlugin')
+    if (state.activePluginDB) {
+      await dispatch('fetchActiveHeader')
+    }
+    let dependencies = state.activeHeader.masters.map(val => val[0])
+    for (let dep of dependencies) {
+      state.dependenciesDB[dep] = await initPlugin(dep)
+    }
+    dispatch('fetchPluginsData')
+  },
+
+  async fetchAllDialogueNPCs({}, []) {
+    state.allDialogueNPCs = await fetchAllDialogueNPCs()
+  },
+
+  async fetchAllQuestIDs({}, []) {
+    state.allQuestIDs = await fetchAllQuestIDs()
+  },
+
+  
+
+  async fetchPluginsData({state, dispatch}) {
+    //dispatch('fetchQuestsData')
+    await Promise.all([
+      dispatch('fetchAllDialogueNPCs', []),
+      dispatch('fetchAllQuestIDs', [])
+    ])
+  },
+
+  async parsePluginData({state, dispatch}, [plugin, fileName]) {
+    state.activePluginDB = await importPlugin(plugin, fileName, true)
+    if (state.activePluginDB) {
+      await dispatch('fetchActiveHeader')
+      dispatch('fetchPluginsData')
+    }
+  },
+
+  async parseDependency({state}, [plugin, fileName]) {
+    let dependency = await importPlugin(plugin, fileName, false)
+    state.dependenciesDB.fileName = dependency
+  },
+
+  async fetchActiveHeader({state}) {
+    let activePlugin = state.activePluginDB
+    let headers = await activePlugin.pluginData.where("type").equalsIgnoreCase("Header").toArray()
+    if (headers.length) {
+      state.activeHeader = headers[0]
+    }
+  },
+
+  async fetchTopicsData({state}) {
+    let activePlugin = state.activePluginDB
+    let topicsList = await activePlugin.pluginData.where("type").equalsIgnoreCase("Info").toArray()
+    for (let dep of Object.keys(state.dependenciesDB)) {
+      let depTopicsList = await state.dependenciesDB[dep].pluginData.where("type").equalsIgnoreCase("Info").toArray()
+      topicsList = [...topicsList, ...depTopicsList]
+    }
+    state.topicsList = topicsList
+  },
+
+
+
+  async fetchQuestsData({state}) {
+    let activePlugin = state.activePluginDB
+    let questEntries = await activePlugin.pluginData.where("TMP_type").equalsIgnoreCase("Journal").toArray()
+    for (let dep of Object.keys(state.dependenciesDB)) {
+      let depQuestEntries = await state.dependenciesDB[dep].pluginData.where("TMP_type").equalsIgnoreCase("Journal").toArray()
+      questEntries = [...questEntries, ...depQuestEntries]
+    }
+
+    let quests = [];
+    let initialQuestData = {
+      id: "",
+      name: "",
+      nameId: "",
+      nameNextId: "",
+      entries: []
+    };
+    let questData = {
+      id: "",
+      name: "",
+      nameId: "",
+      nameNextId: "",
+      entries: []
+    };
+
+    for (let entry of questEntries) {
+      if (!entry) continue
+      if (entry.type === "Dialogue") {
+        if (entry.id !== questData.id && questData.id !== "") {
+          quests.push(questData);
+          questData = JSON.parse(JSON.stringify(initialQuestData));
+        }
+        questData.id = entry.id;
+      } else if (entry.TMP_type === "Journal") {
+        if (entry.quest_name === 1) {
+          questData.name = entry.text;
+          questData.nameId = entry.info_id;
+          questData.nameNextId = entry.next_id;
+        } else {
+          questData.entries.push(entry);
+        }
+      }
+    }
+    if (questData.id) quests.push(questData);
+    state.questEntries = quests
+
+  },
 };
 
 const mutations = {
@@ -985,96 +1087,6 @@ const mutations = {
 
   addEntryToActive(state, entry) {
     state.activePlugin = [...state.activePlugin, entry];
-  },
-
-  parsePluginData(state, plugin) {
-    let dialogueType;
-    let dialogueId;
-    for (let entry in plugin) {
-      if (["Info", "Dialogue"].includes(plugin[entry].type)) {
-        if (plugin[entry].type === "Dialogue") {
-          dialogueType = plugin[entry].dialogue_type;
-        }
-        if (plugin[entry].id)
-          dialogueId = plugin[entry].id;
-        let dialogueEntry = {
-          ...plugin[entry],
-          TMP_topic: dialogueId,
-          TMP_type: dialogueType
-        };
-        state.activePlugin[entry] = dialogueEntry;
-      }
-      else if (["Cell"].includes(plugin[entry].type)) {
-        state.cellList = [...state.cellList, plugin[entry].id];
-      }
-      else if (["Race"].includes(plugin[entry].type)) {
-        state.raceList = [...state.raceList, plugin[entry].id];
-      }
-      else if (["Class"].includes(plugin[entry].type)) {
-        state.classList = [...state.classList, plugin[entry].id];
-      }
-      else if (["Faction"].includes(plugin[entry].type)) {
-        state.factionList = [
-          ...state.factionList,
-          plugin[entry].id
-        ];
-      }
-      else if (["Header"].includes(plugin[entry].type)) {
-        state.activeHeader = plugin[entry];
-      }
-      else if (["Npc"].includes(plugin[entry].type)) {
-        let npc = {
-          id: plugin[entry].id, 
-          name: plugin[entry].name,
-          race: plugin[entry].race,
-          class: plugin[entry].class,
-        }
-        state.npcList.push(Object.freeze(npc))
-      }
-    }
-    state.cellList = [...new Set(state.cellList)];
-    state.raceList = [...new Set(state.raceList)];
-    state.classList = [...new Set(state.classList)];
-    state.factionList = [...new Set(state.factionList)];
-  },
-
-  setDependencies(state, [plugin, fileName]) {
-    let dialogueType;
-    let dialogueId;
-    let pluginData = [];
-    for (let entry of plugin) {
-      entry = { ...entry, TMP_dep: fileName };
-      if (["Info", "Dialogue"].includes(entry.type)) {
-        if (entry.type === "Dialogue") {
-          dialogueType = entry.dialogue_type;
-        }
-        if (entry.id) dialogueId = entry.id;
-        let dialogueEntry = {
-          ...entry,
-          TMP_topic: dialogueId,
-          TMP_type: dialogueType
-        };
-        pluginData.push(Object.freeze(dialogueEntry));
-      } else if (["Cell"].includes(entry.type)) {
-        state.cellList = [...state.cellList, entry.id];
-      } else if (["Race"].includes(entry.type)) {
-        state.raceList = [...state.raceList, entry.id];
-      } else if (["Class"].includes(entry.type)) {
-        state.classList = [...state.classList, entry.id];
-      } else if (
-        ["Faction", "Book", "Npc", "Header", "Creature"].includes(entry.type)
-      ) {
-        pluginData.push(Object.freeze(entry));
-        if (entry.type === "Faction") {
-          state.factionList = [...state.factionList, entry.id];
-        }
-      }
-    }
-    state.cellList = [...new Set(state.cellList)];
-    state.raceList = [...new Set(state.raceList)];
-    state.classList = [...new Set(state.classList)];
-    state.factionList = [...new Set(state.factionList)];
-    state.dependencies.push({ name: fileName, data: pluginData });
   },
 
   addToActiveArray(state, [destination, entry]) {

@@ -6,6 +6,7 @@
     "axios": "^0.19.0",
     "codemirror": "^6.0.1",
     "date-fns": "^1.30.1",
+    "dexie": "^3.2.5",
     "highlight.js": "^11.7.0",
     "legacy-encoding": "^3.0.0",
     "marked": "^0.7.0",

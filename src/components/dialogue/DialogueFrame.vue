@@ -129,7 +129,7 @@ export default {
   },
   computed: {
     getNPCs() {
-      return this.$store.getters["getDialogueSpeaker"](this.speakerTypes);
+      return this.$store.getters["getAllNpcs"];
     },
     getSpeakerIdLength() {
       return (

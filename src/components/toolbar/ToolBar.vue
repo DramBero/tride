@@ -3,7 +3,7 @@
   <div class="toolbar">
     <div class="file-controls">
       <ToolBarOpen />
-      <ToolBarSave v-if="getTitle"/>
+      <!-- <ToolBarSave v-if="getTitle"/> -->
     </div>
     <div class="header-controls" v-if="getTitle">
       <div class="header-controls__title">
@@ -27,7 +27,7 @@ export default {
   components: { ToolBarOpen, ToolBarSave },
   computed: {
     getTitle() {
-      return this.$store.getters['getActivePluginTitle']
+      return this.$store.getters['getActiveHeader'].TMP_dep
     }
   }
 };

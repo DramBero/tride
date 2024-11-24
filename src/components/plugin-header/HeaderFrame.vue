@@ -133,16 +133,13 @@ export default {
       this.description = newHeader.description;
       this.dependencies = JSON.parse(JSON.stringify(newHeader.masters));
     },
-    getActivePluginTitle(newValue) {
-      this.name = newValue;
-    }
   },
   computed: {
     getActiveHeader() {
       return this.$store.getters["getActiveHeader"];
     },
     getActivePluginTitle() {
-      return JSON.parse(JSON.stringify(this.$store.getters["getActivePluginTitle"]));
+      return this.getActiveHeader.TMP_dep
     }
   },
   components: { Icon, draggable },

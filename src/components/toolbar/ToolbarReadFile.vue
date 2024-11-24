@@ -4,8 +4,8 @@
       <input ref="file" type="file" accept=".json" @change="loadTextFromFile" />
       {{ !dep ? "Load active plugin" : "Load dependency" }}
     </label>
-    {{ fileName }}
-    {{ fileSize }}
+    {{ !dep ? getActivePluginName : fileName }}
+    {{ fileSize || '' }}
   </div>
 </template>
 
@@ -23,6 +23,11 @@ export default {
       fileName: "",
       fileSize: null
     };
+  },
+  computed: {
+    getActivePluginName() {
+      return this.$store.getters['getActiveHeader'].TMP_dep
+    }
   },
   methods: {
     formatBytes(bytes, decimals = 2) {
@@ -67,7 +72,7 @@ export default {
 
         if (!this.dep) {
           this.$store.dispatch("parseLocalPlugin", [
-            JSON.parse(plugin)
+            JSON.parse(plugin), this.fileName
           ]);
         } else {
           this.$store.dispatch("parseDependency", [
@@ -91,6 +96,7 @@ input[type="file"] {
     gap: 15px;
     align-items: center;
     flex-direction: row-reverse;
+    justify-content: space-between;
   }
   cursor: pointer;
   background: rgba(0, 0, 0, 0.65);

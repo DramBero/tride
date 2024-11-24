@@ -31,10 +31,10 @@ import "vue-awesome/icons";
 export default {
   computed: {
     getJournal() {
-      return this.$store.getters["getParsedQuests"];
+      return this.$store.getters["getAllQuestIDs"];
     },
     getQuestNamesList() {
-      let questNames = this.getJournal.map(val => `["${val.id}"]: "${val.name}",`)
+      let questNames = this.getJournal.map(val => `["${val.id.toLowerCase()}"]: "${val.name || 'skip'}",`)
       return questNames
     },
     getHighlighted() {
